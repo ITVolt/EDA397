@@ -41,3 +41,6 @@ captures/
 
 #Finder
 .DS_STORE
+
+#Android Studio config
+.idea/
