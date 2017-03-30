@@ -1,44 +1,21 @@
-language : andriod
+language: andriod
 jdk: oraclejdk7
 sudo: false
-
-
 android:
   components:
-    # Uncomment the lines below if you want to
-    # use the latest revision of Android SDK Tools
-    - platform-tools
-    - tools
-
-    # The BuildTools version used by your project
-    - build-tools-22.0.1
-
-    # The SDK version used to compile your project
-    - android-22
-
-    # Additional components
-    #- extra-google-google_play_services
-    #- extra-google-m2repository
-    - extra-android-m2repository
-    #- addon-google_apis-google-19
-
-    # Specify at least one system image,
-    # if you need to run emulator(s) during your tests
-    - sys-img-armeabi-v7a-android-22
-    #- sys-img-armeabi-v7a-android-17
-
+  - platform-tools
+  - tools
+  - build-tools-22.0.1
+  - android-22
+  - extra-android-m2repository
+  - sys-img-armeabi-v7a-android-22
 before_script:
-  #Create and start emulator
-  - echo no | android create avd -- force -n test -t android-22 --abi armeabi-v7a
-  - emulator -avd test -no-skin -no-audio -no-window &
-  - android-wait-for-emulator
-  - adb shell input keyevent 82 &
-
+- echo no | android create avd -- force -n test -t android-22 --abi armeabi-v7a
+- emulator -avd test -no-skin -no-audio -no-window &
+- android-wait-for-emulator
+- adb shell input keyevent 82 &
 script: runtests.sh
-
 notification:
   email: false
   slack:
-    secure: TATKRZg66C9SGu+kVvK6C6OY1aVPFr39Meij1REuVtUUkfVPCSrSPElDM5IRvQevfmcd0QAsdLFbtcEc7AbjCKByLm8SyrwBQlJ+aWT8sPvN1ZJOw2HbgfLo3g/l/Mkg3I/hBrmA29dfBp80c3QJGzgeHC5icziM6qB6KFGv416G6AVO8l6CSBwKtXCNC/iCHv4mDZRHNq6ppcWR2xU1laxWO6BHckSbYLjQygG6waJmm1Oi8f+obOk1S26ZLKFRhkyBIEI7bsY2auSYay1LQ4mnb7oxx/SgKz1bDvgBrm1HQI01CCFfdV03kL+g0H0lVQbPobBngWmcmnWPiA6mxxfEGAjOBb9g50JpeWP+JOCPqiajFj70pQffQCRY50pGfI8+kGkg0lbosNI4OLn0ZFOtYdqUraStSvnXXMa5WymuFkZ0JfLlYGJMijH1s6XQztqk0YjaBPI/nZFBp86qrhErQZW4gtu7n6jdzGL/+volv90It2Kxo+kcRpogXhmM6y4nbcX/yplfitBJa3DpXUeORIdgDVoR00TpSF/IcuFIfLJaOxOMMWpBaKQESyDBnhRPIGj1y3r8qR8M7FzjzUnmNH4MQymSL8AQuoOa8fF99rD357rchlpLFYrbIMctluLJPan73ZRHa2lUEEPW+rIAwIOY/aZal7KlZbvH37E=
-
-
+    secure: DOTAxcKRPtQ635XSUO/r9FR6Dh6T5x0//ngOEz5xdSWiv5OPi62G4Sqeh6A4AXQNI+yLmE7ulSpjhCkQIF+LBrx+/AacEjvIbnblgexiD3/P/ioD0gN7WT0q0U5log9AMPtDSrNGNTCaL2LjADjd5IL7V2rcwpDf7laofd0lAUqP9NNWVZsgtFC1q3SZ/e5plbWuI0x6OL0UkGD5/G3+zlWwV5l273p8rOr7xrlQ78VGAq8zf5V0dCb6vtdl9uvumzxomAFfu4BeLxotKux14subUNj4KUypw4owVn2gtVS4RPGkwci/VbbgB1nXZxk9yzKEEQCEJLjC4be8z0hmsnc2RxS6ciEikQIiS763DD/4SdvtKhJrU0/Ha5HY/8l14DKQrdDM1Ti3A7bN8RQKj2VxlWzrcdP2un+40Ln0E4h9wjHZCnIkghab8e2F4b8LgbCiZ6mDYgkuCFciTT1dZY6hrXl/faJ1tptTER2ouYxer7VtAfoEymCZbcvIbudnc8sOLfMmlltbD9v8VcYwdDD6yw7dpsu7A9u/HCs5xFtuFZv+ndeskOf09XYWYLZTGXahU2GgwbuQllczLJmlZCq7ly7uh+mrhjVH1Sx+8u2ruw+K4OEP4kyz6xoqqcJZfLeYpi7y1KWPTKlyFoFr6m7/N+nK+UaL94jc4xAoHro=#travis
