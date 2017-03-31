@@ -3,21 +3,23 @@ jdk: oraclejdk8
 sudo: required
 android:
   components:
-  - tools
-  - tools
-  - platform-tools
-  - build-tools-25.0.2
-  - android-25
-  - extra-android-m2repository
-  - sys-img-armeabi-v7a-android-22
-  - extra
+    - tools
+    - platform-tools
+    - tools
+    - build-tools-25.0.2
+    - android-25
+    - extra-android-m2repository
+    - sys-img-armeabi-v7a-android-22
+    - extra
+
 #before_script:
 #- echo no | android create avd -- force -n test -t android-22 --abi armeabi-v7a
 #- emulator -avd test -no-skin -no-audio -no-window &
 #- android-wait-for-emulator
 #- adb shell input keyevent 82 &
 script: ./runtests.sh
-notification:
+
+notifications:
   email: false
   slack:
     secure: T1vI7qiIXAo21fZNvre+ntGflxX1l2vTPX0+oRDrujpDOV63RYaGbEZ1lomgFtutbP9wcwF15En92fwPss87kMKTmqp8dlISqZ2rLeAlrPzTfqHp41nj8oPY+AhJx4elQTQ7gLwbpVuq8067OvGdi1rxFFnGdEQlYyLGNrfl3PG+UXtnhjaKNpRy2o6NM7iXN98vcdxgNtkG9rYe/MrfiH34eACyBFrgW3wf6RR3cZJbevBuDi4siZ/Zysi6gihzoAqPURCs+K1vSf0y1ccKWmpdcjg8jvqe9NNuDAYKKVvddsg+RebXa1dq+9/xijBFwQSJPq6+ryL+9OBxreoAnMCbOtKjTMGsHNxcEAv81sk8pdIk09m17I9WA9vHC2NW3n0IP46H9gUGeplLzHZV7ZfmxmoL8al63QEnRIq8MADSCnAR2xhnoRSkjL1FC3V1zVCwbqv3lN3uGLZ/DdYt14lwhp0Xc/duQ+E9tVoxbQ/oJEv4a70OP763fkYlhOl7ZcM+swph4c+1kcVVXrgxyO8eNqjdeE2eyRjPf6OwfykVSmjymHT23+1x88Ug5wZNY51ml/gi3N+h2/ut9CQXjo/6VjvJkCka8jVZh2+VnIhBYR+WQ5BplrD7ewnupeHmrDuCNwOhMT5J6d3/Np8oS+MNlrmz4L1/0JDT8m9vWaM=
