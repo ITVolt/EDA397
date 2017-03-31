@@ -1,4 +1,4 @@
-language: andriod
+language: android
 jdk: oraclejdk8
 sudo: required
 android:
@@ -10,6 +10,7 @@ android:
   - android-25
   - extra-android-m2repository
   - sys-img-armeabi-v7a-android-22
+  - extra
 #before_script:
 #- echo no | android create avd -- force -n test -t android-22 --abi armeabi-v7a
 #- emulator -avd test -no-skin -no-audio -no-window &
