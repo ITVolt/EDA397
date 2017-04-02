@@ -3,6 +3,9 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="timer_button_start">Start</string>
+    <string name="timer_button_pause">Pause</string>
+    <string name="timer_button_reset">Reset</string>
 
     <string name="action_settings">Settings</string>
 </resources>
