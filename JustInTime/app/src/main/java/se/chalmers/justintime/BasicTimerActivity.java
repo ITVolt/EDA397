@@ -1,9 +1,10 @@
 package se.chalmers.justintime;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
@@ -37,14 +38,13 @@ public class BasicTimerActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_basic_timer);
 
+
+
         timerText = (TextView) findViewById(R.id.basicTimerTV);
         chronometer = (Chronometer) findViewById(R.id.chronometerBasicTimer);
 
         startPauseTimerButton = (Button) findViewById(R.id.timerStartPauseButton);
         resetTimerButton = (Button) findViewById(R.id.timerResetButton);
-
-        startValue = 90000;
-        currentTimerValue = startValue;
 
         // FIXME Remove when the real chronometer is implemented.
         chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
@@ -57,9 +57,9 @@ public class BasicTimerActivity extends AppCompatActivity
             }
         });
         setButtonOnClickListeners();
-        setRunningState(false);
-        resetTimerButton.setEnabled(false);
-        updateTimerText();
+
+        startValue = 90000;
+        reset();
 
         // Navigation drawer.
         /*
@@ -104,7 +104,7 @@ public class BasicTimerActivity extends AppCompatActivity
     @Override
     public void reset() {
         setRunningState(false);
-        resetTimerButton.setEnabled(false);
+        disableResetButton();
         currentTimerValue = startValue; // FIXME Remove when the real chronometer is implemented.
         updateTimerText();
     }
@@ -129,14 +129,14 @@ public class BasicTimerActivity extends AppCompatActivity
     }
 
     private void setRunningState(boolean run) {
-        if (run && !isTimerRunning) {
+        if (run) {
             startPauseTimerButton.setText(R.string.timer_button_pause);
-            resetTimerButton.setEnabled(false);
+            disableResetButton();
             isTimerRunning = true;
             chronometer.start();  //FIXME Remove when the real chronometer is implemented.
-        } else if (!run && isTimerRunning) {
+        } else {
             startPauseTimerButton.setText(R.string.timer_button_start);
-            resetTimerButton.setEnabled(true);
+            enableResetButton();
             isTimerRunning = false;
             chronometer.stop();  //FIXME Remove when the real chronometer is implemented.
         }
@@ -159,6 +159,20 @@ public class BasicTimerActivity extends AppCompatActivity
                 reset();
             }
         });
+    }
+
+    private void enableResetButton() {
+        resetTimerButton.setEnabled(true);
+        Animator animator = AnimatorInflater.loadAnimator(this, R.animator.fade_in);
+        animator.setTarget(resetTimerButton);
+        animator.start();
+    }
+
+    private void disableResetButton() {
+        resetTimerButton.setEnabled(false);
+        Animator animator = AnimatorInflater.loadAnimator(this, R.animator.fade_out);
+        animator.setTarget(resetTimerButton);
+        animator.start();
     }
 
     //TODO Might be good to refactor into a util class if needed elsewhere as well.
