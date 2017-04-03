@@ -9,6 +9,7 @@ public class Timer {
 
     private long startTime = 0;
     private long stopTime = 0;
+    private long currentTime = 0;
     private boolean running = false;
 
 
@@ -26,6 +27,16 @@ public class Timer {
     public void reset() {
         this.startTime = 0;
         this.stopTime = 0;
+    }
+
+    public void pause() {
+        this.running = false;
+        currentTime = System.currentTimeMillis() - startTime;
+    }
+
+    public void resume() {
+        this.running = true;
+        this.startTime = System.currentTimeMillis() - currentTime;
     }
 
     // elaspsed time in milliseconds

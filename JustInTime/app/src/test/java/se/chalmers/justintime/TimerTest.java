@@ -1,4 +1,4 @@
-package se.chalmers.justintime.alert;
+package se.chalmers.justintime;
 
 import org.junit.Test;
 
@@ -21,6 +21,21 @@ public class TimerTest {
         t.stop();
         assertEquals(0, t.getElapsedTime());
 
+    }
+
+    @Test
+    public void pauseCheck() {
+
+        Timer t = new Timer();
+        t.start();
+        t.pause();
+        for(int i = 1000; i>0; i--){
+            System.out.println(i);
+        }
+        t.resume();
+        t.stop();
+
+        assertEquals(0,t.getElapsedTime());
     }
 
 
