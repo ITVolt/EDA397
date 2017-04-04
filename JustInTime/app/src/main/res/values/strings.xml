@@ -3,6 +3,8 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="course_name">EDA397</string>
+    <string name="group_name">Group 5</string>
     <string name="timer_button_start">Start</string>
     <string name="timer_button_pause">Pause</string>
     <string name="timer_button_reset">Reset</string>
