@@ -1,62 +1,91 @@
 package se.chalmers.justintime;
 
+import android.os.CountDownTimer;
+
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
+
 /**
  * Created by JonasPC on 2017-04-02.
  */
 
-public class Timer {
+    public abstract class Timer {
+        long millisInFuture = 0;
+        long countDownInterval = 0;
+        long millisRemaining =  0;
 
+        CountDownTimer countDownTimer = null;
 
-    private long startTime = 0;
-    private long stopTime = 0;
-    private long currentTime = 0;
-    private boolean running = false;
+        boolean isPaused = true;
 
-
-    public void start() {
-        this.startTime = System.currentTimeMillis();
-        this.running = true;
-    }
-
-
-    public void stop() {
-        this.stopTime = System.currentTimeMillis();
-        this.running = false;
-    }
-
-    public void reset() {
-        this.startTime = 0;
-        this.stopTime = 0;
-    }
-
-    public void pause() {
-        this.running = false;
-        currentTime = System.currentTimeMillis() - startTime;
-    }
-
-    public void resume() {
-        this.running = true;
-        this.startTime = System.currentTimeMillis() - currentTime;
-    }
-
-    // elaspsed time in milliseconds
-    public long getElapsedTime() {
-        if (running) {
-            return System.currentTimeMillis() - startTime;
+        public Timer(long millisInFuture, long countDownInterval) {
+            super();
+            this.millisInFuture = millisInFuture;
+            this.countDownInterval = countDownInterval;
+            this.millisRemaining = this.millisInFuture;
         }
-        return stopTime - startTime;
-    }
+        private void createCountDownTimer(){
+            countDownTimer = new CountDownTimer(millisRemaining,countDownInterval) {
 
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    millisRemaining = millisUntilFinished;
+                    Timer.this.onTick(millisUntilFinished);
 
-    // elaspsed time in seconds
-    public long getElapsedTimeSecs() {
-        if (running) {
-            return ((System.currentTimeMillis() - startTime) / 1000);
+                }
+
+                @Override
+                public void onFinish() {
+                    Timer.this.onFinish();
+
+                }
+            };
         }
-        return ((stopTime - startTime) / 1000);
+        /**
+         * Callback fired on regular interval.
+         *
+         * @param millisUntilFinished The amount of time until finished.
+         */
+        public abstract void onTick(long millisUntilFinished);
+        /**
+         * Callback fired when the time is up.
+         */
+        public abstract void onFinish();
+        /**
+         * Cancel the countdown.
+         */
+        public final void cancel(){
+            if(countDownTimer!=null){
+                countDownTimer.cancel();
+            }
+            this.millisRemaining = 0;
+        }
+        /**
+         * Start or Resume the countdown.
+         * @return CountDownTimerPausable current instance
+         */
+        public synchronized final Timer start(){
+            if(isPaused){
+                createCountDownTimer();
+                countDownTimer.start();
+                isPaused = false;
+            }
+            return this;
+        }
+        /**
+         * Pauses the CountDownTimerPausable, so it could be resumed(start)
+         * later from the same point where it was paused.
+         */
+        public void pause()throws IllegalStateException{
+            if(isPaused==false){
+                countDownTimer.cancel();
+            } else{
+                throw new IllegalStateException("CountDownTimerPausable is already in pause state, start counter before pausing it.");
+            }
+            isPaused = true;
+        }
+        public boolean isPaused() {
+            return isPaused;
+        }
     }
 
 
-
-
-}
