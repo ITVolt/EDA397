@@ -21,12 +21,16 @@ public class SoundAlarm extends AlarmDecorator {
     @Override
     public void alert() {
         super.alert();
-        mediaPlayer.start();
+        if (mediaPlayer != null) {
+            mediaPlayer.start();
+        }
     }
 
     @Override
     public void dismissAlarm() {
         super.dismissAlarm();
-        mediaPlayer.stop();
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+        }
     }
 }
