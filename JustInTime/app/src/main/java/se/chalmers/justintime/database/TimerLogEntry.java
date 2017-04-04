@@ -39,6 +39,7 @@ public class TimerLogEntry {
     }
 
     public TimerLogEntry(Cursor cursor) {
+        cursor.moveToFirst();
         this.id = cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID));
         this.groupId = cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_GROUPID));
         this.startTime = Instant.ofEpochMilli(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_START_TIME))).atZone(ZoneId.systemDefault()).toLocalDateTime();//FIXME Try to find a way around using time zones

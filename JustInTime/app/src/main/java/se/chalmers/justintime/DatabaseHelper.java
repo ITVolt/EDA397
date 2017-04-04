@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import org.threeten.bp.ZoneOffset;
 import org.threeten.bp.temporal.ChronoField;
 
 import se.chalmers.justintime.database.TimerLogEntry;
@@ -44,11 +45,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean insertTimer(TimerLogEntry timerLogEntry) {
+        long start = timerLogEntry.getStartTime().toEpochSecond(ZoneOffset.UTC);
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_NAME_ID, timerLogEntry.getId());
         contentValues.put(COLUMN_NAME_GROUPID, timerLogEntry.getGroupId());
-        contentValues.put(COLUMN_NAME_START_TIME, 1); //timerLogEntry.getStartTime().getLong(ChronoField.MILLI_OF_SECOND
+        contentValues.put(COLUMN_NAME_START_TIME, 1);// timerLogEntry.getStartTime().toEpochSecond(ZoneOffset.UTC)); FIXME This is not the correct time.
         contentValues.put(COLUMN_NAME_DURATION, timerLogEntry.getDuration());
         long id = db.insert(TABLE_NAME, null, contentValues);
         return id > -1  ;

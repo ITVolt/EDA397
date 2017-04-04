@@ -43,10 +43,10 @@ public class DatabaseHelperTest {
 
     @Test
     public void insertTimer() throws Exception {
-//        TimerLogEntry entry = new TimerLogEntry(1 ,1, LocalDateTime.now(), 1);
-//        databaseHelper.insertTimer(entry);
-//        TimerLogEntry timerLogEntry = databaseHelper.getEntryById(1);
-//        assertTrue(timerLogEntry.getGroupId() == 3);
+        TimerLogEntry entry = new TimerLogEntry(1337 ,42, LocalDateTime.now(), 1);
+        databaseHelper.insertTimer(entry);
+        TimerLogEntry timerLogEntry = databaseHelper.getEntryById(1337);
+        assertTrue(timerLogEntry.getGroupId() == 42);
     }
 
 
