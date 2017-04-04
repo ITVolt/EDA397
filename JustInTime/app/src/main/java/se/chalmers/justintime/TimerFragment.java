@@ -1,12 +1,15 @@
 package se.chalmers.justintime;
 
+
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.TextView;
@@ -14,13 +17,13 @@ import android.widget.TextView;
 import se.chalmers.justintime.alert.Alarm;
 import se.chalmers.justintime.alert.AlarmBuilder;
 
-/**
- * This activity shows a basic timer counting down from a time to zero.
- * Created by Patrik on 2017-04-01.
- */
 
-public class BasicTimerActivity extends AppCompatActivity
-        implements CounterActivity{
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link TimerFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class TimerFragment extends Fragment implements CounterActivity {
 
     private long startValue;
     private long currentTimerValue;
@@ -38,21 +41,46 @@ public class BasicTimerActivity extends AppCompatActivity
     private Alarm alarm;
     private StringBuilder strBuilder = new StringBuilder(8);
 
+    private View view;
+
+
+    public TimerFragment() {
+        // Required empty public constructor
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @return A new instance of fragment TimerFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static TimerFragment newInstance() {
+        TimerFragment fragment = new TimerFragment();
+        Bundle args = new Bundle();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_basic_timer);
+    }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        view = inflater.inflate(R.layout.fragment_timer, container, false);
 
+        timerText = (TextView) view.findViewById(R.id.basicTimerTV);
+        chronometer = (Chronometer) view.findViewById(R.id.chronometerBasicTimer);
 
-        timerText = (TextView) findViewById(R.id.basicTimerTV);
-        chronometer = (Chronometer) findViewById(R.id.chronometerBasicTimer);
-
-        startPauseTimerButton = (Button) findViewById(R.id.timerStartPauseButton);
-        resetTimerButton = (Button) findViewById(R.id.timerResetButton);
+        startPauseTimerButton = (Button) view.findViewById(R.id.timerStartPauseButton);
+        resetTimerButton = (Button) view.findViewById(R.id.timerResetButton);
 
         // Set up the alarm.
-        AlarmBuilder ab = new AlarmBuilder(this);
+        AlarmBuilder ab = new AlarmBuilder(view.getContext());
         ab.setUseSound(true);
         ab.setUseVibration(true);
         alarm = ab.getAlarmInstance();
@@ -74,7 +102,9 @@ public class BasicTimerActivity extends AppCompatActivity
 
         startValue = 90000;
         reset();
+        return view;
     }
+
 
     public void setTimerStartValue (long startValue) {
         this.startValue = startValue;
@@ -153,14 +183,14 @@ public class BasicTimerActivity extends AppCompatActivity
 
     private void enableResetButton() {
         resetTimerButton.setEnabled(true);
-        Animator animator = AnimatorInflater.loadAnimator(this, R.animator.fade_in);
+        Animator animator = AnimatorInflater.loadAnimator(view.getContext(), R.animator.fade_in);
         animator.setTarget(resetTimerButton);
         animator.start();
     }
 
     private void disableResetButton() {
         resetTimerButton.setEnabled(false);
-        Animator animator = AnimatorInflater.loadAnimator(this, R.animator.fade_out);
+        Animator animator = AnimatorInflater.loadAnimator(view.getContext(), R.animator.fade_out);
         animator.setTarget(resetTimerButton);
         animator.start();
     }
