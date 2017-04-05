@@ -129,7 +129,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
     public void pause() {
         setRunningState(false);
         duration = startValue - currentTimerValue - duration;
-        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), currentPauseId, LocalDateTime.now().minusSeconds(duration/1000), duration);//FIXME This date format is wrong.
+        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), currentPauseId, LocalDateTime.ofEpochSecond(startValue,0, ZoneOffset.UTC), duration);
         databaseHelper.insertTimer(entry);
     }
 
@@ -160,6 +160,10 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private void onTimerFinish() {
         Log.d("BasicTimerActivity", "onTimerFinish: Time's up!");
         alarm.alert();
+        setRunningState(false);
+        duration = startValue - currentTimerValue - duration;
+        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), currentPauseId, LocalDateTime.ofEpochSecond(startValue,0, ZoneOffset.UTC), duration);
+        databaseHelper.insertTimer(entry);
     }
 
     private void setRunningState(boolean run) {

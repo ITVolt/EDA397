@@ -11,7 +11,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import org.threeten.bp.ZoneOffset;
-import org.threeten.bp.temporal.ChronoField;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -88,7 +87,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_NAME_ID, timerLogEntry.getId());
         contentValues.put(COLUMN_NAME_GROUPID, timerLogEntry.getGroupId());
-        contentValues.put(COLUMN_NAME_START_TIME, 1);// timerLogEntry.getStartTime().toEpochSecond(ZoneOffset.UTC)); FIXME This is not the correct time.
+        contentValues.put(COLUMN_NAME_START_TIME, timerLogEntry.getStartTime().toEpochSecond(ZoneOffset.UTC));
         contentValues.put(COLUMN_NAME_DURATION, timerLogEntry.getDuration());
         nextAvailableId = getNextAvailableId() + 1;
         db.insert(TABLE_NAME, null, contentValues);

@@ -1,11 +1,11 @@
 package se.chalmers.justintime;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
+
+import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +14,8 @@ import org.threeten.bp.LocalDateTime;
 
 import se.chalmers.justintime.database.TimerLogEntry;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by David on 2017-04-04.
@@ -28,6 +29,7 @@ public class DatabaseHelperTest {
     public void setUp() throws Exception {
         Context appContext = InstrumentationRegistry.getTargetContext();
         databaseHelper = new DatabaseHelper(appContext);
+        AndroidThreeTen.init(appContext);
     }
 
     public void tearDown() throws Exception{

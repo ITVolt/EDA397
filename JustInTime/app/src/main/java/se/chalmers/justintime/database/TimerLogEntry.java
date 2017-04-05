@@ -2,9 +2,8 @@ package se.chalmers.justintime.database;
 
 import android.database.Cursor;
 
-import org.threeten.bp.Instant;
 import org.threeten.bp.LocalDateTime;
-import org.threeten.bp.ZoneId;
+import org.threeten.bp.ZoneOffset;
 
 /**
  * Created by David on 2017-04-04.
@@ -43,7 +42,7 @@ public class TimerLogEntry {
         cursor.moveToFirst();
         this.id = cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID));
         this.groupId = cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_GROUPID));
-        this.startTime = Instant.ofEpochMilli(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_START_TIME))).atZone(ZoneId.systemDefault()).toLocalDateTime();//FIXME Try to find a way around using time zones
+        this.startTime = LocalDateTime.ofEpochSecond(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_START_TIME)),0, ZoneOffset.UTC);
         this.duration = cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_DURATION));
     }
 

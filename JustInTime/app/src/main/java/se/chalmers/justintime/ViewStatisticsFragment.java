@@ -13,6 +13,10 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.ZoneOffset;
+import org.threeten.bp.format.DateTimeFormatter;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -169,9 +173,8 @@ public class ViewStatisticsFragment extends Fragment {
             textView_0.setGravity(Gravity.CENTER);
             tableRow.addView(textView_0);
 
-            start.setTimeInMillis(cursor.getLong(cursor.getColumnIndex("start_time")));
-            String startText = formatter.format(start.getTime()) + "   ";
-            textView_1.setText(startText);
+            LocalDateTime start = LocalDateTime.ofEpochSecond(cursor.getLong(cursor.getColumnIndex("start_time")), 0, ZoneOffset.UTC);
+            textView_1.setText(start.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             textView_1.setGravity(Gravity.CENTER);
             tableRow.addView(textView_1);
 
