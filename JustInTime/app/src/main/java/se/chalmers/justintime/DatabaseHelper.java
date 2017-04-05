@@ -25,10 +25,7 @@ import static se.chalmers.justintime.database.TimerLogEntry.COLUMN_NAME_ID;
 import static se.chalmers.justintime.database.TimerLogEntry.COLUMN_NAME_START_TIME;
 import static se.chalmers.justintime.database.TimerLogEntry.SQL_DELETE_ENTRIES;
 import static se.chalmers.justintime.database.TimerLogEntry.TABLE_NAME;
-import static se.chalmers.justintime.database.TimerLogEntry.COLUMNS_SUMMARY;
 import static se.chalmers.justintime.database.TimerLogEntry.COLUMNS;
-import static se.chalmers.justintime.database.TimerLogEntry.COLUMNS_DURATIONS;
-
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -123,19 +120,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.query(TABLE_NAME, COLUMNS, null, null, null, null, null);
     }
 
-    public Cursor getSummary(){
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.query(TABLE_NAME, COLUMNS_SUMMARY, null, null, COLUMN_NAME_GROUPID, null, null);
-    }
     public String getTotalDuration(){
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_NAME, COLUMNS_DURATIONS, null, null, null, null, null);
+        Cursor cursor = getData();//db.rawQuery("select * from " + TABLE_NAME, null);
+        cursor.moveToFirst();
         int duration = 0;
-        for(cursor.moveToFirst();cursor.isLast();cursor.moveToNext())
-        {
+        while(!cursor.isAfterLast()) {
             duration += cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_DURATION));
+            cursor.moveToNext();
         }
-
         String durationInHour;
         long hour = TimeUnit.MILLISECONDS.toHours(duration);
         long minute = TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(duration));

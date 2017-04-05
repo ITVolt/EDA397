@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_timerC) {
             Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_statistics) {
+            jumpToFragment(ViewStatisticsFragment.newInstance());
             Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_settings) {
             Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
