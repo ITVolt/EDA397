@@ -30,6 +30,9 @@ public class TimerLogEntry {
             COLUMN_NAME_START_TIME + " DATETIME, " +
             COLUMN_NAME_DURATION + " INTEGER );";
 
+    public static final String[] COLUMNS = {COLUMN_NAME_START_TIME, COLUMN_NAME_DURATION, COLUMN_NAME_GROUPID};
+    public static final String[] COLUMNS_SUMMARY = {COLUMN_NAME_START_TIME, "count(group_id)"};
+    public static final String[] COLUMNS_DURATIONS = {COLUMN_NAME_START_TIME, "sum(duration)"};
 
     public TimerLogEntry(int id, int groupId, LocalDateTime startTime, long duration) {
         this.id = id;

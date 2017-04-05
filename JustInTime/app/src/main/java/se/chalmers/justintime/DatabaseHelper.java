@@ -13,6 +13,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import org.threeten.bp.ZoneOffset;
 import org.threeten.bp.temporal.ChronoField;
 
+import java.util.concurrent.TimeUnit;
+
 import se.chalmers.justintime.database.TimerLogEntry;
 
 import static se.chalmers.justintime.database.TimerLogEntry.COLUMN_NAME_DURATION;
@@ -21,12 +23,17 @@ import static se.chalmers.justintime.database.TimerLogEntry.COLUMN_NAME_ID;
 import static se.chalmers.justintime.database.TimerLogEntry.COLUMN_NAME_START_TIME;
 import static se.chalmers.justintime.database.TimerLogEntry.SQL_DELETE_ENTRIES;
 import static se.chalmers.justintime.database.TimerLogEntry.TABLE_NAME;
+import static se.chalmers.justintime.database.TimerLogEntry.COLUMNS_SUMMARY;
+import static se.chalmers.justintime.database.TimerLogEntry.COLUMNS;
+import static se.chalmers.justintime.database.TimerLogEntry.COLUMNS_DURATIONS;
 
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 4;
     private static final String DATABASE_NAME = "Database.db";
+
+
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -74,6 +81,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_NAME_DURATION, String.valueOf(timerLogEntry.getDuration()));
 
         db.update(TABLE_NAME, contentValues, COLUMN_NAME_ID + " = ? ", new String[]{String.valueOf(timerLogEntry.getId())});
+    }
+
+    public Cursor getData() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.query(TABLE_NAME, COLUMNS, null, null, null, null, null);
+    }
+
+    public Cursor getSummary(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.query(TABLE_NAME, COLUMNS_SUMMARY, null, null, COLUMN_NAME_GROUPID, null, null);
+    }
+    public String getTotalDuration(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_NAME, COLUMNS_DURATIONS, null, null, null, null, null);
+        int duration = 0;
+        for(cursor.moveToFirst();cursor.isLast();cursor.moveToNext())
+        {
+            duration += cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_DURATION));
+        }
+
+        String durationInHour;
+        long hour = TimeUnit.MILLISECONDS.toHours(duration);
+        long minute = TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(duration));
+        long second = TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration));
+        durationInHour = String.format("%02d:%02d:%02d",hour, minute, second).concat("  Hours");
+        cursor.close();
+        return durationInHour;
     }
 
 }
