@@ -14,8 +14,12 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.TextView;
 
+import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.ZoneOffset;
+
 import se.chalmers.justintime.alert.Alarm;
 import se.chalmers.justintime.alert.AlarmBuilder;
+import se.chalmers.justintime.database.TimerLogEntry;
 
 
 /**
@@ -27,6 +31,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
     private long startValue;
     private long currentTimerValue;
+    private long duration;
 
     private boolean isTimerRunning;
 
@@ -40,6 +45,9 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
     private Alarm alarm;
     private StringBuilder strBuilder = new StringBuilder(8);
+
+    private DatabaseHelper databaseHelper;
+    private int currentPauseId;
 
     private View view;
 
@@ -99,6 +107,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
             }
         });
         setButtonOnClickListeners();
+        databaseHelper = new DatabaseHelper(this.getContext());
 
         startValue = 90000;
         reset();
@@ -119,6 +128,9 @@ public class TimerFragment extends Fragment implements CounterActivity {
     @Override
     public void pause() {
         setRunningState(false);
+        duration = startValue - currentTimerValue - duration;
+        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), currentPauseId, LocalDateTime.now().minusSeconds(duration/1000), duration);//FIXME This date format is wrong.
+        databaseHelper.insertTimer(entry);
     }
 
     @Override
@@ -127,6 +139,8 @@ public class TimerFragment extends Fragment implements CounterActivity {
         disableResetButton();
         currentTimerValue = startValue; // FIXME Remove when the real chronometer is implemented.
         updateTimerText();
+        duration = 0;
+        currentPauseId = databaseHelper.getNextAvailablePauseId();
     }
 
     @Override

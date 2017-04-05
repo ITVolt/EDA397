@@ -13,6 +13,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import org.threeten.bp.ZoneOffset;
 import org.threeten.bp.temporal.ChronoField;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import se.chalmers.justintime.database.TimerLogEntry;
@@ -32,7 +34,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 4;
     private static final String DATABASE_NAME = "Database.db";
-
+    private int nextAvailableId = -1;
 
 
     public DatabaseHelper(Context context) {
@@ -43,6 +45,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_DELETE_ENTRIES);
         db.execSQL(TimerLogEntry.SQL_CREATE_ENTRIES);
+        nextAvailableId = -1;
     }
 
     @Override
@@ -51,16 +54,48 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    public void resetDatabase() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL(SQL_DELETE_ENTRIES);
+        db.execSQL(TimerLogEntry.SQL_CREATE_ENTRIES);
+        nextAvailableId = -1;
+    }
+
+    public int getNextAvailableId(){
+        if (nextAvailableId == -1){
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor res = db.rawQuery("select * from " + TABLE_NAME, null);
+            nextAvailableId = res.getCount() + 1;
+        }
+        return nextAvailableId;
+    }
+
+    public int getNextAvailablePauseId(){
+        int nextAvailablePauseId;
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor res = db.rawQuery("select * from " + TABLE_NAME, null);
+            res.moveToFirst();
+        Set noDuplicatesPauseId = new HashSet();
+            while (!res.isAfterLast()){
+                noDuplicatesPauseId.add(res.getInt(res.getColumnIndex(COLUMN_NAME_GROUPID)));
+                res.moveToNext();
+            }
+            nextAvailablePauseId = noDuplicatesPauseId.size() + 1;
+
+        return nextAvailablePauseId;
+    }
+
+
     public boolean insertTimer(TimerLogEntry timerLogEntry) {
-        long start = timerLogEntry.getStartTime().toEpochSecond(ZoneOffset.UTC);
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_NAME_ID, timerLogEntry.getId());
         contentValues.put(COLUMN_NAME_GROUPID, timerLogEntry.getGroupId());
         contentValues.put(COLUMN_NAME_START_TIME, 1);// timerLogEntry.getStartTime().toEpochSecond(ZoneOffset.UTC)); FIXME This is not the correct time.
         contentValues.put(COLUMN_NAME_DURATION, timerLogEntry.getDuration());
-        long id = db.insert(TABLE_NAME, null, contentValues);
-        return id > -1  ;
+        nextAvailableId = getNextAvailableId() + 1;
+        db.insert(TABLE_NAME, null, contentValues);
+        return true;
     }
 
     private Cursor getData(int timerId) {

@@ -43,12 +43,76 @@ public class DatabaseHelperTest {
 
     @Test
     public void insertTimer() throws Exception {
+        databaseHelper.resetDatabase();
         TimerLogEntry entry = new TimerLogEntry(1337 ,42, LocalDateTime.now(), 1);
         databaseHelper.insertTimer(entry);
         TimerLogEntry timerLogEntry = databaseHelper.getEntryById(1337);
         assertTrue(timerLogEntry.getGroupId() == 42);
     }
 
+    @Test
+    public void getNextAvailableId() throws Exception {
+        databaseHelper.resetDatabase();
+        TimerLogEntry entry1 = new TimerLogEntry(1 ,1, LocalDateTime.now(), 60);
+        TimerLogEntry entry2 = new TimerLogEntry(2 ,2, LocalDateTime.now(), 120);
+        TimerLogEntry entry3 = new TimerLogEntry(3 ,3, LocalDateTime.now(), 180);
+        TimerLogEntry entry4 = new TimerLogEntry(4 ,4, LocalDateTime.now(), 240);
+        databaseHelper.insertTimer(entry1);
+        databaseHelper.insertTimer(entry2);
+        databaseHelper.insertTimer(entry3);
+        databaseHelper.insertTimer(entry4);
+        assertTrue(databaseHelper.getNextAvailableId() == 5);
+    }
+
+    @Test
+    public void getNextAvailablePauseId() throws Exception {
+        databaseHelper.resetDatabase();
+        TimerLogEntry entry1 = new TimerLogEntry(1 ,1, LocalDateTime.now(), 60);
+        TimerLogEntry entry2 = new TimerLogEntry(2 ,1, LocalDateTime.now(), 120);
+        TimerLogEntry entry3 = new TimerLogEntry(3 ,2, LocalDateTime.now(), 180);
+        TimerLogEntry entry4 = new TimerLogEntry(4 ,2, LocalDateTime.now(), 240);
+        databaseHelper.insertTimer(entry1);
+        databaseHelper.insertTimer(entry2);
+        databaseHelper.insertTimer(entry3);
+        databaseHelper.insertTimer(entry4);
+        assertTrue(databaseHelper.getNextAvailablePauseId() == 3);
+
+    }
+
+    @Test
+    public void insertEntries() throws Exception {
+        databaseHelper.resetDatabase();
+        TimerLogEntry entry1 = new TimerLogEntry(1 ,1, LocalDateTime.now(), 60);
+        TimerLogEntry entry2 = new TimerLogEntry(2 ,1, LocalDateTime.now(), 120);
+        TimerLogEntry entry3 = new TimerLogEntry(3 ,2, LocalDateTime.now(), 180);
+        TimerLogEntry entry4 = new TimerLogEntry(4 ,2, LocalDateTime.now(), 240);
+        databaseHelper.insertTimer(entry1);
+        databaseHelper.insertTimer(entry2);
+        databaseHelper.insertTimer(entry3);
+        databaseHelper.insertTimer(entry4);
+        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getNextAvailablePauseId(), LocalDateTime.now(), 30);
+        databaseHelper.insertTimer(entry);
+        assertTrue(databaseHelper.getEntryById(5).getGroupId() == 3);
+        assertTrue(databaseHelper.getEntryById(5).getDuration() == 30);
+    }
+
+    @Test
+    public void insertFirstEntry() throws Exception {
+        databaseHelper.resetDatabase();
+        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getNextAvailablePauseId(), LocalDateTime.now(), 30);
+        databaseHelper.insertTimer(entry);
+
+        TimerLogEntry entry2 = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getNextAvailablePauseId(), LocalDateTime.now(), 30);
+        databaseHelper.insertTimer(entry2);
+
+        TimerLogEntry entry3 = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getEntryById(2).getGroupId() , LocalDateTime.now(), 30);
+        databaseHelper.insertTimer(entry3);
+
+        assertTrue(databaseHelper.getEntryById(1).getGroupId() == 1);
+        assertTrue(databaseHelper.getEntryById(2).getGroupId() == 2);
+        assertTrue(databaseHelper.getEntryById(3).getGroupId() == 2);
+
+    }
 
     @Test
     public void updateTimer() throws Exception {
