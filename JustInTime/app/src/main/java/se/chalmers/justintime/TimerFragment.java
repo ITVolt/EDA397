@@ -31,7 +31,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
     private long startValue;
     private long currentTimerValue;
-    private long duration;
+    private long previousDuration;
 
     private boolean isTimerRunning;
 
@@ -128,7 +128,8 @@ public class TimerFragment extends Fragment implements CounterActivity {
     @Override
     public void pause() {
         setRunningState(false);
-        duration = startValue - currentTimerValue - duration;
+        long duration = startValue - currentTimerValue - previousDuration;
+        previousDuration = previousDuration + duration;
         TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), currentPauseId, LocalDateTime.ofEpochSecond(startValue,0, ZoneOffset.UTC), duration);
         databaseHelper.insertTimer(entry);
     }
@@ -139,7 +140,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         disableResetButton();
         currentTimerValue = startValue; // FIXME Remove when the real chronometer is implemented.
         updateTimerText();
-        duration = 0;
+        previousDuration = 0;
         currentPauseId = databaseHelper.getNextAvailablePauseId();
     }
 
@@ -161,7 +162,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         Log.d("BasicTimerActivity", "onTimerFinish: Time's up!");
         alarm.alert();
         setRunningState(false);
-        duration = startValue - currentTimerValue - duration;
+        long duration = startValue - currentTimerValue - previousDuration;
         TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), currentPauseId, LocalDateTime.ofEpochSecond(startValue,0, ZoneOffset.UTC), duration);
         databaseHelper.insertTimer(entry);
     }
