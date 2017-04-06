@@ -1,4 +1,4 @@
-package se.chalmers.justintime;
+package se.chalmers.justintime.database;
 
 /**
  * Created by Felix on 2017-03-30.
@@ -16,15 +16,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import se.chalmers.justintime.database.TimerLogEntry;
-
+import static se.chalmers.justintime.database.TimerLogEntry.COLUMNS;
 import static se.chalmers.justintime.database.TimerLogEntry.COLUMN_NAME_DURATION;
 import static se.chalmers.justintime.database.TimerLogEntry.COLUMN_NAME_GROUPID;
 import static se.chalmers.justintime.database.TimerLogEntry.COLUMN_NAME_ID;
 import static se.chalmers.justintime.database.TimerLogEntry.COLUMN_NAME_START_TIME;
 import static se.chalmers.justintime.database.TimerLogEntry.SQL_DELETE_ENTRIES;
 import static se.chalmers.justintime.database.TimerLogEntry.TABLE_NAME;
-import static se.chalmers.justintime.database.TimerLogEntry.COLUMNS;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 

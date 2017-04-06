@@ -15,10 +15,10 @@ import android.widget.Chronometer;
 import android.widget.TextView;
 
 import org.threeten.bp.LocalDateTime;
-import org.threeten.bp.ZoneOffset;
 
 import se.chalmers.justintime.alert.Alarm;
 import se.chalmers.justintime.alert.AlarmBuilder;
+import se.chalmers.justintime.database.DatabaseHelper;
 import se.chalmers.justintime.database.TimerLogEntry;
 
 
@@ -32,6 +32,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private long startValue;
     private long currentTimerValue;
     private long previousDuration;
+    private LocalDateTime startTime;
 
     private boolean isTimerRunning;
 
@@ -130,7 +131,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         setRunningState(false);
         long duration = startValue - currentTimerValue - previousDuration;
         previousDuration = previousDuration + duration;
-        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), currentPauseId, LocalDateTime.ofEpochSecond(startValue,0, ZoneOffset.UTC), duration);
+        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), currentPauseId,startTime, duration);
         databaseHelper.insertTimer(entry);
     }
 
@@ -163,12 +164,13 @@ public class TimerFragment extends Fragment implements CounterActivity {
         alarm.alert();
         setRunningState(false);
         long duration = startValue - currentTimerValue - previousDuration;
-        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), currentPauseId, LocalDateTime.ofEpochSecond(startValue,0, ZoneOffset.UTC), duration);
+        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), currentPauseId, startTime, duration);
         databaseHelper.insertTimer(entry);
     }
 
     private void setRunningState(boolean run) {
         if (run) {
+            startTime = LocalDateTime.now();
             startPauseTimerButton.setText(R.string.timer_button_pause);
             disableResetButton();
             isTimerRunning = true;

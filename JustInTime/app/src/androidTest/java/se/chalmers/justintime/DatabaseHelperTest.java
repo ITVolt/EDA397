@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.threeten.bp.LocalDateTime;
 
+import se.chalmers.justintime.database.DatabaseHelper;
 import se.chalmers.justintime.database.TimerLogEntry;
 
 import static org.junit.Assert.assertNotNull;

@@ -20,6 +20,8 @@ import org.threeten.bp.format.DateTimeFormatter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import se.chalmers.justintime.database.DatabaseHelper;
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the

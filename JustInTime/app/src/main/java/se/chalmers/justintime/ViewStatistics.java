@@ -12,6 +12,8 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import se.chalmers.justintime.database.DatabaseHelper;
+
 public class ViewStatistics extends AppCompatActivity {
     DatabaseHelper db;
     Cursor cursor;
