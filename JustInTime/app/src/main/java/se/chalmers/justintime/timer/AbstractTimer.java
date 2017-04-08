@@ -1,14 +1,12 @@
-package se.chalmers.justintime;
+package se.chalmers.justintime.timer;
 
 import android.os.CountDownTimer;
-
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 /**
  * Created by JonasPC on 2017-04-02.
  */
 
-    public abstract class Timer {
+    public abstract class AbstractTimer implements Timer{
         long millisInFuture = 0;
         long countDownInterval = 0;
         long millisRemaining =  0;
@@ -17,25 +15,26 @@ import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
         boolean isPaused = true;
 
-        public Timer(long millisInFuture, long countDownInterval) {
+        public AbstractTimer(long millisInFuture, long countDownInterval) {
             super();
             this.millisInFuture = millisInFuture;
             this.countDownInterval = countDownInterval;
             this.millisRemaining = this.millisInFuture;
         }
+
         private void createCountDownTimer(){
             countDownTimer = new CountDownTimer(millisRemaining,countDownInterval) {
 
                 @Override
                 public void onTick(long millisUntilFinished) {
                     millisRemaining = millisUntilFinished;
-                    Timer.this.onTick(millisUntilFinished);
+                    AbstractTimer.this.onTick(millisUntilFinished);
 
                 }
 
                 @Override
                 public void onFinish() {
-                    Timer.this.onFinish();
+                    AbstractTimer.this.onFinish();
 
                 }
             };
@@ -45,10 +44,12 @@ import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
          *
          * @param millisUntilFinished The amount of time until finished.
          */
+
         public abstract void onTick(long millisUntilFinished);
         /**
          * Callback fired when the time is up.
          */
+
         public abstract void onFinish();
         /**
          * Cancel the countdown.
@@ -63,13 +64,12 @@ import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
          * Start or Resume the countdown.
          * @return CountDownTimerPausable current instance
          */
-        public synchronized final Timer start(){
+        public synchronized final void start(){
             if(isPaused){
                 createCountDownTimer();
                 countDownTimer.start();
                 isPaused = false;
             }
-            return this;
         }
         /**
          * Pauses the CountDownTimerPausable, so it could be resumed(start)

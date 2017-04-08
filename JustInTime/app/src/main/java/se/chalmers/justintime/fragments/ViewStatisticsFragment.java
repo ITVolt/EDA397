@@ -1,4 +1,4 @@
-package se.chalmers.justintime;
+package se.chalmers.justintime.fragments;
 
 import android.database.Cursor;
 import android.graphics.Color;
@@ -20,6 +20,7 @@ import org.threeten.bp.format.DateTimeFormatter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import se.chalmers.justintime.R;
 import se.chalmers.justintime.database.DatabaseHelper;
 
 /**

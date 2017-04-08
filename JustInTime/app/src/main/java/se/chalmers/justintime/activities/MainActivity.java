@@ -1,4 +1,4 @@
-package se.chalmers.justintime;
+package se.chalmers.justintime.activities;
 
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -14,6 +14,10 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.jakewharton.threetenabp.AndroidThreeTen;
+
+import se.chalmers.justintime.R;
+import se.chalmers.justintime.fragments.TimerFragment;
+import se.chalmers.justintime.fragments.ViewStatisticsFragment;
 
 
 public class MainActivity extends AppCompatActivity

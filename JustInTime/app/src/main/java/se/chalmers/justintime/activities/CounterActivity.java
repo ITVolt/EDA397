@@ -1,4 +1,4 @@
-package se.chalmers.justintime;
+package se.chalmers.justintime.activities;
 
 /**
  * Functionality common for all activities with timers or stopwatches.

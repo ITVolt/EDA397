@@ -1,7 +1,8 @@
 package se.chalmers.justintime;
 
-import android.os.SystemClock;
 import android.view.View;
+
+import se.chalmers.justintime.timer.AbstractTimer;
 
 /**
  * Created by Patrik on 2017-04-04.
@@ -12,7 +13,7 @@ public class Presenter {
     public static final int REFRESH_RATE = 30;
     public static final int FRAME_LENGTH = 1000/REFRESH_RATE;
 
-    private Timer timer;
+    private AbstractTimer abstractTimer;
 
     private boolean isStarted;
     private boolean isRunning;

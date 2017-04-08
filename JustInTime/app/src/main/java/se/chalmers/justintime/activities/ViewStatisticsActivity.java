@@ -1,4 +1,4 @@
-package se.chalmers.justintime;
+package se.chalmers.justintime.activities;
 
 import android.database.Cursor;
 import android.graphics.Color;
@@ -12,9 +12,10 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import se.chalmers.justintime.R;
 import se.chalmers.justintime.database.DatabaseHelper;
 
-public class ViewStatistics extends AppCompatActivity {
+public class ViewStatisticsActivity extends AppCompatActivity {
     DatabaseHelper db;
     Cursor cursor;
     Calendar start = Calendar.getInstance();

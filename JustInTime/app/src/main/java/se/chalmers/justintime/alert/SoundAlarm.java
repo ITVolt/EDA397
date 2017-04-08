@@ -14,8 +14,8 @@ public class SoundAlarm extends AlarmDecorator {
 
     public SoundAlarm(Alarm alarm, Context context) {
         super(alarm, context);
-        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        mediaPlayer = MediaPlayer.create(context, notification);
+        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        mediaPlayer = MediaPlayer.create(context, uri);
     }
 
     @Override

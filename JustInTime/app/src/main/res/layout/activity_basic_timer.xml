@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark"
-    tools:context="se.chalmers.justintime.BasicTimerActivity">
+    tools:context="se.chalmers.justintime.activities.BasicTimerActivity">
 
     <Chronometer
         android:id="@+id/chronometerBasicTimer"

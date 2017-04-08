@@ -8,7 +8,6 @@ import android.content.Context;
 
 public class AlarmDecorator implements Alarm {
     private Alarm alarm;
-
     private Context context;
 
     public AlarmDecorator(Alarm alarm, Context context) {
