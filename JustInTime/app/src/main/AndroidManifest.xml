@@ -19,7 +19,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.BasicTimerActivity"></activity>
     </application>
     <uses-permission android:name="android.permission.VIBRATE" />
 </manifest>

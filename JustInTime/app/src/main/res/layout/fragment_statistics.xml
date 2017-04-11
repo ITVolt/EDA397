@@ -1,48 +1,24 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".fragments.ViewStatisticsFragment">
+    android:layout_height="match_parent">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <android.support.design.widget.TabLayout
+        android:id="@+id/statistics_sliding_tabs"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="" />
-    <ScrollView
-        android:id="@+id/scrollView1"
-        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="#3d455b">
+        android:background="@color/colorPrimary"
+        app:tabTextColor="@color/icons"
+        app:tabSelectedTextColor="@color/colorAccent"
+        app:tabMode="fixed" />
 
-
-        <HorizontalScrollView
-            android:id="@+id/hscrll1"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-
-            <RelativeLayout
-                android:id="@+id/RelativeLayout1"
-                android:layout_width="wrap_content"
-                android:layout_gravity="center"
-                android:layout_height="fill_parent"
-                android:orientation="vertical" >
-
-                <TableLayout
-                    android:id="@+id/table_main_"
-                    android:layout_marginLeft="45dp"
-                    android:layout_marginBottom="25dp"
-                    android:layout_marginRight="45dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true" >
-                </TableLayout>
-            </RelativeLayout>
-        </HorizontalScrollView>
-    </ScrollView>
-
-</FrameLayout>
-
-
-
-
+    <android.support.v4.view.ViewPager
+        android:id="@+id/statistics_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="1"
+        android:background="@color/colorPrimaryDark" />
+</LinearLayout>

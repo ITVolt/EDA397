@@ -23,12 +23,11 @@ import se.chalmers.justintime.alert.AlarmBuilder;
 import se.chalmers.justintime.database.DatabaseHelper;
 import se.chalmers.justintime.database.TimerLogEntry;
 
-
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link TimerFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * This fragment shows a basic timer counting down from a time to zero.
+ * Created by Patrik on 2017-04-01.
  */
+
 public class TimerFragment extends Fragment implements CounterActivity {
 
     private long startValue;
@@ -162,7 +161,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
     }
 
     private void onTimerFinish() {
-        Log.d("BasicTimerActivity", "onTimerFinish: Time's up!");
+        Log.d("TimerFragment", "onTimerFinish: Time's up!");
         alarm.alert();
         setRunningState(false);
         long duration = startValue - currentTimerValue - previousDuration;

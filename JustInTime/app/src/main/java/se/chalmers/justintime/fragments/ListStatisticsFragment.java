@@ -25,13 +25,10 @@ import se.chalmers.justintime.database.DatabaseHelper;
 
 /**
  * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ViewStatisticsFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ViewStatisticsFragment#newInstance} factory method to
+ * Use the {@link StatisticsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ViewStatisticsFragment extends Fragment {
+public class ListStatisticsFragment extends Fragment {
 
     DatabaseHelper db;
     Cursor cursor;
@@ -44,14 +41,14 @@ public class ViewStatisticsFragment extends Fragment {
     View view;
     private OnFragmentInteractionListener mListener;
 
-    public ViewStatisticsFragment() {
+    public ListStatisticsFragment() {
         // Required empty public constructor
     }
 
 
     // TODO: Rename and change types and number of parameters
-    public static ViewStatisticsFragment newInstance() {
-        ViewStatisticsFragment fragment = new ViewStatisticsFragment();
+    public static ListStatisticsFragment newInstance() {
+        ListStatisticsFragment fragment = new ListStatisticsFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -66,7 +63,7 @@ public class ViewStatisticsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_statistics, container, false);
+        view = inflater.inflate(R.layout.fragment_list_statistics, container, false);
         showEveryEntry();
         return view;
     }

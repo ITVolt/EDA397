@@ -16,8 +16,9 @@ import android.widget.Toast;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import se.chalmers.justintime.R;
+import se.chalmers.justintime.fragments.ListStatisticsFragment;
 import se.chalmers.justintime.fragments.TimerFragment;
-import se.chalmers.justintime.fragments.ViewStatisticsFragment;
+import se.chalmers.justintime.fragments.StatisticsFragment;
 
 
 public class MainActivity extends AppCompatActivity
@@ -88,8 +89,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_timerC) {
             Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_statistics) {
-            jumpToFragment(ViewStatisticsFragment.newInstance());
-            Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+            jumpToFragment(StatisticsFragment.newInstance());
         } else if (id == R.id.nav_settings) {
             Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
         }
