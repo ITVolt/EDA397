@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity
     private BackgroundAlarm backgroundAlarm;
     private long timerLength = 0; // In seconds
     private long wakeUpTime;
-    private Calendar rightNow;
+    private long savedTime;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         AndroidThreeTen.init(this);
@@ -41,10 +41,6 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         mPreferences = new SharedPreference(this);
         backgroundAlarm = new BackgroundAlarm(this);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-             rightNow  = Calendar.getInstance();
-        }
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -125,9 +121,8 @@ public class MainActivity extends AppCompatActivity
         super.onPause();
         if(TimerFragment.isTimmerRunning) {
             timerLength = mPreferences.getTimeToGo();
-            wakeUpTime = (rightNow.getTimeInMillis() + 15000 + timerLength * 1000);
-            //I AM GETTING A TIME DELAY THAT IS WHY I ADDED THE 15 SEC
-                backgroundAlarm.setAlalrm(wakeUpTime);
+            wakeUpTime = (Calendar.getInstance().getTimeInMillis() + timerLength * 1000);
+            backgroundAlarm.setAlalrm(wakeUpTime);
         }
     }
 
@@ -135,10 +130,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPostResume() {
         super.onPostResume();
-        backgroundAlarm.removeAlarm();
         if(TimerFragment.isTimmerRunning) {
-            long savedTime = wakeUpTime - rightNow.getTimeInMillis() -15000;
-            //I AM GETTING A TIME DELAY THAT IS WHY I ADDED THE 15 SEC
+            backgroundAlarm.removeAlarm();
+            if(wakeUpTime <= Calendar.getInstance().getTimeInMillis()) savedTime = 0;
+            else savedTime = wakeUpTime - Calendar.getInstance().getTimeInMillis();
             TimerFragment.currentTimerValue = savedTime;
         }
     }

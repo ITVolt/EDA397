@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
@@ -29,8 +30,9 @@ public class Notification {
         Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         b.setSound(notification)
                 .setContentTitle("TIMMER HAS FINISHED")
-                .setContentText("it is time!")
-                .setSmallIcon(R.drawable.ic_menu_camera)
+                .setColor(Color.BLUE)
+                .setContentText("go back to timmer")
+                .setSmallIcon(R.drawable.ic_menu_manage)
                 .setContentIntent(pIntent);
 
         android.app.Notification n = b.build();
