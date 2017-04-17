@@ -26,6 +26,9 @@
         </activity>
         <receiver android:name=".alert.BroadCaster" >
         </receiver>
+        <service android:name=".timer.TimerService"
+            android:process=":timerservice" />
     </application>
+
 
 </manifest>
