@@ -165,8 +165,6 @@ public class TimerService extends Service {
                 .setSmallIcon(R.drawable.logo)  // the status icon
                 .setWhen(System.currentTimeMillis()+10000)  // the time stamp
                 .setContentTitle(getText(R.string.local_service_label))  // the label of the entry
-                .setUsesChronometer(true)
-                .setChronometerCountDown(true)
                 .setContentText("Change me")  // the contents of the entry
                 .setContentIntent(contentIntent)  // The intent to send when the entry is clicked
                 .build();
