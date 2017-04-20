@@ -51,6 +51,7 @@ public class DatabaseHelperTest {
         databaseHelper.insertTimer(entry);
         TimerLogEntry timerLogEntry = databaseHelper.getEntryById(1337);
         assertTrue(timerLogEntry.getGroupId() == 42);
+        databaseHelper.resetDatabase();
     }
 
     @Test

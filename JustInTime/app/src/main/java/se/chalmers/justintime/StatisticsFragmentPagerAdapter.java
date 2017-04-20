@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import se.chalmers.justintime.fragments.ListStatisticsFragment;
 import se.chalmers.justintime.fragments.TempStatisticsFragment;
+import se.chalmers.justintime.fragments.WeekStatisticsFragment;
 
 /**
  * Handles the tabs in the statistics view.
@@ -14,7 +15,7 @@ import se.chalmers.justintime.fragments.TempStatisticsFragment;
  */
 
 public class StatisticsFragmentPagerAdapter extends FragmentPagerAdapter {
-    final int PAGE_COUNT = 3;
+    private final int PAGE_COUNT = 3;
     private String tabTitles[] = new String[3];
     private Context context;
 
@@ -35,6 +36,8 @@ public class StatisticsFragmentPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         if (position == 2) {
             return ListStatisticsFragment.newInstance();
+        } else if (position == 0) {
+            return WeekStatisticsFragment.newInstance(tabTitles[position]);
         } else {
             return TempStatisticsFragment.newInstance(tabTitles[position]);
         }
