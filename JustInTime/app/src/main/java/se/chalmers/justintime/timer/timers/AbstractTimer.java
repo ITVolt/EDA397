@@ -5,7 +5,7 @@ import android.os.SystemClock;
 /**
  * Created by JonasPC on 2017-04-02.
  */
-public abstract class AbstractTimer implements Runnable, Timer {
+public abstract class AbstractTimer implements Timer {
     private long targetInMilliSeconds;
     private long durationInMilliSeconds;
     private long timeOffset;
@@ -14,11 +14,6 @@ public abstract class AbstractTimer implements Runnable, Timer {
 
     public AbstractTimer(long targetInMilliSeconds) {
         this.targetInMilliSeconds = targetInMilliSeconds;
-    }
-
-    @Override
-    public void run() {
-        this.update();
     }
 
     public void update() {

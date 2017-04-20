@@ -7,7 +7,7 @@ import java.util.List;
  * Created by David on 2017-04-20.
  */
 
-public class TimerInstance {
+public class TimerInstance implements Runnable{
     private List<AbstractTimer> sequentialTimers;
     private AbstractTimer currentTimer;
     private List<String> tags;
@@ -19,8 +19,9 @@ public class TimerInstance {
         currentTimer = timer;
     }
 
-    public AbstractTimer getCurrentTimer() {
-        return currentTimer;
+    @Override
+    public void run() {
+        currentTimer.update();
     }
 
     public void setNextTimer() {
@@ -50,4 +51,5 @@ public class TimerInstance {
     public List<String> getTags() {
         return tags;
     }
+
 }

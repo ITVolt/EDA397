@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import se.chalmers.justintime.timer.timers.AbstractTimer;
 import se.chalmers.justintime.timer.timers.TimerInstance;
 
 /**
@@ -27,18 +26,18 @@ public class TimerHandler {
     }
 
     public void startTimer(TimerInstance timerInstance) {
-        scheduleTimerWithFixedRate(timerInstance.getCurrentTimer(), 20);
+        scheduleTimerWithFixedRate(timerInstance, 20);
     }
 
-    private void scheduleTimerWithFixedRate(AbstractTimer timer, long fixedRateInMilliSeconds) {
+    private void scheduleTimerWithFixedRate(TimerInstance timer, long fixedRateInMilliSeconds) {
         timerSchedulerExecutor.scheduleAtFixedRate(timer, 0, fixedRateInMilliSeconds, TimeUnit.MILLISECONDS);
     }
 
     public boolean removeTimer(TimerInstance timerInstance) {
-        return stopTimer(timerInstance.getCurrentTimer()) && timers.remove(timerInstance);
+        return stopTimer(timerInstance) && timers.remove(timerInstance);
     }
 
-    public boolean stopTimer(AbstractTimer timer) {
+    public boolean stopTimer(TimerInstance timer) {
         return timerSchedulerExecutor.remove(timer);
     }
 }
