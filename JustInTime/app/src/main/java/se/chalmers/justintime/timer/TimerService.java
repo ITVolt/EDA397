@@ -12,7 +12,6 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
 import se.chalmers.justintime.R;
 import se.chalmers.justintime.activities.MainActivity;
@@ -26,11 +25,52 @@ public class TimerService extends Service {
     private NotificationManager notificationManager;
     private Messenger client;
 
+    private final static int ONGOING_NOTIFICATION = 1;
+
+    /**
+     * For testing purposes only
+     */
     public final static int ECHO = 0;
+
+    /**
+     * Set the receiver of the updates from the TimerSerivce
+     */
     public final static int REGISTER_CLIENT = 1;
+    /**
+     * Run the TimerService in the foreground
+     */
     public final static int ENTER_FOREGROUND = 2;
+    /**
+     * Stop the TimerService from running in the foreground
+     */
     public final static int LEAVE_FORGROUND = 3;
-    //TODO add messages for interaction with timers
+
+    /**
+     * TimerService creates a new timer
+     */
+    public final static int NEW_TIMER = 10;
+    /**
+     * TimerService starts a timer
+     */
+    public final static int START_TIMER = 11;
+    /**
+     * TimerService pauses a timer
+     */
+    public final static int PAUSE_TIMER = 12;
+    /**
+     * TimerService resets a timer to its default value
+     */
+    public final static int RESET_TIMER = 13;
+
+    /**
+     * Notifiy client that the time have changed
+     * obj Long time left on the current timer
+     */
+    public final static int UPDATE_TIMER = 20;
+    /**
+     * Notify client that a timer have finnished
+     */
+    public final static int ALERT_TIMER = 21;
 
     //TODO add timers
 
@@ -52,10 +92,10 @@ public class TimerService extends Service {
                     client = message.replyTo;
                     break;
                 case ENTER_FOREGROUND:
-                    showNotification("Entered foreground");
+                    showForegroundNotification();
                     break;
                 case LEAVE_FORGROUND:
-                    notificationManager.cancel(R.string.remote_service_started);
+                    stopForeground(true);
                     break;
                 default:
                     super.handleMessage(message);
@@ -81,14 +121,17 @@ public class TimerService extends Service {
         // Cancel the persistent notification.
         notificationManager.cancel(R.string.remote_service_started);
 
-        // Tell the user we stopped.
-        Toast.makeText(this, R.string.remote_service_stopped, Toast.LENGTH_SHORT).show();
+    }
+
+    public int onStartCommand(Intent intent, int flags, int startId){
+
+        return START_STICKY;
     }
 
     /**
      * Show a notification while this service is running.
      */
-    private void showNotification(CharSequence text) {
+    private void showNotification(int notificationId, CharSequence text) {
 
 
         // The PendingIntent to launch our activity if the user selects this notification
@@ -107,6 +150,30 @@ public class TimerService extends Service {
 
         // Send the notification.
         // We use a string id because it is a unique number.  We use it later to cancel.
-        notificationManager.notify(R.string.remote_service_started, notification);
+        notificationManager.notify(notificationId, notification);
+    }
+
+    private void showForegroundNotification(){
+        // The PendingIntent to launch our activity if the user selects this notification
+        //TODO move to the timer fragment insted of the last used fragment
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, MainActivity.class), 0);
+
+        //TODO fix the content of the notification
+        // Set the info for the views that show in the notification panel.
+        Notification notification = new Notification.Builder(this)
+                .setSmallIcon(R.drawable.logo)  // the status icon
+                .setWhen(System.currentTimeMillis()+10000)  // the time stamp
+                .setContentTitle(getText(R.string.local_service_label))  // the label of the entry
+                .setUsesChronometer(true)
+                .setChronometerCountDown(true)
+                .setContentText("Change me")  // the contents of the entry
+                .setContentIntent(contentIntent)  // The intent to send when the entry is clicked
+                .build();
+
+        // Send the notification.
+        // We use a string id because it is a unique number.  We use it later to cancel.
+        //notificationManager.notify(R.string.remote_service_started, notification);
+        startForeground(ONGOING_NOTIFICATION, notification);
     }
 }

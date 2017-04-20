@@ -1,8 +1,10 @@
 package se.chalmers.justintime;
 
-import android.view.View;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 
-import se.chalmers.justintime.timer.timers.AbstractTimer;
+import se.chalmers.justintime.fragments.TimerFragment;
 
 /**
  * Created by Patrik on 2017-04-04.
@@ -10,44 +12,27 @@ import se.chalmers.justintime.timer.timers.AbstractTimer;
 
 public class Presenter {
 
-    public static final int REFRESH_RATE = 30;
-    public static final int FRAME_LENGTH = 1000/REFRESH_RATE;
-
-    private AbstractTimer abstractTimer;
-
-    private boolean isStarted;
-    private boolean isRunning;
-
-    private View currView;
-
-    public Presenter(View view) {
-        currView = view;
+    private TimerFragment timerFragment;
+    private Messenger timerService;
+    public Presenter(TimerFragment fragment) {
+        this.timerFragment = fragment;
     }
 
-    private void updateRunning() {
-        boolean running = isStarted;
-        if (running != isRunning) {
-            if (running) {
-                //updateText(SystemClock.elapsedRealtime());
-                //dispatchChronometerTick();
-                currView.postDelayed(tickRunnable, FRAME_LENGTH);
-            } else {
-                currView.removeCallbacks(tickRunnable);
-            }
-            isRunning = running;
-        }
+    public void updateTimer(long time){
+
     }
 
-    private final Runnable tickRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (isRunning) {
-                //updateText(SystemClock.elapsedRealtime());
-                //dispatchChronometerTick();
-                currView.postDelayed(tickRunnable, FRAME_LENGTH);
+    public void setTimerService(Messenger timerService) {
+        this.timerService = timerService;
+    }
+
+    private void sendMessage(Message message){
+        if(timerService != null){
+            try{
+                timerService.send(message);
+            } catch (RemoteException e) {
+                e.printStackTrace();
             }
         }
-    };
-
-
+    }
 }

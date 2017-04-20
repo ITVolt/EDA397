@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import org.threeten.bp.LocalDateTime;
 
+import se.chalmers.justintime.Presenter;
 import se.chalmers.justintime.R;
 import se.chalmers.justintime.activities.CounterActivity;
 import se.chalmers.justintime.alert.Alarm;
@@ -57,6 +58,8 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private View view;
     public static boolean isTimmerRunning = false;
 
+
+    private Presenter presenter;
 
     public TimerFragment() {
         // Required empty public constructor
@@ -276,5 +279,9 @@ public class TimerFragment extends Fragment implements CounterActivity {
      */
     private String parseTimeDetailed(long time) {
         return parseTime(time) + (time % DateUtils.SECOND_IN_MILLIS);
+    }
+
+    public void setPresenter(Presenter presenter) {
+        this.presenter = presenter;
     }
 }
