@@ -2,7 +2,7 @@ package se.chalmers.justintime;
 
 import android.view.View;
 
-import se.chalmers.justintime.timer.AbstractTimer;
+import se.chalmers.justintime.timer.timers.AbstractTimer;
 
 /**
  * Created by Patrik on 2017-04-04.
