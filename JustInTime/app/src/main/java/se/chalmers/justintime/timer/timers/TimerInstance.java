@@ -3,16 +3,20 @@ package se.chalmers.justintime.timer.timers;
 import java.util.ArrayList;
 import java.util.List;
 
+import se.chalmers.justintime.timer.Ticker;
+
 /**
  * Created by David on 2017-04-20.
  */
 
 public class TimerInstance implements Runnable{
+    private final Ticker ticker;
     private List<AbstractTimer> sequentialTimers;
     private AbstractTimer currentTimer;
     private List<String> tags;
 
-    public TimerInstance(AbstractTimer timer) {
+    public TimerInstance(AbstractTimer timer,Ticker ticker) {
+        this.ticker = ticker;
         this.sequentialTimers = new ArrayList<>();
         tags = new ArrayList<>();
         sequentialTimers.add(timer);
@@ -22,6 +26,7 @@ public class TimerInstance implements Runnable{
     @Override
     public void run() {
         currentTimer.update();
+        ticker.onTick(currentTimer.getRemainingTime());
     }
 
     public void setNextTimer() {
@@ -42,6 +47,10 @@ public class TimerInstance implements Runnable{
 
     public boolean isTimerDone() {
         return currentTimer.isDone();
+    }
+
+    public long getRemainingTime() {
+        return currentTimer.getRemainingTime();
     }
 
     public boolean addTag(String tag) {

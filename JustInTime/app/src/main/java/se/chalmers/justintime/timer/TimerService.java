@@ -15,16 +15,18 @@ import android.util.Log;
 
 import se.chalmers.justintime.R;
 import se.chalmers.justintime.activities.MainActivity;
+import se.chalmers.justintime.timer.timers.BasicTimer;
+import se.chalmers.justintime.timer.timers.TimerInstance;
 
 /**
  * Created by Nieo on 08/04/17.
  */
 
-public class TimerService extends Service {
-
+public class TimerService extends Service implements Ticker {
+    private TimerHandler timerHandler = new TimerHandler();
     private NotificationManager notificationManager;
     private Messenger client;
-
+    private TimerService self = this;
     private final static int ONGOING_NOTIFICATION = 1;
 
     /**
@@ -97,6 +99,11 @@ public class TimerService extends Service {
                 case LEAVE_FORGROUND:
                     stopForeground(true);
                     break;
+                case START_TIMER:
+                    TimerInstance timerInstance = new TimerInstance(new BasicTimer(1000 * 60), self);
+                    timerHandler.addTimer(timerInstance);
+                    timerHandler.startTimer(timerInstance);
+                    break;
                 default:
                     super.handleMessage(message);
             }
@@ -105,6 +112,8 @@ public class TimerService extends Service {
     }
 
     final Messenger messenger = new Messenger(new MessagingHandler());
+
+
 
     @Nullable
     @Override
@@ -175,5 +184,16 @@ public class TimerService extends Service {
         // We use a string id because it is a unique number.  We use it later to cancel.
         //notificationManager.notify(R.string.remote_service_started, notification);
         startForeground(ONGOING_NOTIFICATION, notification);
+    }
+
+    @Override
+    public void onTick(long time){
+        Log.d("TimerService", "Sending update");
+        Message message = Message.obtain(null, UPDATE_TIMER, time);
+        try {
+            client.send(message);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 }

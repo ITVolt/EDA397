@@ -5,6 +5,8 @@ import android.os.Messenger;
 import android.os.RemoteException;
 
 import se.chalmers.justintime.fragments.TimerFragment;
+import se.chalmers.justintime.timer.TimerHandler;
+import se.chalmers.justintime.timer.TimerService;
 
 /**
  * Created by Patrik on 2017-04-04.
@@ -12,14 +14,18 @@ import se.chalmers.justintime.fragments.TimerFragment;
 
 public class Presenter {
 
+
     private TimerFragment timerFragment;
     private Messenger timerService;
     public Presenter(TimerFragment fragment) {
         this.timerFragment = fragment;
+
+
     }
 
-    public void updateTimer(long time){
 
+    public void updateTimer(long time){
+        timerFragment.updateTime(time);
     }
 
     public void setTimerService(Messenger timerService) {
@@ -34,5 +40,10 @@ public class Presenter {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void startTimer() {
+        Message message = Message.obtain(null, TimerService.START_TIMER);
+        sendMessage(message);
     }
 }

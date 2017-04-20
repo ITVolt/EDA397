@@ -15,6 +15,8 @@ import android.widget.Chronometer;
 import android.widget.TextView;
 
 import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.LocalTime;
+import org.threeten.bp.ZoneOffset;
 
 import se.chalmers.justintime.Presenter;
 import se.chalmers.justintime.R;
@@ -32,19 +34,11 @@ import se.chalmers.justintime.database.TimerLogEntry;
 
 public class TimerFragment extends Fragment implements CounterActivity {
 
-    private long startValue;
-    //private long currentTimerValue;
-    public static long currentTimerValue;
-    private long previousDuration;
-    private LocalDateTime startTime;
 
     private boolean isTimerRunning;
     private SharedPreference preferences;
 
-    // private BasicTimer timer;    FIXME For when the real chronometer is implemented.
     private TextView timerText;
-    private Chronometer chronometer; // FIXME Remove when the real chronometer is implemented.
-    private String tempString = "Temp stuff, ignore"; // FIXME Remove when the real chronometer is implemented.
 
     private Button startPauseTimerButton;
     private Button resetTimerButton;
@@ -56,10 +50,9 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private int currentPauseId;
 
     private View view;
-    public static boolean isTimmerRunning = false;
-
 
     private Presenter presenter;
+    private long currentTimerValue;
 
     public TimerFragment() {
         // Required empty public constructor
@@ -91,7 +84,6 @@ public class TimerFragment extends Fragment implements CounterActivity {
         view = inflater.inflate(R.layout.fragment_timer, container, false);
 
         timerText = (TextView) view.findViewById(R.id.basicTimerTV);
-        chronometer = (Chronometer) view.findViewById(R.id.chronometerBasicTimer);
 
         startPauseTimerButton = (Button) view.findViewById(R.id.timerStartPauseButton);
         resetTimerButton = (Button) view.findViewById(R.id.timerResetButton);
@@ -103,61 +95,34 @@ public class TimerFragment extends Fragment implements CounterActivity {
         ab.setUseVibration(true);
         alarm = ab.getAlarmInstance();
 
-        // FIXME Remove when the real chronometer is implemented.
-        chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
-            @Override
-            public void onChronometerTick(Chronometer chronometer) {
-                if (isTimerRunning) {
-                    currentTimerValue -= 1000;
-                    preferences.setTimeToGo(currentTimerValue/1000);
-                    updateTimerText();
-                    if (currentTimerValue <= 0) {
-                        onTimerFinish();
-                    }
-                }
-            }
-        });
         setButtonOnClickListeners();
-        databaseHelper = new DatabaseHelper(this.getContext());
-
-        startValue = 90000;
-        reset();
         return view;
     }
 
 
     public void setTimerStartValue (long startValue) {
-        this.startValue = startValue;
         setRunningState(false);
     }
 
     @Override
     public void start() {
         setRunningState(true);
+        presenter.startTimer();
     }
 
     @Override
     public void pause() {
-        setRunningState(false);
-        long duration = startValue - currentTimerValue - previousDuration;
-        previousDuration = previousDuration + duration;
-        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), currentPauseId,startTime, duration);
-        databaseHelper.insertTimer(entry);
     }
 
     @Override
     public void reset() {
-        setRunningState(false);
         disableResetButton();
-        currentTimerValue = startValue; // FIXME Remove when the real chronometer is implemented.
         updateTimerText();
-        previousDuration = 0;
-        currentPauseId = databaseHelper.getNextAvailablePauseId();
     }
 
     @Override
     public void updateTime(long ms) {
-        //currentTimerValue = ms;   FIXME For when the real chronometer is implemented.
+        currentTimerValue = ms;
         updateTimerText();
         if (currentTimerValue <= 0) {
             onTimerFinish();
@@ -166,30 +131,22 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
     private void updateTimerText() {
         timerText.setText(parseTime(currentTimerValue));
-        chronometer.setText(tempString);
     }
 
     private void onTimerFinish() {
         Log.d("TimerFragment", "onTimerFinish: Time's up!");
         alarm.alert();
-        setRunningState(false);
-        long duration = startValue - currentTimerValue - previousDuration;
-        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), currentPauseId, startTime, duration);
-        databaseHelper.insertTimer(entry);
     }
 
     private void setRunningState(boolean run) {
         if (run) {
-            startTime = LocalDateTime.now();
             startPauseTimerButton.setText(R.string.timer_button_pause);
             disableResetButton();
             isTimerRunning = true;
-            chronometer.start();  //FIXME Remove when the real chronometer is implemented.
         } else {
             startPauseTimerButton.setText(R.string.timer_button_start);
             enableResetButton();
             isTimerRunning = false;
-            chronometer.stop();  //FIXME Remove when the real chronometer is implemented.
         }
     }
 
@@ -197,6 +154,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         startPauseTimerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                start();
                 if (isTimerRunning) {
                     pause();
                 } else {
@@ -251,7 +209,6 @@ public class TimerFragment extends Fragment implements CounterActivity {
         if (time >= DateUtils.SECOND_IN_MILLIS) {
             s = (int) (time/DateUtils.SECOND_IN_MILLIS);
         }
-
         if (h>0) {
             text.append(h).append(":");
         }

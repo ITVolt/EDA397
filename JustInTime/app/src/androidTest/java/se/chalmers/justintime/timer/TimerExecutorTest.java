@@ -21,10 +21,16 @@ public class TimerExecutorTest {
     private TimerInstance basicTimer,basicTimer1, timerThatWillNotFinish;
     @Before
     public void setUp() throws Exception {
+        Ticker ticker = new Ticker() {
+            @Override
+            public void onTick(long time) {
+
+            }
+        };
         timerHandler = new TimerHandler();
-        basicTimer = new TimerInstance(new BasicTimer(200));
-        basicTimer1 = new TimerInstance(new BasicTimer(200));
-        timerThatWillNotFinish = new TimerInstance(new BasicTimer(2000L));
+        basicTimer = new TimerInstance(new BasicTimer(200),ticker);
+        basicTimer1 = new TimerInstance(new BasicTimer(200),ticker);
+        timerThatWillNotFinish = new TimerInstance(new BasicTimer(2000L),ticker);
     }
 
     @Test
