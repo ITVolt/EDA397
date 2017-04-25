@@ -1,6 +1,8 @@
 package se.chalmers.justintime.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -8,45 +10,60 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import se.chalmers.justintime.R;
 
+import static android.R.attr.animation;
+
 public class SplashScreenActivity extends AppCompatActivity {
+
+    private static final long SPLASH_SCREEN_DELAY = 2500;
+
+    private Handler mSplashHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
 
-        Thread myThread = new Thread(){
+        mSplashHandler = new Handler();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+        mSplashHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                try {
-                    sleep(2500);
-                    Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                    startActivity(intent);
-                    finish();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                Intent intent = new Intent(SplashScreenActivity.this, MainActivity.class);
+                SplashScreenActivity.this.startActivity(intent);
+                SplashScreenActivity.this.finish();
             }
-        };
-        myThread.start();
+        }, SPLASH_SCREEN_DELAY);
 
-
-        final ImageView iv = (ImageView) findViewById(R.id.imageButton3);
         final Animation an = AnimationUtils.loadAnimation(getBaseContext(),R.anim.fade_in);
+        final ImageView iv = (ImageView) findViewById(R.id.imageButton3);
         final TextView tv = (TextView) findViewById(R.id.textView3);
 
         tv.setAnimation(an);
-
         iv.startAnimation(an);
+
         an.setAnimationListener(new Animation.AnimationListener() {
 
 
             @Override
             public void onAnimationStart(Animation animation) {
+                /*
+                Context context = getApplicationContext();
+                CharSequence text = "Loading...";
+                int duration = Toast.LENGTH_SHORT;
 
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+                */
             }
 
             @Override
@@ -61,14 +78,27 @@ public class SplashScreenActivity extends AppCompatActivity {
 
         });
 
+
     }
+
+
+    @Override
+    protected void onPause() {
+
+        super.onPause();
+        mSplashHandler.removeCallbacksAndMessages(null);
+
+    }
+
+
 
     public void removeSplash(View view){
 
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-        finish();
-}
+        Intent intent = new Intent(SplashScreenActivity.this, MainActivity.class);
+        SplashScreenActivity.this.startActivity(intent);
+        SplashScreenActivity.this.finish();
+
+    }
 
 
 }
