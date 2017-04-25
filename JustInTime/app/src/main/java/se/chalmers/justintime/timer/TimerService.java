@@ -66,9 +66,9 @@ public class TimerService extends Service implements Ticker {
 
     /**
      * Notifiy client that the time have changed
-     * obj Long time left on the current timer
      */
     public final static int UPDATE_TIMER = 20;
+    public final static String UPDATED_TIME = "UPDATED_TIME";
     /**
      * Notify client that a timer have finnished
      */
@@ -92,6 +92,7 @@ public class TimerService extends Service implements Ticker {
                     break;
                 case REGISTER_CLIENT:
                     client = message.replyTo;
+                    Log.d("TimerService", "Setting client " + client);
                     break;
                 case ENTER_FOREGROUND:
                     showForegroundNotification();
@@ -175,7 +176,6 @@ public class TimerService extends Service implements Ticker {
                 .setWhen(System.currentTimeMillis()+10000)  // the time stamp
                 .setContentTitle(getText(R.string.local_service_label))  // the label of the entry
                 .setUsesChronometer(true)
-                .setChronometerCountDown(true)
                 .setContentText("Change me")  // the contents of the entry
                 .setContentIntent(contentIntent)  // The intent to send when the entry is clicked
                 .build();
@@ -188,12 +188,23 @@ public class TimerService extends Service implements Ticker {
 
     @Override
     public void onTick(long time){
-        Log.d("TimerService", "Sending update");
-        Message message = Message.obtain(null, UPDATE_TIMER, time);
-        try {
-            client.send(message);
-        } catch (RemoteException e) {
-            e.printStackTrace();
+        if(client != null){
+            //Log.d("TimerService", "Sending update to " + client);
+            ParcelableLong l = new ParcelableLong(time);
+            Message message = Message.obtain(null, UPDATE_TIMER);
+            message.getData().putParcelable(UPDATED_TIME, l);
+            try {
+                client.send(message);
+                //Log.d("TimerService", "Sent onTick");
+            } catch (RemoteException e) {
+                Log.d("TimerService", "onTick RemoteExeption " + e.getMessage());
+                e.printStackTrace();
+                Log.d("TimerService", "Got a remote execption setting client to null");
+                client = null;
+            } catch (Exception e){
+                Log.d("TimerService", e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 }

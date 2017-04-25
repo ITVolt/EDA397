@@ -32,6 +32,7 @@ import se.chalmers.justintime.R;
 import se.chalmers.justintime.alert.BackgroundAlarm;
 import se.chalmers.justintime.fragments.StatisticsFragment;
 import se.chalmers.justintime.fragments.TimerFragment;
+import se.chalmers.justintime.timer.ParcelableLong;
 import se.chalmers.justintime.timer.TimerService;
 
 
@@ -41,19 +42,23 @@ public class MainActivity extends AppCompatActivity
 
     private Presenter presenter;
 
+    final Messenger receiver = new Messenger(new MessagingHandler());;
     Messenger timerService;
     boolean isBound;
 
-    class MessagingHandler extends Handler {
+    private class MessagingHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-            Log.d("MainActivity", "Received message " + msg.what);
+            //Log.d("MainActivity", "Received message " + msg.what);
             switch (msg.what) {
                 case TimerService.ECHO:
                     Log.d("Messaging", "Received echo");
                     break;
                 case TimerService.UPDATE_TIMER:
-                    presenter.updateTimer((Long) msg.obj);
+                    final Bundle bundle = msg.getData();
+                    bundle.setClassLoader(getClassLoader());
+                    ParcelableLong time = bundle.getParcelable(TimerService.UPDATED_TIME);
+                    presenter.updateTimer(time.getL());
                     break;
                 default:
                     super.handleMessage(msg);
@@ -84,7 +89,6 @@ public class MainActivity extends AppCompatActivity
         jumpToFragment(timerFragment);
     }
 
-    final Messenger receiver = new Messenger(new MessagingHandler());
     private ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -93,6 +97,8 @@ public class MainActivity extends AppCompatActivity
             try {
                 Message message = Message.obtain(null, TimerService.REGISTER_CLIENT);
                 message.replyTo = receiver;
+                timerService.send(message);
+                message.what = TimerService.ECHO;
                 timerService.send(message);
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -210,7 +216,6 @@ public class MainActivity extends AppCompatActivity
                 e.printStackTrace();
             }
         }
-
     }
 
 }

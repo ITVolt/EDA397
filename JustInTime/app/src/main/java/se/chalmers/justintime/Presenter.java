@@ -3,9 +3,9 @@ package se.chalmers.justintime;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.util.Log;
 
 import se.chalmers.justintime.fragments.TimerFragment;
-import se.chalmers.justintime.timer.TimerHandler;
 import se.chalmers.justintime.timer.TimerService;
 
 /**
