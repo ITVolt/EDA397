@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity
                     ParcelableLong time = bundle.getParcelable(TimerService.UPDATED_TIME);
                     presenter.updateTimer(time.getL());
                     break;
+
                 default:
                     super.handleMessage(msg);
             }
@@ -196,7 +197,9 @@ public class MainActivity extends AppCompatActivity
 
         Message message = Message.obtain(null, TimerService.ENTER_FOREGROUND);
         try {
-            timerService.send(message);
+            if(timerService != null){
+                timerService.send(message);
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
         }

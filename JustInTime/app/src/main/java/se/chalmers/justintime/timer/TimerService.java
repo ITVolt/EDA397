@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -15,7 +16,6 @@ import android.util.Log;
 
 import se.chalmers.justintime.R;
 import se.chalmers.justintime.activities.MainActivity;
-import se.chalmers.justintime.timer.timers.BasicTimer;
 import se.chalmers.justintime.timer.timers.TimerInstance;
 
 /**
@@ -28,6 +28,8 @@ public class TimerService extends Service implements Ticker {
     private Messenger client;
     private TimerService self = this;
     private final static int ONGOING_NOTIFICATION = 1;
+
+
 
     /**
      * For testing purposes only
@@ -49,18 +51,23 @@ public class TimerService extends Service implements Ticker {
 
     /**
      * TimerService creates a new timer
+     * Append a ParcelableTimer in the bundle tagged with NEW_TIMER_INFO.
      */
     public final static int NEW_TIMER = 10;
+    public final static String NEW_TIMER_INFO = "NEW_TIMER";
     /**
      * TimerService starts a timer
+     * arg1: id of timer
      */
     public final static int START_TIMER = 11;
     /**
-     * TimerService pauses a timer
+     * TimerService stops a timer
+     * arg1: id of timer
      */
     public final static int PAUSE_TIMER = 12;
     /**
      * TimerService resets a timer to its default value
+     * arg1: id of timer
      */
     public final static int RESET_TIMER = 13;
 
@@ -100,11 +107,22 @@ public class TimerService extends Service implements Ticker {
                 case LEAVE_FORGROUND:
                     stopForeground(true);
                     break;
-                case START_TIMER:
-                    TimerInstance timerInstance = new TimerInstance(new BasicTimer(1000 * 60), self);
+                case NEW_TIMER:
+                    final Bundle bundle = message.getData();
+                    bundle.setClassLoader(getClassLoader());
+                    ParcelableTimer timerData = bundle.getParcelable(NEW_TIMER_INFO);
+                    TimerInstance timerInstance = new TimerInstance(timerData, self);
                     timerHandler.addTimer(timerInstance);
-                    timerHandler.startTimer(timerInstance);
                     break;
+                case START_TIMER:
+                    timerHandler.startTimer(message.arg1);
+                    break;
+                case PAUSE_TIMER:
+                    timerHandler.stopTimer(message.arg1);
+                    break;
+                case RESET_TIMER:
+                    long time  =timerHandler.resetTimer(message.arg1);
+                    onTick(time);
                 default:
                     super.handleMessage(message);
             }

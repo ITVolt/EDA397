@@ -11,12 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Chronometer;
 import android.widget.TextView;
 
-import org.threeten.bp.LocalDateTime;
-import org.threeten.bp.LocalTime;
-import org.threeten.bp.ZoneOffset;
+import java.util.ArrayList;
 
 import se.chalmers.justintime.Presenter;
 import se.chalmers.justintime.R;
@@ -25,7 +22,6 @@ import se.chalmers.justintime.alert.Alarm;
 import se.chalmers.justintime.alert.AlarmBuilder;
 import se.chalmers.justintime.alert.SharedPreference;
 import se.chalmers.justintime.database.DatabaseHelper;
-import se.chalmers.justintime.database.TimerLogEntry;
 
 /**
  * This fragment shows a basic timer counting down from a time to zero.
@@ -35,7 +31,7 @@ import se.chalmers.justintime.database.TimerLogEntry;
 public class TimerFragment extends Fragment implements CounterActivity {
 
 
-    private boolean isTimerRunning;
+    private boolean isTimerRunning = false;
     private SharedPreference preferences;
 
     private TextView timerText;
@@ -53,6 +49,8 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
     private Presenter presenter;
     private long currentTimerValue;
+
+    private int currentTimerId;
 
     public TimerFragment() {
         // Required empty public constructor
@@ -96,6 +94,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         alarm = ab.getAlarmInstance();
 
         setButtonOnClickListeners();
+
         return view;
     }
 
@@ -107,26 +106,33 @@ public class TimerFragment extends Fragment implements CounterActivity {
     @Override
     public void start() {
         setRunningState(true);
-        presenter.startTimer();
+        //FIXME remove this when gui can add new timers
+        if(currentTimerId == 0){
+            ArrayList<Long> duraiton = new ArrayList<>();
+            duraiton.add(10000L);
+            currentTimerId = presenter.newTimer(duraiton);
+        }
+        presenter.startTimer(currentTimerId);
     }
 
     @Override
     public void pause() {
+        presenter.pauseTimer(currentTimerId);
+        setRunningState(false);
     }
 
     @Override
     public void reset() {
         disableResetButton();
         updateTimerText();
+        presenter.resetTimer(currentTimerId);
     }
 
     @Override
     public void updateTime(long ms) {
+        Log.d("UPDATE TIME", ms + " ");
         currentTimerValue = ms;
         updateTimerText();
-        if (currentTimerValue <= 0) {
-            onTimerFinish();
-        }
     }
 
     private void updateTimerText() {
@@ -154,7 +160,6 @@ public class TimerFragment extends Fragment implements CounterActivity {
         startPauseTimerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                start();
                 if (isTimerRunning) {
                     pause();
                 } else {
@@ -239,5 +244,5 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
     public void setPresenter(Presenter presenter) {
         this.presenter = presenter;
-    }
+        }
 }

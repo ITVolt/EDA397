@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import se.chalmers.justintime.timer.timers.BasicTimer;
 import se.chalmers.justintime.timer.timers.TimerInstance;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -28,9 +29,9 @@ public class TimerExecutorTest {
             }
         };
         timerHandler = new TimerHandler();
-        basicTimer = new TimerInstance(new BasicTimer(200),ticker);
-        basicTimer1 = new TimerInstance(new BasicTimer(200),ticker);
-        timerThatWillNotFinish = new TimerInstance(new BasicTimer(2000L),ticker);
+        basicTimer = new TimerInstance(1, new BasicTimer(200),ticker);
+        basicTimer1 = new TimerInstance(2, new BasicTimer(200),ticker);
+        timerThatWillNotFinish = new TimerInstance(3, new BasicTimer(2000L),ticker);
     }
 
     @Test
@@ -41,13 +42,53 @@ public class TimerExecutorTest {
         timerHandler.addTimer(basicTimer);
         timerHandler.addTimer(basicTimer1);
         timerHandler.addTimer(timerThatWillNotFinish);
-        timerHandler.startTimer(basicTimer);
-        timerHandler.startTimer(basicTimer1);
-        timerHandler.startTimer(timerThatWillNotFinish);
+        timerHandler.startTimer(1);
+        timerHandler.startTimer(2);
+        timerHandler.startTimer(3);
         Thread.sleep(300);
         assertTrue(basicTimer.isTimerDone());
         assertTrue(basicTimer1.isTimerDone());
         assertFalse(timerThatWillNotFinish.isTimerDone());
+
     }
+
+    @Test
+    public void stopTimer() throws InterruptedException {
+        timerHandler.addTimer(timerThatWillNotFinish);
+        timerHandler.startTimer(3);
+        Thread.sleep(300);
+        timerHandler.stopTimer(3);
+        long l = timerThatWillNotFinish.getRemainingTime();
+        Thread.sleep(300);
+        long l2 = timerThatWillNotFinish.getRemainingTime();
+        assertTrue(l == timerThatWillNotFinish.getRemainingTime());
+    }
+
+
+    @Test
+    public void resumeTimer() throws InterruptedException {
+        timerHandler.addTimer(timerThatWillNotFinish);
+        timerHandler.startTimer(3);
+        Thread.sleep(100);
+        timerHandler.stopTimer(3);
+        long pause = timerThatWillNotFinish.getRemainingTime();
+        timerHandler.startTimer(3);
+        Thread.sleep(100);
+        long after100 = timerThatWillNotFinish.getRemainingTime();
+        assertTrue(pause > after100);
+    }
+
+    @Test
+    public void resetTimer() throws InterruptedException {
+        timerHandler.addTimer(timerThatWillNotFinish);
+        timerHandler.startTimer(3);
+        Thread.sleep(100);
+        assertFalse(2000L == timerThatWillNotFinish.getRemainingTime());
+        assertEquals(2000L, timerHandler.resetTimer(3));
+        Thread.sleep(100);
+        long l = timerThatWillNotFinish.getRemainingTime();
+        System.out.println(l);
+    }
+
 
 }

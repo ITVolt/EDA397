@@ -2,6 +2,7 @@ package se.chalmers.justintime.timer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -12,6 +13,7 @@ import se.chalmers.justintime.timer.timers.TimerInstance;
  */
 
 public class TimerHandler {
+
     private List<TimerInstance> timers;
     private ScheduledThreadPoolExecutor timerSchedulerExecutor;
 
@@ -25,19 +27,34 @@ public class TimerHandler {
         timers.add(timerInstance);
     }
 
-    public void startTimer(TimerInstance timerInstance) {
-        scheduleTimerWithFixedRate(timerInstance, 20);
+    public void startTimer(int timerInstance) {
+        scheduleTimerWithFixedRate(findById(timerInstance), 20);
     }
 
     private void scheduleTimerWithFixedRate(TimerInstance timer, long fixedRateInMilliSeconds) {
-        timerSchedulerExecutor.scheduleAtFixedRate(timer, 0, fixedRateInMilliSeconds, TimeUnit.MILLISECONDS);
+        ScheduledFuture sf = timerSchedulerExecutor.scheduleAtFixedRate(timer, 0, fixedRateInMilliSeconds, TimeUnit.MILLISECONDS);
+        timer.setFuture(sf);
     }
 
-    public boolean removeTimer(TimerInstance timerInstance) {
-        return stopTimer(timerInstance) && timers.remove(timerInstance);
+    public boolean removeTimer(int timerId) {
+        return stopTimer(timerId) && timers.remove(findById(timerId));
     }
 
-    public boolean stopTimer(TimerInstance timer) {
-        return timerSchedulerExecutor.remove(timer);
+    public boolean stopTimer(int timerId) {
+        TimerInstance t = findById(timerId);
+        return t.stop();
+    }
+
+    private TimerInstance findById(int id){
+        for (TimerInstance t: timers) {
+            if(t.getId() == id) {
+                return t;
+            }
+        }
+        return null;
+    }
+
+    public long resetTimer(int timerId) {
+        return findById(timerId).reset();
     }
 }
