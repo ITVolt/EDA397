@@ -33,7 +33,8 @@ public class Notification {
                 .setColor(Color.BLUE)
                 .setContentText("go back to timmer")
                 .setSmallIcon(R.drawable.ic_menu_manage)
-                .setContentIntent(pIntent);
+                .setContentIntent(pIntent)
+                .setAutoCancel(true);
 
         android.app.Notification n = b.build();
         NotificationManager mNotificationManager =

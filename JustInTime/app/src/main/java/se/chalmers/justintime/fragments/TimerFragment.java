@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import org.threeten.bp.LocalDateTime;
 
+import se.chalmers.justintime.Presenter;
 import se.chalmers.justintime.R;
 import se.chalmers.justintime.activities.CounterActivity;
 import se.chalmers.justintime.alert.Alarm;
@@ -38,7 +39,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private LocalDateTime startTime;
 
     private boolean isTimerRunning;
-    private SharedPreference mPreferences;
+    private SharedPreference preferences;
 
     // private BasicTimer timer;    FIXME For when the real chronometer is implemented.
     private TextView timerText;
@@ -57,6 +58,8 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private View view;
     public static boolean isTimmerRunning = false;
 
+
+    private Presenter presenter;
 
     public TimerFragment() {
         // Required empty public constructor
@@ -94,7 +97,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         resetTimerButton = (Button) view.findViewById(R.id.timerResetButton);
 
         // Set up the alarm.
-        mPreferences = new SharedPreference(view.getContext());
+        preferences = new SharedPreference(view.getContext());
         AlarmBuilder ab = new AlarmBuilder(view.getContext());
         ab.setUseSound(true);
         ab.setUseVibration(true);
@@ -106,7 +109,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
             public void onChronometerTick(Chronometer chronometer) {
                 if (isTimerRunning) {
                     currentTimerValue -= 1000;
-                    mPreferences.setTimeToGo(currentTimerValue/1000);
+                    preferences.setTimeToGo(currentTimerValue/1000);
                     updateTimerText();
                     if (currentTimerValue <= 0) {
                         onTimerFinish();
@@ -188,7 +191,6 @@ public class TimerFragment extends Fragment implements CounterActivity {
             isTimerRunning = false;
             chronometer.stop();  //FIXME Remove when the real chronometer is implemented.
         }
-        isTimmerRunning = isTimerRunning;
     }
 
     private void setButtonOnClickListeners() {
@@ -276,5 +278,9 @@ public class TimerFragment extends Fragment implements CounterActivity {
      */
     private String parseTimeDetailed(long time) {
         return parseTime(time) + (time % DateUtils.SECOND_IN_MILLIS);
+    }
+
+    public void setPresenter(Presenter presenter) {
+        this.presenter = presenter;
     }
 }

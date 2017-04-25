@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
+import se.chalmers.justintime.Presenter;
 import se.chalmers.justintime.R;
 import se.chalmers.justintime.alert.BackgroundAlarm;
 import se.chalmers.justintime.alert.SharedPreference;
@@ -44,22 +45,25 @@ public class MainActivity extends AppCompatActivity
     private long wakeUpTime;
     private long savedTime;
 
+    private Presenter presenter;
 
     Messenger timerService;
     boolean isBound;
-    static class MessagingHandler extends Handler{
+    class MessagingHandler extends Handler{
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case TimerService.ECHO:
                     Log.d("Messaging", "Received echo");
                     break;
+                case TimerService.UPDATE_TIMER:
+                    presenter.updateTimer((Long)msg.obj);
+                    break;
                 default:
                     super.handleMessage(msg);
             }
         }
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,8 +83,10 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        jumpToFragment(TimerFragment.newInstance());
+        TimerFragment timerFragment = TimerFragment.newInstance();
+        presenter = new Presenter(timerFragment);
+        timerFragment.setPresenter(presenter);
+        jumpToFragment(timerFragment);
     }
     final Messenger receiver = new Messenger(new MessagingHandler());
     private ServiceConnection connection = new ServiceConnection() {
@@ -95,11 +101,13 @@ public class MainActivity extends AppCompatActivity
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
+            presenter.setTimerService(timerService);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             timerService = null;
+            presenter.setTimerService(null);
             Log.d("Messaging", "Disconnected");
         }
     };
