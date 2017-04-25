@@ -9,9 +9,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.SparseArray;
 
+import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.ZoneOffset;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -134,4 +137,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return durationInHour;
     }
 
+    public TimerInfoBundle[] getAllTimerData() {
+        ArrayList<TimerInfoBundle> timerInfoBundles = new ArrayList<>();
+
+        SparseArray<ArrayList<TimerLogEntry>> timers = new SparseArray<>();
+        ArrayList<TimerLogEntry> timer;
+        Cursor cursor = getData();
+        cursor.moveToFirst();
+
+        int id;
+        while(!cursor.isAfterLast()) {
+            id = cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_GROUPID));
+            timer = timers.get(id);
+            if (timer == null) {
+                timers.append(id, new ArrayList<TimerLogEntry>());
+                timer = timers.get(id);
+            }
+            timer.add(new TimerLogEntry(-1,
+                    id,
+                    LocalDateTime.ofEpochSecond(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_START_TIME)),0, ZoneOffset.UTC),
+                    cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_DURATION))));
+
+            cursor.moveToNext();
+        }
+
+        for (int i=0; i<timers.size(); i++) {
+            timer = timers.valueAt(i);
+            timerInfoBundles.add(new TimerInfoBundle("Undefined",
+                    timer.toArray(new TimerLogEntry[timer.size()]),
+                    new String[] {"Undefined"}));
+        }
+        return timerInfoBundles.toArray(new TimerInfoBundle[timerInfoBundles.size()]);
+    }
 }
