@@ -1,16 +1,12 @@
 package se.chalmers.justintime.fragments;
 
 
-import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.provider.CalendarContract;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
@@ -29,14 +25,14 @@ import se.chalmers.justintime.R;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link WeekStatisticsFragment#newInstance} factory method to
+ * Use the {@link WeekDetailedStatisticsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class WeekStatisticsFragment extends Fragment {
+public class WeekDetailedStatisticsFragment extends Fragment {
 
     private View view;
 
-    public WeekStatisticsFragment() {
+    public WeekDetailedStatisticsFragment() {
         // Required empty public constructor
     }
 
@@ -44,11 +40,11 @@ public class WeekStatisticsFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment WeekStatisticsFragment.
+     * @return A new instance of fragment WeekDetailedStatisticsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static WeekStatisticsFragment newInstance(String fragmentName) {
-        WeekStatisticsFragment fragment = new WeekStatisticsFragment();
+    public static WeekDetailedStatisticsFragment newInstance(String fragmentName) {
+        WeekDetailedStatisticsFragment fragment = new WeekDetailedStatisticsFragment();
         return fragment;
     }
 
