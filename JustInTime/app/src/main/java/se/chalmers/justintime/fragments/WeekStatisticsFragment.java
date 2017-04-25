@@ -3,10 +3,13 @@ package se.chalmers.justintime.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewPager;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import org.threeten.bp.LocalDateTime;
@@ -15,6 +18,7 @@ import org.threeten.bp.temporal.WeekFields;
 
 import se.chalmers.justintime.R;
 import se.chalmers.justintime.StatisticsBundle;
+import se.chalmers.justintime.StatisticsFragmentPagerAdapter;
 import se.chalmers.justintime.WeekListAdapter;
 import se.chalmers.justintime.database.DatabaseHelper;
 import se.chalmers.justintime.database.TimerInfoBundle;
@@ -29,6 +33,7 @@ import java.util.Locale;
 public class WeekStatisticsFragment extends Fragment {
 
     private StatisticsBundle[] weekData;
+    private StatisticsFragmentPagerAdapter tabManager;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -58,8 +63,17 @@ public class WeekStatisticsFragment extends Fragment {
         // Gather the weekly statistics.
         populateWeekData(new DatabaseHelper(view.getContext()).getAllTimerData());
 
-        ListView listview = (ListView) view.findViewById(R.id.week_list_view);
+        final ListView listview = (ListView) view.findViewById(R.id.week_list_view);
         listview.setAdapter(new WeekListAdapter(view.getContext(), weekData));
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                FragmentManager manager = getActivity().getSupportFragmentManager();
+                manager.beginTransaction().replace(
+                        R.id.relativeLayoutForFragment, WeekDetailedStatisticsFragment.newInstance((StatisticsBundle) listview.getItemAtPosition(position)))
+                        .commit();
+            }
+        });
 
         return view;
     }
@@ -112,5 +126,10 @@ public class WeekStatisticsFragment extends Fragment {
         }
 
         weekData = weekBundles.toArray(new StatisticsBundle[weekBundles.size()]);
+    }
+
+    public WeekStatisticsFragment setTabManager(StatisticsFragmentPagerAdapter manager) {
+        this.tabManager = manager;
+        return this;
     }
 }

@@ -22,6 +22,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import java.util.ArrayList;
 
 import se.chalmers.justintime.R;
+import se.chalmers.justintime.StatisticsBundle;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -43,7 +44,7 @@ public class WeekDetailedStatisticsFragment extends Fragment {
      * @return A new instance of fragment WeekDetailedStatisticsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static WeekDetailedStatisticsFragment newInstance(String fragmentName) {
+    public static WeekDetailedStatisticsFragment newInstance(StatisticsBundle fragmentName) {
         WeekDetailedStatisticsFragment fragment = new WeekDetailedStatisticsFragment();
         return fragment;
     }
