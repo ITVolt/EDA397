@@ -13,26 +13,19 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
     android:weightSum="1">
 
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="63dp"
-        android:layout_height="58dp"
-        app:srcCompat="@drawable/logohires" />
-
     <TextView
         android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/course_name"
-        android:textColor="@color/colorAccent" />
-
-    <TextView
-        android:id="@+id/textView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:text="@string/group_name"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="@color/colorAccent" />
+        android:layout_weight="0.14"
+        android:text="Tima"
+        android:textColor="@android:color/white"
+        android:textSize="24sp" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="95dp"
+        android:layout_height="78dp"
+        app:srcCompat="@drawable/logohires" />
 
 </LinearLayout>

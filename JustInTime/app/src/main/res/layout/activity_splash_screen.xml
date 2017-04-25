@@ -32,7 +32,7 @@
         android:layout_marginTop="122dp"
         android:fontFamily="sans-serif-condensed"
         android:gravity="center"
-        android:text="Tima"
+        android:text="@string/app_name"
         android:textColor="@color/icons"
         android:textSize="75sp"
         android:typeface="normal"
@@ -40,6 +40,18 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:layout_width="66dp"
+        android:layout_height="86dp"
+        android:indeterminate="true"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/textView3"
+        android:layout_marginBottom="86dp"
+        app:layout_constraintHorizontal_bias="0.498" />
 
 
 
