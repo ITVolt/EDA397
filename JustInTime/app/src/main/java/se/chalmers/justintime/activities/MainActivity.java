@@ -34,6 +34,7 @@ import se.chalmers.justintime.alert.BackgroundAlarm;
 import se.chalmers.justintime.alert.SharedPreference;
 import se.chalmers.justintime.fragments.StatisticsFragment;
 import se.chalmers.justintime.fragments.TimerFragment;
+import se.chalmers.justintime.fragments.TimerSequenceFragment;
 import se.chalmers.justintime.timer.TimerService;
 
 
@@ -165,7 +166,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_timerA) {
             jumpToFragment(TimerFragment.newInstance());
         } else if (id == R.id.nav_timerB) {
-            Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+            jumpToFragment(TimerSequenceFragment.newInstance());
         } else if (id == R.id.nav_timerC) {
             Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_statistics) {
