@@ -55,12 +55,14 @@ public class MainActivity extends AppCompatActivity
                     Log.d("Messaging", "Received echo");
                     break;
                 case TimerService.UPDATE_TIMER:
-                    final Bundle bundle = msg.getData();
+                    Bundle bundle = msg.getData();
                     bundle.setClassLoader(getClassLoader());
                     ParcelableLong time = bundle.getParcelable(TimerService.UPDATED_TIME);
                     presenter.updateTimer(time.getL());
                     break;
-
+                case TimerService.ALERT_TIMER:
+                    presenter.alert();
+                    break;
                 default:
                     super.handleMessage(msg);
             }

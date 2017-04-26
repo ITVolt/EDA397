@@ -70,4 +70,7 @@ public class Presenter {
     public void resetTimer(int id){
         sendMessage(Message.obtain(null, TimerService.RESET_TIMER, id, 0));
     }
+    public void alert(){
+        timerFragment.onTimerFinish();
+    }
 }

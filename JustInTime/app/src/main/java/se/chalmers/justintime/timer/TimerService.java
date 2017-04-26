@@ -81,7 +81,6 @@ public class TimerService extends Service implements Ticker {
      */
     public final static int ALERT_TIMER = 21;
 
-    //TODO add timers
 
     private class MessagingHandler extends Handler{
         @Override
@@ -208,11 +207,15 @@ public class TimerService extends Service implements Ticker {
     public void onTick(long time){
         if(client != null){
             //Log.d("TimerService", "Sending update to " + client);
+
             ParcelableLong l = new ParcelableLong(time);
             Message message = Message.obtain(null, UPDATE_TIMER);
             message.getData().putParcelable(UPDATED_TIME, l);
             try {
                 client.send(message);
+                if(time <= 0){ //If timer is done send alert aswell
+                    client.send(Message.obtain(null, ALERT_TIMER));
+                }
                 //Log.d("TimerService", "Sent onTick");
             } catch (RemoteException e) {
                 Log.d("TimerService", "onTick RemoteExeption " + e.getMessage());

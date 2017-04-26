@@ -139,7 +139,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         timerText.setText(parseTime(currentTimerValue));
     }
 
-    private void onTimerFinish() {
+    public void onTimerFinish() {
         Log.d("TimerFragment", "onTimerFinish: Time's up!");
         alarm.alert();
     }
@@ -199,6 +199,12 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private String parseTime(long time) {
         StringBuilder text = strBuilder;
         text.setLength(0);
+
+        if(time < 0){
+            text.append("-");
+            time = Math.abs(time);
+        }
+
         int h = 0;
         int m = 0;
         int s = 0;
