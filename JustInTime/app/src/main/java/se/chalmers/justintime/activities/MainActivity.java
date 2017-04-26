@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-        if(TimerFragment.isTimmerRunning) {
+        if(TimerFragment.isStaticTimerRunning) {
             timerLength = mPreferences.getTimeToGo();
             wakeUpTime = (Calendar.getInstance().getTimeInMillis() + timerLength * 1000);
             backgroundAlarm.setAlalrm(wakeUpTime);
@@ -219,11 +219,12 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        if(TimerFragment.isTimmerRunning) {
+        if(TimerFragment.isStaticTimerRunning) {
             backgroundAlarm.removeAlarm();
-            if(wakeUpTime <= Calendar.getInstance().getTimeInMillis()) savedTime = 0;
-            else savedTime = wakeUpTime - Calendar.getInstance().getTimeInMillis();
-            TimerFragment.currentTimerValue = savedTime;
+            /* Now that the timer can run in the background in timerservice then we can remove this code*/
+           // if(wakeUpTime <= Calendar.getInstance().getTimeInMillis()) savedTime = 0;
+            //else savedTime = wakeUpTime - Calendar.getInstance().getTimeInMillis();
+            //TimerFragment.currentTimerValue = savedTime;
         }
     }
 

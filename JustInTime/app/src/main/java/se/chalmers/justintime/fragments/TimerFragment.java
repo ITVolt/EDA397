@@ -58,7 +58,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private int currentPauseId;
 
     private View view;
-    public static boolean isTimmerRunning = false;
+    public static boolean isStaticTimerRunning = false;
 
 
     private Presenter presenter;
@@ -250,6 +250,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
             isTimerRunning = false;
             chronometer.stop();  //FIXME Remove when the real chronometer is implemented.
         }
+        isStaticTimerRunning = isTimerRunning;
     }
 
     private void setButtonOnClickListeners() {

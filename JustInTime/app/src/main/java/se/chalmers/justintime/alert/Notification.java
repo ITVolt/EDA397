@@ -32,7 +32,7 @@ public class Notification {
                 .setContentTitle("TIMMER HAS FINISHED")
                 .setColor(Color.BLUE)
                 .setContentText("go back to timmer")
-                .setSmallIcon(R.drawable.ic_menu_manage)
+                .setSmallIcon(R.drawable.logo)
                 .setContentIntent(pIntent)
                 .setAutoCancel(true);
 
