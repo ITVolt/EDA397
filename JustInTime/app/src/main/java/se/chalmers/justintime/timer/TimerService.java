@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -15,17 +16,20 @@ import android.util.Log;
 
 import se.chalmers.justintime.R;
 import se.chalmers.justintime.activities.MainActivity;
+import se.chalmers.justintime.timer.timers.TimerInstance;
 
 /**
  * Created by Nieo on 08/04/17.
  */
 
-public class TimerService extends Service {
-
+public class TimerService extends Service implements Ticker {
+    private TimerHandler timerHandler = new TimerHandler();
     private NotificationManager notificationManager;
     private Messenger client;
-
+    private TimerService self = this;
     private final static int ONGOING_NOTIFICATION = 1;
+
+    private boolean isForeground = false;
 
     /**
      * For testing purposes only
@@ -47,32 +51,36 @@ public class TimerService extends Service {
 
     /**
      * TimerService creates a new timer
+     * Append a ParcelableTimer in the bundle tagged with NEW_TIMER_INFO.
      */
     public final static int NEW_TIMER = 10;
+    public final static String NEW_TIMER_INFO = "NEW_TIMER";
     /**
      * TimerService starts a timer
+     * arg1: id of timer
      */
     public final static int START_TIMER = 11;
     /**
-     * TimerService pauses a timer
+     * TimerService stops a timer
+     * arg1: id of timer
      */
     public final static int PAUSE_TIMER = 12;
     /**
      * TimerService resets a timer to its default value
+     * arg1: id of timer
      */
     public final static int RESET_TIMER = 13;
 
     /**
      * Notifiy client that the time have changed
-     * obj Long time left on the current timer
      */
     public final static int UPDATE_TIMER = 20;
+    public final static String UPDATED_TIME = "UPDATED_TIME";
     /**
      * Notify client that a timer have finnished
      */
     public final static int ALERT_TIMER = 21;
 
-    //TODO add timers
 
     private class MessagingHandler extends Handler{
         @Override
@@ -90,13 +98,32 @@ public class TimerService extends Service {
                     break;
                 case REGISTER_CLIENT:
                     client = message.replyTo;
+                    Log.d("TimerService", "Setting client " + client);
                     break;
                 case ENTER_FOREGROUND:
-                    showForegroundNotification();
+                    isForeground = true;
+                   // showForegroundNotification();
                     break;
                 case LEAVE_FORGROUND:
-                    stopForeground(true);
+                    isForeground = false;
+                   // stopForeground(true);
                     break;
+                case NEW_TIMER:
+                    final Bundle bundle = message.getData();
+                    bundle.setClassLoader(getClassLoader());
+                    ParcelableTimer timerData = bundle.getParcelable(NEW_TIMER_INFO);
+                    TimerInstance timerInstance = new TimerInstance(timerData, self);
+                    timerHandler.addTimer(timerInstance);
+                    break;
+                case START_TIMER:
+                    timerHandler.startTimer(message.arg1);
+                    break;
+                case PAUSE_TIMER:
+                    timerHandler.stopTimer(message.arg1);
+                    break;
+                case RESET_TIMER:
+                    long time  =timerHandler.resetTimer(message.arg1);
+                    onTick(time);
                 default:
                     super.handleMessage(message);
             }
@@ -105,6 +132,8 @@ public class TimerService extends Service {
     }
 
     final Messenger messenger = new Messenger(new MessagingHandler());
+
+
 
     @Nullable
     @Override
@@ -165,6 +194,7 @@ public class TimerService extends Service {
                 .setSmallIcon(R.drawable.logo)  // the status icon
                 .setWhen(System.currentTimeMillis()+10000)  // the time stamp
                 .setContentTitle(getText(R.string.local_service_label))  // the label of the entry
+                .setUsesChronometer(true)
                 .setContentText("Change me")  // the contents of the entry
                 .setContentIntent(contentIntent)  // The intent to send when the entry is clicked
                 .build();
@@ -173,5 +203,34 @@ public class TimerService extends Service {
         // We use a string id because it is a unique number.  We use it later to cancel.
         //notificationManager.notify(R.string.remote_service_started, notification);
         startForeground(ONGOING_NOTIFICATION, notification);
+    }
+
+    @Override
+    public void onTick(long time){
+        if(client != null){
+            //Log.d("TimerService", "Sending update to " + client);
+
+            ParcelableLong l = new ParcelableLong(time);
+            Message message = Message.obtain(null, UPDATE_TIMER);
+            message.getData().putParcelable(UPDATED_TIME, l);
+            try {
+                client.send(message);
+                if(time <= 0){ //If timer is done send alert aswell
+                    client.send(Message.obtain(null, ALERT_TIMER));
+                    if(isForeground){
+                        showNotification(2, "Timer has finished");
+                    }
+                }
+                //Log.d("TimerService", "Sent onTick");
+            } catch (RemoteException e) {
+                Log.d("TimerService", "onTick RemoteExeption " + e.getMessage());
+                e.printStackTrace();
+                Log.d("TimerService", "Got a remote execption setting client to null");
+                client = null;
+            } catch (Exception e){
+                Log.d("TimerService", e.getMessage());
+                e.printStackTrace();
+            }
+        }
     }
 }

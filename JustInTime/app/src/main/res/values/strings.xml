@@ -16,5 +16,6 @@
     <string name="total">Total</string>
     <string name="remote_service_started">Remote Started</string>
     <string name="remote_service_stopped">Remote stopped</string>
-    <string name="local_service_label">Place a timer here</string>
+    <string name="local_service_label">Timer</string>
+    <string name="timer_button_stop">Stop</string>
 </resources>

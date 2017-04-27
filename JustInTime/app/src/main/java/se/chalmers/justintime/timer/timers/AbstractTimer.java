@@ -49,7 +49,7 @@ public abstract class AbstractTimer implements Timer {
 
     @Override
     public void pause() {
-        isRunning = false;
+        timeOffset = 0;
     }
 
     @Override

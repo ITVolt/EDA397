@@ -4,7 +4,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.icu.util.Calendar;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,30 +34,41 @@ import se.chalmers.justintime.alert.SharedPreference;
 import se.chalmers.justintime.fragments.StatisticsFragment;
 import se.chalmers.justintime.fragments.TimerFragment;
 import se.chalmers.justintime.fragments.TimerSequenceFragment;
+import se.chalmers.justintime.timer.ParcelableLong;
 import se.chalmers.justintime.timer.TimerService;
 
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    private SharedPreference mPreferences;
     private BackgroundAlarm backgroundAlarm;
+
+    private Presenter presenter;
+
+    final Messenger receiver = new Messenger(new MessagingHandler());;
+    Messenger timerService;
+    boolean isBound;
+
+    private SharedPreference mPreferences;
     private long timerLength = 0; // In seconds
     private long wakeUpTime;
     private long savedTime;
 
-    private Presenter presenter;
-
-    Messenger timerService;
-    boolean isBound;
-    class MessagingHandler extends Handler{
+    private class MessagingHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
+            //Log.d("MainActivity", "Received message " + msg.what);
             switch (msg.what) {
                 case TimerService.ECHO:
                     Log.d("Messaging", "Received echo");
                     break;
                 case TimerService.UPDATE_TIMER:
-                    presenter.updateTimer((Long)msg.obj);
+                    Bundle bundle = msg.getData();
+                    bundle.setClassLoader(getClassLoader());
+                    ParcelableLong time = bundle.getParcelable(TimerService.UPDATED_TIME);
+                    presenter.updateTimer(time.getL());
+                    break;
+                case TimerService.ALERT_TIMER:
+                    presenter.alert();
                     break;
                 default:
                     super.handleMessage(msg);
@@ -71,9 +81,9 @@ public class MainActivity extends AppCompatActivity
         AndroidThreeTen.init(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mPreferences = new SharedPreference(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        mPreferences = new SharedPreference(this);
         backgroundAlarm = new BackgroundAlarm(this);
         doBindService();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -89,15 +99,17 @@ public class MainActivity extends AppCompatActivity
         timerFragment.setPresenter(presenter);
         jumpToFragment(timerFragment);
     }
-    final Messenger receiver = new Messenger(new MessagingHandler());
+
     private ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             timerService = new Messenger(service);
             Log.d("Messaging", "Attached");
-            try{
+            try {
                 Message message = Message.obtain(null, TimerService.REGISTER_CLIENT);
                 message.replyTo = receiver;
+                timerService.send(message);
+                message.what = TimerService.ECHO;
                 timerService.send(message);
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -113,13 +125,14 @@ public class MainActivity extends AppCompatActivity
         }
     };
 
-    void doBindService(){
+    void doBindService() {
         bindService(new Intent(this, TimerService.class), connection, Context.BIND_AUTO_CREATE);
         isBound = true;
         Log.d("Messaging", "Binding ");
     }
-    void doUnbindService(){
-        if(isBound){
+
+    void doUnbindService() {
+        if (isBound) {
             unbindService(connection);
             isBound = false;
             Log.d("Messaging", "Unbinding");
@@ -164,7 +177,10 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         if (id == R.id.nav_timerA) {
-            jumpToFragment(TimerFragment.newInstance());
+            TimerFragment timerFragment = TimerFragment.newInstance();
+            presenter = new Presenter(timerFragment);
+            timerFragment.setPresenter(presenter);
+            jumpToFragment(timerFragment);
         } else if (id == R.id.nav_timerB) {
             jumpToFragment(TimerSequenceFragment.newInstance());
         } else if (id == R.id.nav_timerC) {
@@ -194,16 +210,11 @@ public class MainActivity extends AppCompatActivity
 
         Message message = Message.obtain(null, TimerService.ENTER_FOREGROUND);
         try {
-            timerService.send(message);
+            if(timerService != null){
+                timerService.send(message);
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
-        }
-
-
-        if(TimerFragment.isStaticTimerRunning) {
-            timerLength = mPreferences.getTimeToGo();
-            wakeUpTime = (Calendar.getInstance().getTimeInMillis() + timerLength * 1000);
-            backgroundAlarm.setAlalrm(wakeUpTime);
         }
     }
 
@@ -211,7 +222,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPostResume() {
         super.onPostResume();
-        if(timerService != null){
+        if (timerService != null) {
             Message message = Message.obtain(null, TimerService.LEAVE_FORGROUND);
             try {
                 timerService.send(message);
@@ -220,13 +231,6 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        if(TimerFragment.isStaticTimerRunning) {
-            backgroundAlarm.removeAlarm();
-            /* Now that the timer can run in the background in timerservice then we can remove this code*/
-           // if(wakeUpTime <= Calendar.getInstance().getTimeInMillis()) savedTime = 0;
-            //else savedTime = wakeUpTime - Calendar.getInstance().getTimeInMillis();
-            //TimerFragment.currentTimerValue = savedTime;
-        }
     }
 
 }
