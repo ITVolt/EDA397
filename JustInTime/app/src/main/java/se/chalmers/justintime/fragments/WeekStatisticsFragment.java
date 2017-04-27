@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import org.threeten.bp.DayOfWeek;
 import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.temporal.TemporalField;
 import org.threeten.bp.temporal.WeekFields;
@@ -33,7 +34,6 @@ import java.util.Locale;
 public class WeekStatisticsFragment extends Fragment {
 
     private StatisticsBundle[] weekData;
-    private StatisticsFragmentPagerAdapter tabManager;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -69,8 +69,10 @@ public class WeekStatisticsFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 FragmentManager manager = getActivity().getSupportFragmentManager();
+                WeekDetailedStatisticsFragment weekDetailedStatisticsFragment = WeekDetailedStatisticsFragment.newInstance();
+                weekDetailedStatisticsFragment.setData((StatisticsBundle) listview.getItemAtPosition(position));
                 manager.beginTransaction().replace(
-                        R.id.relativeLayoutForFragment, WeekDetailedStatisticsFragment.newInstance((StatisticsBundle) listview.getItemAtPosition(position)))
+                        R.id.relativeLayoutForFragment, weekDetailedStatisticsFragment)
                         .commit();
             }
         });
@@ -100,7 +102,9 @@ public class WeekStatisticsFragment extends Fragment {
             date = tib.getTimes().get(0).first;
             weekNbr = date.get(woy);
             yearNbr = date.getYear();
-
+            if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {  //Had to add this because it was getting the wrong week for sundays.
+                weekNbr--;
+            }
             SparseArray<ArrayList<TimerInfoBundle>> year = years.get(yearNbr);
             if (year == null) {
                 years.append(yearNbr, new SparseArray<ArrayList<TimerInfoBundle>>());
@@ -126,10 +130,5 @@ public class WeekStatisticsFragment extends Fragment {
         }
 
         weekData = weekBundles.toArray(new StatisticsBundle[weekBundles.size()]);
-    }
-
-    public WeekStatisticsFragment setTabManager(StatisticsFragmentPagerAdapter manager) {
-        this.tabManager = manager;
-        return this;
     }
 }

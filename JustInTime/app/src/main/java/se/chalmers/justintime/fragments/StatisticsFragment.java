@@ -49,7 +49,7 @@ public class StatisticsFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_statistics, container, false);
 
         ViewPager viewPager = (ViewPager) view.findViewById(R.id.statistics_viewpager);
-        viewPager.setAdapter(new StatisticsFragmentPagerAdapter(getFragmentManager(), view.getContext()));
+        viewPager.setAdapter(new StatisticsFragmentPagerAdapter(getChildFragmentManager(), view.getContext()));
 
         TabLayout tabLayout = (TabLayout) view.findViewById(R.id.statistics_sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);

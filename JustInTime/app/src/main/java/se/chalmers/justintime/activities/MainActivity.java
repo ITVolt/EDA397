@@ -34,6 +34,7 @@ import se.chalmers.justintime.alert.BackgroundAlarm;
 import se.chalmers.justintime.alert.SharedPreference;
 import se.chalmers.justintime.fragments.StatisticsFragment;
 import se.chalmers.justintime.fragments.TimerFragment;
+import se.chalmers.justintime.fragments.TimerSequenceFragment;
 import se.chalmers.justintime.timer.TimerService;
 
 
@@ -165,7 +166,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_timerA) {
             jumpToFragment(TimerFragment.newInstance());
         } else if (id == R.id.nav_timerB) {
-            Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+            jumpToFragment(TimerSequenceFragment.newInstance());
         } else if (id == R.id.nav_timerC) {
             Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_statistics) {
@@ -199,7 +200,7 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-        if(TimerFragment.isTimmerRunning) {
+        if(TimerFragment.isStaticTimerRunning) {
             timerLength = mPreferences.getTimeToGo();
             wakeUpTime = (Calendar.getInstance().getTimeInMillis() + timerLength * 1000);
             backgroundAlarm.setAlalrm(wakeUpTime);
@@ -219,11 +220,12 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        if(TimerFragment.isTimmerRunning) {
+        if(TimerFragment.isStaticTimerRunning) {
             backgroundAlarm.removeAlarm();
-            if(wakeUpTime <= Calendar.getInstance().getTimeInMillis()) savedTime = 0;
-            else savedTime = wakeUpTime - Calendar.getInstance().getTimeInMillis();
-            TimerFragment.currentTimerValue = savedTime;
+            /* Now that the timer can run in the background in timerservice then we can remove this code*/
+           // if(wakeUpTime <= Calendar.getInstance().getTimeInMillis()) savedTime = 0;
+            //else savedTime = wakeUpTime - Calendar.getInstance().getTimeInMillis();
+            //TimerFragment.currentTimerValue = savedTime;
         }
     }
 

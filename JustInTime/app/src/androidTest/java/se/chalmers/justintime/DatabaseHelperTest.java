@@ -119,11 +119,63 @@ public class DatabaseHelperTest {
     }
 
     @Test
-    public void updateTimer() throws Exception {
-//        TimerLogEntry entry = new TimerLogEntry(1 ,1, LocalDateTime.now(), 1);
-//        databaseHelper.insertTimer(entry);
-//        entry.setGroupId(2);
-//        databaseHelper.updateTimer(entry);
+    public void populateWithMockValues() throws Exception {
+        databaseHelper.resetDatabase();
+        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getNextAvailablePauseId(), LocalDateTime.now(), 5000);
+        databaseHelper.insertTimer(entry);
+
+        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getNextAvailablePauseId(), LocalDateTime.now().minusDays(1), 15000);
+        databaseHelper.insertTimer(entry);
+
+        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getNextAvailablePauseId(), LocalDateTime.now().minusDays(2), 20000);
+        databaseHelper.insertTimer(entry);
+
+        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getNextAvailablePauseId(), LocalDateTime.now().minusDays(3), 10000);
+        databaseHelper.insertTimer(entry);
+
+        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getNextAvailablePauseId(), LocalDateTime.now().minusDays(4), 11000);
+        databaseHelper.insertTimer(entry);
+
+        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getNextAvailablePauseId(), LocalDateTime.now().minusDays(5), 12000);
+        databaseHelper.insertTimer(entry);
+
+        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getNextAvailablePauseId(), LocalDateTime.now().minusDays(6), 13000);
+        databaseHelper.insertTimer(entry);
+
+        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getNextAvailablePauseId(), LocalDateTime.now().minusDays(7), 4000);
+        databaseHelper.insertTimer(entry);
+
+        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getNextAvailablePauseId(), LocalDateTime.now().minusDays(8), 8000);
+        databaseHelper.insertTimer(entry);
+
+        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getNextAvailablePauseId(), LocalDateTime.now().minusDays(9), 9000);
+        databaseHelper.insertTimer(entry);
+
+        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getNextAvailablePauseId(), LocalDateTime.now().minusDays(10), 14000);
+        databaseHelper.insertTimer(entry);
+
+        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getNextAvailablePauseId(), LocalDateTime.now().minusDays(11), 17000);
+        databaseHelper.insertTimer(entry);
+
+        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getNextAvailablePauseId(), LocalDateTime.now().minusDays(12), 22000);
+        databaseHelper.insertTimer(entry);
+
+        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getNextAvailablePauseId(), LocalDateTime.now().minusDays(13), 13000);
+        databaseHelper.insertTimer(entry);
+
+        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getNextAvailablePauseId(), LocalDateTime.now().minusDays(14), 5000);
+        databaseHelper.insertTimer(entry);
+
+        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getNextAvailablePauseId(), LocalDateTime.now().minusDays(15), 7000);
+        databaseHelper.insertTimer(entry);
+
+        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getNextAvailablePauseId(), LocalDateTime.now().minusDays(16), 5000);
+        databaseHelper.insertTimer(entry);
+
+    }
+    @Test
+    public void clearDatabase() throws Exception {
+        databaseHelper.resetDatabase();
     }
 
 }

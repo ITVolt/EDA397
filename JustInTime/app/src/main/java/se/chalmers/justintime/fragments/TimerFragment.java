@@ -4,6 +4,7 @@ package se.chalmers.justintime.fragments;
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v4.app.Fragment;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.threeten.bp.LocalDateTime;
@@ -56,10 +58,17 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private int currentPauseId;
 
     private View view;
-    public static boolean isTimmerRunning = false;
+    public static boolean isStaticTimerRunning = false;
 
 
     private Presenter presenter;
+
+
+    private long timeCountInMilliSeconds;
+
+    private ProgressBar progressBarCircle;
+    private CountDownTimer countDownTimer;
+
 
     public TimerFragment() {
         // Required empty public constructor
@@ -119,21 +128,69 @@ public class TimerFragment extends Fragment implements CounterActivity {
         });
         setButtonOnClickListeners();
         databaseHelper = new DatabaseHelper(this.getContext());
-
+        progressBarCircle = (ProgressBar) view.findViewById(R.id.progressBarCircle);
         startValue = 90000;
-        reset();
+        timeCountInMilliSeconds = startValue;
+        currentTimerValue = startValue; // FIXME Remove when the real chronometer is implemented.
+        updateTimerText();
         return view;
     }
 
+    private void timerStart() {
+        setTimerValues();
+        setProgressBarValues();
+        startCountDownTimer();
+    }
 
-    public void setTimerStartValue (long startValue) {
-        this.startValue = startValue;
-        setRunningState(false);
+    private void timerPause(){
+        stopCountDownTimer();
+    }
+
+    private void startCountDownTimer() {
+
+        countDownTimer = new CountDownTimer(timeCountInMilliSeconds, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                progressBarCircle.setProgress((int) (millisUntilFinished/ 1000));
+
+            }
+
+            @Override
+            public void onFinish() {
+                reset();
+            }
+
+        }.start();
+        countDownTimer.start();
+    }
+
+    private void stopCountDownTimer() {
+        countDownTimer.cancel();
+
+    }
+
+    private void resetCountDownTimer() {
+        countDownTimer.cancel();
+        resetProgressBarValues();
+    }
+
+    private void setProgressBarValues() {
+        progressBarCircle.setMax((int) startValue / 1000);
+        progressBarCircle.setProgress((int) (timeCountInMilliSeconds) / 1000);
+    }
+
+    private void setTimerValues() {
+        timeCountInMilliSeconds = currentTimerValue + 1000;
+    }
+
+    private void resetProgressBarValues() {
+        progressBarCircle.setProgress((int)startValue/1000);
     }
 
     @Override
     public void start() {
         setRunningState(true);
+        timerStart();
     }
 
     @Override
@@ -143,6 +200,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         previousDuration = previousDuration + duration;
         TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), currentPauseId,startTime, duration);
         databaseHelper.insertTimer(entry);
+        timerPause();
     }
 
     @Override
@@ -153,6 +211,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         updateTimerText();
         previousDuration = 0;
         currentPauseId = databaseHelper.getNextAvailablePauseId();
+        resetCountDownTimer();
     }
 
     @Override
@@ -191,6 +250,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
             isTimerRunning = false;
             chronometer.stop();  //FIXME Remove when the real chronometer is implemented.
         }
+        isStaticTimerRunning = isTimerRunning;
     }
 
     private void setButtonOnClickListeners() {
