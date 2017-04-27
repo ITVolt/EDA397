@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.view.ViewPager;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +18,6 @@ import org.threeten.bp.temporal.WeekFields;
 
 import se.chalmers.justintime.R;
 import se.chalmers.justintime.StatisticsBundle;
-import se.chalmers.justintime.StatisticsFragmentPagerAdapter;
 import se.chalmers.justintime.WeekListAdapter;
 import se.chalmers.justintime.database.DatabaseHelper;
 import se.chalmers.justintime.database.TimerInfoBundle;

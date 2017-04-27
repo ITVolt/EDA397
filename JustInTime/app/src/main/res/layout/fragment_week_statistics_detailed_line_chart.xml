@@ -13,7 +13,7 @@
             android:id="@+id/button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Back"
+            android:text="@string/back"
             android:textColor="@color/colorAccent"
             android:background="@color/colorPrimary"/>
 
@@ -22,9 +22,9 @@
             android:layout_height="fill_parent"
             android:textColor="@color/colorAccent"
             android:gravity="center"
-            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
             android:background="@color/colorPrimary"
-            android:text="This is a detailed view of the statistics"/>
+            android:text="@string/this_is_a_detailed_view_of_the_statistics"/>
 
     </LinearLayout>
 
