@@ -116,6 +116,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         progressBarCircle = (ProgressBar) view.findViewById(R.id.progressBarCircle);
         startValue = 90000;
         timeCountInMilliSeconds = startValue;
+        disableResetButton();
         currentTimerValue = startValue; // FIXME Remove when the real chronometer is implemented.
         updateTimerText();
 
