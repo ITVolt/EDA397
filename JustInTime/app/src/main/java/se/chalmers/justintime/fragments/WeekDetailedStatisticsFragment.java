@@ -126,7 +126,7 @@ public class WeekDetailedStatisticsFragment extends Fragment{
         xAxis.setDrawAxisLine(true);
         xAxis.setDrawGridLines(false);
         xAxis.setValueFormatter(formatter);
-        chart.animateXY(1000, 3000);
+        chart.animateY(300);
 
         YAxis yAxisLeft = chart.getAxisLeft();
         yAxisLeft.setTextSize(16f);

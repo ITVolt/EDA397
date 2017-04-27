@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import se.chalmers.justintime.fragments.ListStatisticsFragment;
+import se.chalmers.justintime.fragments.MonthStatisticsFragment;
 import se.chalmers.justintime.fragments.TempStatisticsFragment;
 import se.chalmers.justintime.fragments.WeekStatisticsFragment;
 
@@ -36,6 +37,8 @@ public class StatisticsFragmentPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         if (position == 0) {
             return WeekStatisticsFragment.newInstance();
+        }else if (position == 1) {
+            return MonthStatisticsFragment.newInstance();
         }else if (position == 2) {
             return ListStatisticsFragment.newInstance();
         } else {

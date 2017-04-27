@@ -160,6 +160,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             cursor.moveToNext();
         }
+        cursor.close();
 
         for (int i=0; i<timers.size(); i++) {
             timer = timers.valueAt(i);
