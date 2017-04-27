@@ -63,7 +63,7 @@ public class WeekDetailedStatisticsFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_week_statistics, container, false);
+        view = inflater.inflate(R.layout.fragment_week_statistics_detailed_line_chart, container, false);
         showChart();
 
         button = (Button)view.findViewById(R.id.button);
