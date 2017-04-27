@@ -4,7 +4,6 @@ package se.chalmers.justintime.fragments;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +22,6 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import org.threeten.bp.DayOfWeek;
-import org.threeten.bp.LocalDateTime;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,10 +51,8 @@ public class WeekDetailedStatisticsFragment extends Fragment{
      *
      * @return A new instance of fragment WeekDetailedStatisticsFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static WeekDetailedStatisticsFragment newInstance() {
-        WeekDetailedStatisticsFragment fragment = new WeekDetailedStatisticsFragment();
-        return fragment;
+        return new WeekDetailedStatisticsFragment();
     }
 
     @Override

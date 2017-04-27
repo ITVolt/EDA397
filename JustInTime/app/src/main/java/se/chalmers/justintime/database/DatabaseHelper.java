@@ -58,11 +58,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public int getNextAvailableId(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from " + TABLE_NAME, null);
         if (nextAvailableId == -1){
-            SQLiteDatabase db = this.getReadableDatabase();
-            Cursor res = db.rawQuery("select * from " + TABLE_NAME, null);
+
             nextAvailableId = res.getCount() + 1;
         }
+        res.close();
         return nextAvailableId;
     }
 
@@ -71,13 +73,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getReadableDatabase();
             Cursor res = db.rawQuery("select * from " + TABLE_NAME, null);
             res.moveToFirst();
-        Set noDuplicatesPauseId = new HashSet();
+        Set<Integer> noDuplicatesPauseId = new HashSet<>();
             while (!res.isAfterLast()){
-                noDuplicatesPauseId.add(res.getInt(res.getColumnIndex(COLUMN_NAME_GROUPID)));
+                noDuplicatesPauseId.add((res.getInt(res.getColumnIndex(COLUMN_NAME_GROUPID))));
                 res.moveToNext();
             }
             nextAvailablePauseId = noDuplicatesPauseId.size() + 1;
-
+        res.close();
         return nextAvailablePauseId;
     }
 
@@ -96,8 +98,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private Cursor getData(int timerId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select * from " + TABLE_NAME + " where " + COLUMN_NAME_ID + " = " + timerId , null);
-        return res;
+        return db.rawQuery("select * from " + TABLE_NAME + " where " + COLUMN_NAME_ID + " = " + timerId , null);
     }
 
     public TimerLogEntry getEntryById(int timeId) {
@@ -120,7 +121,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public String getTotalDuration(){
-        SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = getData();//db.rawQuery("select * from " + TABLE_NAME, null);
         cursor.moveToFirst();
         int duration = 0;
