@@ -65,10 +65,10 @@ public class MonthStatisticsFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 FragmentManager manager = getActivity().getSupportFragmentManager();
-                WeekDetailedStatisticsFragment weekDetailedStatisticsFragment = WeekDetailedStatisticsFragment.newInstance();
-                weekDetailedStatisticsFragment.setData((StatisticsBundle) listview.getItemAtPosition(position));
+                MonthDetailedStatisticsFragment monthDetailedStatisticsFragment = MonthDetailedStatisticsFragment.newInstance();
+                monthDetailedStatisticsFragment.setData((StatisticsBundle) listview.getItemAtPosition(position));
                 manager.beginTransaction().replace(
-                        R.id.relativeLayoutForFragment, weekDetailedStatisticsFragment)
+                        R.id.relativeLayoutForFragment, monthDetailedStatisticsFragment)
                         .commit();
             }
         });
