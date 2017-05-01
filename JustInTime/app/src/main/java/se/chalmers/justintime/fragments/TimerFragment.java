@@ -54,7 +54,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private StringBuilder strBuilder = new StringBuilder(8);
 
     private DatabaseHelper databaseHelper;
-    private int currentPauseId;
+    private int timerId;
 
     private View view;
     public static boolean isTimmerRunning = false;
@@ -113,6 +113,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
         setButtonOnClickListeners();
         databaseHelper = new DatabaseHelper(this.getContext());
+        timerId = databaseHelper.insertTimer("Basic timer", new String[]{"Undefined"});
         progressBarCircle = (ProgressBar) view.findViewById(R.id.progressBarCircle);
         startValue = 90000;
         timeCountInMilliSeconds = startValue;
@@ -182,9 +183,9 @@ public class TimerFragment extends Fragment implements CounterActivity {
         setRunningState(true);
         //FIXME remove this when gui can add new timers
         if(currentTimerId == 0){
-            ArrayList<Long> duraiton = new ArrayList<>();
-            duraiton.add(0L + startValue);
-            currentTimerId = presenter.newTimer(duraiton);
+            ArrayList<Long> duration = new ArrayList<>();
+            duration.add(startValue);
+            currentTimerId = presenter.newTimer(duration);
         }
         presenter.startTimer(currentTimerId);
         timerStart();
@@ -197,8 +198,8 @@ public class TimerFragment extends Fragment implements CounterActivity {
         timerPause();
         long duration = startValue - currentTimerValue - previousDuration;
         previousDuration = previousDuration + duration;
-        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), currentPauseId,startTime, duration);
-        databaseHelper.insertTimer(entry);
+        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), timerId, startTime, duration);
+        databaseHelper.insertTimerData(entry);
     }
 
     @Override
@@ -208,7 +209,6 @@ public class TimerFragment extends Fragment implements CounterActivity {
         currentTimerValue = startValue; // FIXME Remove when the real chronometer is implemented.
         updateTimerText();
         previousDuration = 0;
-        currentPauseId = databaseHelper.getNextAvailablePauseId();
         resetCountDownTimer();
         presenter.resetTimer(currentTimerId);
     }
@@ -231,8 +231,8 @@ public class TimerFragment extends Fragment implements CounterActivity {
         startPauseTimerButton.setText(R.string.timer_button_stop);
         setRunningState(false);
         long duration = startValue - currentTimerValue - previousDuration;
-        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), currentPauseId, startTime, duration);
-        databaseHelper.insertTimer(entry);
+        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), timerId, startTime, duration);
+        databaseHelper.insertTimerData(entry);
     }
 
     private void setRunningState(boolean run) {

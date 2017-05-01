@@ -59,7 +59,7 @@ public class WeekStatisticsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_week, container, false);
 
         // Gather the weekly statistics.
-        populateWeekData(new DatabaseHelper(view.getContext()).getAllTimerData());
+        populateWeekData(new DatabaseHelper(view.getContext()).getAllTimerInfo());
 
         final ListView listview = (ListView) view.findViewById(R.id.week_list_view);
         listview.setAdapter(new WeekListAdapter(view.getContext(), weekData));

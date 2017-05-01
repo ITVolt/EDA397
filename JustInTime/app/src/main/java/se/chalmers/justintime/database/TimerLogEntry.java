@@ -10,56 +10,40 @@ import org.threeten.bp.ZoneOffset;
  */
 
 public class TimerLogEntry {
-    int id;
-    int groupId;
-    LocalDateTime startTime;
-    long duration;
+    private int databaseRowId;
+    private  int timerId;
+    private LocalDateTime startTime;
+    private long duration;
 
-    public  static final String COLUMN_NAME_ID = "id";
-    public static final String COLUMN_NAME_GROUPID = "group_id";
-    public static final String COLUMN_NAME_START_TIME = "start_time";
-    public static final String COLUMN_NAME_DURATION = "duration";
-
-    public static final String TABLE_NAME = "timer_data";
-    public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
-
-    public static final String SQL_CREATE_ENTRIES = " CREATE TABLE " + TABLE_NAME +
-            "(" + COLUMN_NAME_ID + " INTEGER PRIMARY KEY, " +
-            COLUMN_NAME_GROUPID + " INTEGER, " +
-            COLUMN_NAME_START_TIME + " DATETIME, " +
-            COLUMN_NAME_DURATION + " INTEGER );";
-
-    public static final String[] COLUMNS = {COLUMN_NAME_START_TIME, COLUMN_NAME_DURATION, COLUMN_NAME_GROUPID};
-
-    public TimerLogEntry(int id, int groupId, LocalDateTime startTime, long duration) {
-        this.id = id;
-        this.groupId = groupId;
+    public TimerLogEntry(int databaseRowId, int timerId, LocalDateTime startTime, long duration) {
+        this.databaseRowId = databaseRowId;
+        this.timerId = timerId;
         this.startTime = startTime;
         this.duration = duration;
     }
 
     public TimerLogEntry(Cursor cursor) {
         cursor.moveToFirst();
-        this.id = cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID));
-        this.groupId = cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_GROUPID));
-        this.startTime = LocalDateTime.ofEpochSecond(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_START_TIME)),0, ZoneOffset.UTC);
-        this.duration = cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_DURATION));
+        this.databaseRowId = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_NAME_ID));
+        this.timerId = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_NAME_TIMERID));
+        this.startTime = LocalDateTime.ofEpochSecond(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_NAME_START_TIME)),0, ZoneOffset.UTC);
+        this.duration = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_NAME_DURATION));
     }
 
-    public int getId() {
-        return id;
+    public int getDatabaseRowId() {
+        return databaseRowId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setDatabaseRowId(int databaseRowId) {
+        this.databaseRowId = databaseRowId;
     }
 
-    public int getGroupId() {
-        return groupId;
+    public int getTimerId() {
+        return timerId;
     }
 
-    public void setGroupId(int groupId) {
-        this.groupId = groupId;
+    public void setTimerId(int timerId) {
+        this.timerId = timerId;
     }
 
     public LocalDateTime getStartTime() {

@@ -5,6 +5,7 @@ import android.util.Pair;
 import org.threeten.bp.LocalDateTime;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Holds information about a the logs of a timer.
@@ -19,7 +20,7 @@ public class TimerInfoBundle {
     private final ArrayList<Pair<LocalDateTime, Long>> times;
     private final long totalDuration;
 
-    public TimerInfoBundle(String label, TimerLogEntry[] times, String[] tags) {
+    public TimerInfoBundle(String label, List<TimerLogEntry> times, String[] tags) {
         this.label = label;
         this.ID = -1;
         this.tags = tags;
