@@ -94,21 +94,23 @@ public class MonthStatisticsFragment extends Fragment {
         int yearNbr;
 
         for (TimerInfoBundle tib : timerInfoBundles) {
-            date = tib.getTimes().get(0).first;
-            monthNbr = date.getMonthValue();
-            yearNbr = date.getYear();
+            if (!tib.getTimes().isEmpty()) {
+                date = tib.getTimes().get(0).first;
+                monthNbr = date.getMonthValue();
+                yearNbr = date.getYear();
 
-            SparseArray<ArrayList<TimerInfoBundle>> year = years.get(yearNbr);
-            if (year == null) {
-                years.append(yearNbr, new SparseArray<ArrayList<TimerInfoBundle>>());
-                year = years.get(yearNbr);
+                SparseArray<ArrayList<TimerInfoBundle>> year = years.get(yearNbr);
+                if (year == null) {
+                    years.append(yearNbr, new SparseArray<ArrayList<TimerInfoBundle>>());
+                    year = years.get(yearNbr);
+                }
+                ArrayList<TimerInfoBundle> month = year.get(monthNbr);
+                if (month == null) {
+                    year.append(monthNbr, new ArrayList<TimerInfoBundle>());
+                    month = year.get(monthNbr);
+                }
+                month.add(tib);
             }
-            ArrayList<TimerInfoBundle> month = year.get(monthNbr);
-            if (month == null) {
-                year.append(monthNbr, new ArrayList<TimerInfoBundle>());
-                month = year.get(monthNbr);
-            }
-            month.add(tib);
         }
 
         ArrayList<StatisticsBundle> monthBundles = new ArrayList<>();

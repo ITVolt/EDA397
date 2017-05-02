@@ -97,23 +97,25 @@ public class WeekStatisticsFragment extends Fragment {
         int yearNbr;
 
         for (TimerInfoBundle tib : timerInfoBundles) {
-            date = tib.getTimes().get(0).first;
-            weekNbr = date.get(woy);
-            yearNbr = date.getYear();
-            if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {  //Had to add this because it was getting the wrong week for sundays.
-                weekNbr--;
+            if (!tib.getTimes().isEmpty()) {
+                date = tib.getTimes().get(0).first;
+                weekNbr = date.get(woy);
+                yearNbr = date.getYear();
+                if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {  //Had to add this because it was getting the wrong week for sundays.
+                    weekNbr--;
+                }
+                SparseArray<ArrayList<TimerInfoBundle>> year = years.get(yearNbr);
+                if (year == null) {
+                    years.append(yearNbr, new SparseArray<ArrayList<TimerInfoBundle>>());
+                    year = years.get(yearNbr);
+                }
+                ArrayList<TimerInfoBundle> week = year.get(weekNbr);
+                if (week == null) {
+                    year.append(weekNbr, new ArrayList<TimerInfoBundle>());
+                    week = year.get(weekNbr);
+                }
+                week.add(tib);
             }
-            SparseArray<ArrayList<TimerInfoBundle>> year = years.get(yearNbr);
-            if (year == null) {
-                years.append(yearNbr, new SparseArray<ArrayList<TimerInfoBundle>>());
-                year = years.get(yearNbr);
-            }
-            ArrayList<TimerInfoBundle> week = year.get(weekNbr);
-            if (week == null) {
-                year.append(weekNbr, new ArrayList<TimerInfoBundle>());
-                week = year.get(weekNbr);
-            }
-            week.add(tib);
         }
 
         ArrayList<StatisticsBundle> weekBundles = new ArrayList<>();
