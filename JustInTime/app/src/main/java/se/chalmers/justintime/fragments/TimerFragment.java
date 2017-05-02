@@ -4,7 +4,6 @@ package se.chalmers.justintime.fragments;
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.v4.app.Fragment;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -16,8 +15,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.threeten.bp.LocalDateTime;
-
-import java.util.ArrayList;
 
 import se.chalmers.justintime.Presenter;
 import se.chalmers.justintime.R;
@@ -54,7 +51,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private StringBuilder strBuilder = new StringBuilder(8);
 
     private DatabaseHelper databaseHelper;
-    private int timerId;
+    private int currentPauseId;
 
     private View view;
     public static boolean isTimmerRunning = false;
@@ -66,8 +63,8 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private long timeCountInMilliSeconds;
 
     private ProgressBar progressBarCircle;
-    private CountDownTimer countDownTimer;
-    private int currentTimerId;
+    private int timerId;
+    private int timerFragmentId;
 
 
     public TimerFragment() {
@@ -103,7 +100,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
         startPauseTimerButton = (Button) view.findViewById(R.id.timerStartPauseButton);
         resetTimerButton = (Button) view.findViewById(R.id.timerResetButton);
-
+        setRunningState(isTimerRunning);
         // Set up the alarm.
         preferences = new SharedPreference(view.getContext());
         AlarmBuilder ab = new AlarmBuilder(view.getContext());
@@ -120,45 +117,11 @@ public class TimerFragment extends Fragment implements CounterActivity {
         disableResetButton();
         currentTimerValue = startValue; // FIXME Remove when the real chronometer is implemented.
         updateTimerText();
-
+        setProgressBarValues();
         return view;
     }
 
-    private void timerStart() {
-        setTimerValues();
-        setProgressBarValues();
-        startCountDownTimer();
-    }
-
-    private void timerPause(){
-        stopCountDownTimer();
-    }
-
-    private void startCountDownTimer() {
-
-        countDownTimer = new CountDownTimer(timeCountInMilliSeconds, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                //progressBarCircle.setProgress((int) (millisUntilFinished/ 1000));
-
-            }
-
-            @Override
-            public void onFinish() {
-                //reset();
-            }
-
-        }.start();
-        countDownTimer.start();
-    }
-
-    private void stopCountDownTimer() {
-        countDownTimer.cancel();
-
-    }
-
     private void resetCountDownTimer() {
-        countDownTimer.cancel();
         resetProgressBarValues();
     }
 
@@ -181,21 +144,13 @@ public class TimerFragment extends Fragment implements CounterActivity {
     @Override
     public void start() {
         setRunningState(true);
-        //FIXME remove this when gui can add new timers
-        if(currentTimerId == 0){
-            ArrayList<Long> duration = new ArrayList<>();
-            duration.add(startValue);
-            currentTimerId = presenter.newTimer(duration);
-        }
-        presenter.startTimer(currentTimerId);
-        timerStart();
+        presenter.startTimer(timerFragmentId);
     }
 
     @Override
     public void pause() {
-        presenter.pauseTimer(currentTimerId);
+        presenter.pauseTimer(timerFragmentId);
         setRunningState(false);
-        timerPause();
         long duration = startValue - currentTimerValue - previousDuration;
         previousDuration = previousDuration + duration;
         TimerLogEntry entry = new TimerLogEntry(timerId, startTime, duration);
@@ -210,19 +165,23 @@ public class TimerFragment extends Fragment implements CounterActivity {
         updateTimerText();
         previousDuration = 0;
         resetCountDownTimer();
-        presenter.resetTimer(currentTimerId);
+        presenter.resetTimer(timerFragmentId);
     }
 
     @Override
     public void updateTime(long ms) {
-        Log.d("UPDATE TIME", ms + " ");
+        //Log.d("UPDATE TIME", ms + " ");
         currentTimerValue = ms;
         updateTimerText();
-        progressBarCircle.setProgress((int) (ms));
+        if (progressBarCircle != null) {
+            progressBarCircle.setProgress((int) (ms));
+        }
     }
 
     private void updateTimerText() {
-        timerText.setText(parseTime(currentTimerValue));
+        if (timerText != null) {
+            timerText.setText(parseTime(currentTimerValue));
+        }
     }
 
     public void onTimerFinish() {
@@ -337,5 +296,11 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
     public void setPresenter(Presenter presenter) {
         this.presenter = presenter;
+        presenter.startSendingUpdates(timerFragmentId);
+        this.isTimerRunning = presenter.getRunningState(timerFragmentId);
+    }
+
+    public void setTimerFragmentId(int timerFragmentId) {
+        this.timerFragmentId = timerFragmentId;
     }
 }

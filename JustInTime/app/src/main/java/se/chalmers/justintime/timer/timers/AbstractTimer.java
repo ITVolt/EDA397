@@ -61,6 +61,7 @@ public abstract class AbstractTimer implements Timer {
     public void stop() {
         isRunning = false;
         durationInMilliSeconds = 0;
+        timeOffset = 0;
     }
 
     @Override

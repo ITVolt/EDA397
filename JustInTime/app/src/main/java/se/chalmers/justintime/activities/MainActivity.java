@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         backgroundAlarm = new BackgroundAlarm(this);
-        doBindService();
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         TimerFragment timerFragment = TimerFragment.newInstance();
+        timerFragment.setTimerFragmentId(1);
         presenter = new Presenter(timerFragment);
         timerFragment.setPresenter(presenter);
         jumpToFragment(timerFragment);
@@ -180,7 +181,12 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         if (id == R.id.nav_timerA) {
             TimerFragment timerFragment = TimerFragment.newInstance();
-            presenter = new Presenter(timerFragment);
+            timerFragment.setTimerFragmentId(1);
+            if(presenter != null){
+                presenter.setFragment(timerFragment);
+            }else{
+                presenter = new Presenter(timerFragment);
+            }
             timerFragment.setPresenter(presenter);
             jumpToFragment(timerFragment);
         } else if (id == R.id.nav_timerB) {
@@ -188,6 +194,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_timerC) {
             Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_statistics) {
+            presenter.stopSendingUpdates();
             jumpToFragment(StatisticsFragment.newInstance());
         } else if (id == R.id.nav_settings) {
             Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
@@ -224,6 +231,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPostResume() {
         super.onPostResume();
+        doBindService();
         if (timerService != null) {
             Message message = Message.obtain(null, TimerService.LEAVE_FORGROUND);
             try {

@@ -27,6 +27,11 @@ public class TimerExecutorTest {
             public void onTick(long time) {
 
             }
+
+            @Override
+            public void onFinish() {
+
+            }
         };
         timerHandler = new TimerHandler();
         basicTimer = new TimerInstance(1, new BasicTimer(200),ticker);
@@ -82,7 +87,7 @@ public class TimerExecutorTest {
     public void resetTimer() throws InterruptedException {
         timerHandler.addTimer(timerThatWillNotFinish);
         timerHandler.startTimer(3);
-        Thread.sleep(100);
+        Thread.sleep(1000);
         assertFalse(2000L == timerThatWillNotFinish.getRemainingTime());
         assertEquals(2000L, timerHandler.resetTimer(3));
         Thread.sleep(100);

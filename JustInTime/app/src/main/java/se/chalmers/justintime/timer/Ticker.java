@@ -6,4 +6,6 @@ package se.chalmers.justintime.timer;
 
 public interface Ticker {
     void onTick(long time);
+
+    void onFinish();
 }
