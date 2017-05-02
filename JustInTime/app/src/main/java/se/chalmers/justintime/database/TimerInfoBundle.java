@@ -15,14 +15,14 @@ import java.util.List;
 public class TimerInfoBundle {
 
     private final String label;
-    private final int ID;
+    private final int id;
     private final String[] tags;
     private final ArrayList<Pair<LocalDateTime, Long>> times;
     private final long totalDuration;
 
-    public TimerInfoBundle(String label, List<TimerLogEntry> times, String[] tags) {
+    public TimerInfoBundle(int id, String label, List<TimerLogEntry> times, String[] tags) {
         this.label = label;
-        this.ID = -1;
+        this.id = id;
         this.tags = tags;
         this.times = new ArrayList<>();
         long totDur = 0;
@@ -37,8 +37,8 @@ public class TimerInfoBundle {
         return label;
     }
 
-    public int getID() {
-        return ID;
+    public int getId() {
+        return id;
     }
 
     public String[] getTags() {

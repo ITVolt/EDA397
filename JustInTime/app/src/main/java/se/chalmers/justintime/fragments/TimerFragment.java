@@ -198,7 +198,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         timerPause();
         long duration = startValue - currentTimerValue - previousDuration;
         previousDuration = previousDuration + duration;
-        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), timerId, startTime, duration);
+        TimerLogEntry entry = new TimerLogEntry(timerId, startTime, duration);
         databaseHelper.insertTimerData(entry);
     }
 
@@ -231,7 +231,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         startPauseTimerButton.setText(R.string.timer_button_stop);
         setRunningState(false);
         long duration = startValue - currentTimerValue - previousDuration;
-        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), timerId, startTime, duration);
+        TimerLogEntry entry = new TimerLogEntry(timerId, startTime, duration);
         databaseHelper.insertTimerData(entry);
     }
 
