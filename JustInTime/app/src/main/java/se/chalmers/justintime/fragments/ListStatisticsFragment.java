@@ -63,7 +63,7 @@ public class ListStatisticsFragment extends Fragment {
                     String totalDuration = db.getTotalDuration();
                     if(totalDuration==null)
                     {
-                        totalDuration = "0 Hours";
+                        totalDuration = "0 Hour";
                     }
                     timerInfoText.setText("Used for : " + totalDuration );
                     timerInfoText.setVisibility(View.VISIBLE);

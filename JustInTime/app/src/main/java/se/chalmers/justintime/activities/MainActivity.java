@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity
 
     private Presenter presenter;
 
-    final Messenger receiver = new Messenger(new MessagingHandler());;
+    final Messenger receiver = new Messenger(new MessagingHandler());
     Messenger timerService;
     boolean isBound;
 
@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mPreferences = new SharedPreference(this);
+        //Increment the app usage by one
         mPreferences.setAppUsageCount(mPreferences.getAppUsageCount() + 1);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

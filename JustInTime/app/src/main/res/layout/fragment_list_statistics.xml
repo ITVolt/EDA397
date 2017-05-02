@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="se.chalmers.justintime.fragments.StatisticsFragment"
-    android:background="#ffffff"> <!--3d455b-->
+    android:background="#ffffff">
 
     <TextView
         android:id="@+id/timerInfoText"
