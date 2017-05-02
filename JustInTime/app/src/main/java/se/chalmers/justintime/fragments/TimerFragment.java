@@ -36,7 +36,6 @@ import se.chalmers.justintime.database.TimerLogEntry;
 public class TimerFragment extends Fragment implements CounterActivity {
 
     private long startValue;
-    //private long currentTimerValue;
     public static long currentTimerValue;
     private long previousDuration;
     private LocalDateTime startTime;
@@ -44,7 +43,6 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private boolean isTimerRunning = false;
     private SharedPreference preferences;
 
-    // private BasicTimer timer;    FIXME For when the real chronometer is implemented.
     private TextView timerText;
 
     private Button startPauseTimerButton;
@@ -57,7 +55,6 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private int timerId;
 
     private View view;
-    public static boolean isTimmerRunning = false;
 
 
     private Presenter presenter;
@@ -174,9 +171,6 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private void resetProgressBarValues() {
         progressBarCircle.setProgress((int) startValue);
     }
-    public void setTimerStartValue (long startValue) {
-        setRunningState(false);
-    }
 
     @Override
     public void start() {
@@ -204,6 +198,9 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
     @Override
     public void reset() {
+        if (!isTimerRunning) {
+            enableStartPauseTimerButton();
+        }
         setRunningState(false);
         disableResetButton();
         currentTimerValue = startValue; // FIXME Remove when the real chronometer is implemented.
@@ -229,6 +226,8 @@ public class TimerFragment extends Fragment implements CounterActivity {
         Log.d("TimerFragment", "onTimerFinish: Time's up!");
         alarm.alert();
         startPauseTimerButton.setText(R.string.timer_button_stop);
+        disableStartPauseTimerButton();
+        presenter.pauseTimer(currentTimerId);
         setRunningState(false);
         long duration = startValue - currentTimerValue - previousDuration;
         TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), timerId, startTime, duration);
@@ -278,6 +277,20 @@ public class TimerFragment extends Fragment implements CounterActivity {
         resetTimerButton.setEnabled(false);
         Animator animator = AnimatorInflater.loadAnimator(view.getContext(), R.animator.fade_out);
         animator.setTarget(resetTimerButton);
+        animator.start();
+    }
+
+    private void disableStartPauseTimerButton() {
+        startPauseTimerButton.setEnabled(false);
+        Animator animator = AnimatorInflater.loadAnimator(view.getContext(), R.animator.fade_out);
+        animator.setTarget(startPauseTimerButton);
+        animator.start();
+    }
+
+    private void enableStartPauseTimerButton() {
+        startPauseTimerButton.setEnabled(true);
+        Animator animator = AnimatorInflater.loadAnimator(view.getContext(), R.animator.fade_in);
+        animator.setTarget(startPauseTimerButton);
         animator.start();
     }
 
