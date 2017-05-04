@@ -1,10 +1,12 @@
 package se.chalmers.justintime.timer.timers;
 
+import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.temporal.ChronoUnit;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
-import se.chalmers.justintime.timer.ParcelableTimer;
 import se.chalmers.justintime.timer.Ticker;
 
 /**
@@ -18,6 +20,7 @@ public class TimerInstance implements Runnable{
     private AbstractTimer currentTimer;
     private List<String> tags;
     private ScheduledFuture future;
+    private LocalDateTime startTime;
 
     public void setSendingUpdates(boolean sendingUpdates) {
         isSendingUpdates = sendingUpdates;
@@ -34,10 +37,10 @@ public class TimerInstance implements Runnable{
         sequentialTimers.add(timer);
         currentTimer = timer;
     }
-    public TimerInstance(ParcelableTimer parcelableTimer, Ticker ticker){
-        id = parcelableTimer.getId();
+    public TimerInstance(int id, ArrayList<Long> durations, Ticker ticker){
+        this.id = id;
         sequentialTimers = new ArrayList<>();
-        for (Long l: parcelableTimer.getDurations()) {
+        for (Long l: durations) {
             sequentialTimers.add(new BasicTimer(l));
         }
         currentTimer = sequentialTimers.get(0);
@@ -52,7 +55,7 @@ public class TimerInstance implements Runnable{
             ticker.onTick(remainingTime);
         }
         if(remainingTime < 0){
-            ticker.onFinish();
+            ticker.onFinish(this);
             future.cancel(false);
         }
     }
@@ -104,7 +107,16 @@ public class TimerInstance implements Runnable{
         currentTimer.pause();
         return future.cancel(false);
     }
-    public void setFuture(ScheduledFuture future) {
+    public void start(ScheduledFuture future) {
         this.future = future;
+        startTime = LocalDateTime.now();
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public long getDuration() {
+        return startTime.until(LocalDateTime.now(), ChronoUnit.MILLIS);
     }
 }

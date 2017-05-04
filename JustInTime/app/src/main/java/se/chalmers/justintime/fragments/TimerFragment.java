@@ -14,16 +14,11 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import org.threeten.bp.LocalDateTime;
-
 import se.chalmers.justintime.Presenter;
 import se.chalmers.justintime.R;
 import se.chalmers.justintime.activities.CounterActivity;
 import se.chalmers.justintime.alert.Alarm;
 import se.chalmers.justintime.alert.AlarmBuilder;
-import se.chalmers.justintime.alert.SharedPreference;
-import se.chalmers.justintime.database.DatabaseHelper;
-import se.chalmers.justintime.database.TimerLogEntry;
 
 /**
  * This fragment shows a basic timer counting down from a time to zero.
@@ -35,13 +30,9 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private long startValue;
     //private long currentTimerValue;
     public static long currentTimerValue;
-    private long previousDuration;
-    private LocalDateTime startTime;
 
     private boolean isTimerRunning = false;
-    private SharedPreference preferences;
 
-    // private BasicTimer timer;    FIXME For when the real chronometer is implemented.
     private TextView timerText;
 
     private Button startPauseTimerButton;
@@ -50,20 +41,14 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private Alarm alarm;
     private StringBuilder strBuilder = new StringBuilder(8);
 
-    private DatabaseHelper databaseHelper;
-    private int currentPauseId;
-
     private View view;
-    public static boolean isTimmerRunning = false;
-
 
     private Presenter presenter;
-
 
     private long timeCountInMilliSeconds;
 
     private ProgressBar progressBarCircle;
-    private int timerId;
+
     private int timerFragmentId;
 
 
@@ -102,15 +87,13 @@ public class TimerFragment extends Fragment implements CounterActivity {
         resetTimerButton = (Button) view.findViewById(R.id.timerResetButton);
         setRunningState(isTimerRunning);
         // Set up the alarm.
-        preferences = new SharedPreference(view.getContext());
+
         AlarmBuilder ab = new AlarmBuilder(view.getContext());
         ab.setUseSound(true);
         ab.setUseVibration(true);
         alarm = ab.getAlarmInstance();
 
         setButtonOnClickListeners();
-        databaseHelper = DatabaseHelper.getInstance(this.getContext());
-        timerId = databaseHelper.insertTimer("Basic timer", new String[]{"Undefined"});
         progressBarCircle = (ProgressBar) view.findViewById(R.id.progressBarCircle);
         startValue = 90000;
         timeCountInMilliSeconds = startValue;
@@ -130,16 +113,10 @@ public class TimerFragment extends Fragment implements CounterActivity {
         progressBarCircle.setProgress((int) (timeCountInMilliSeconds) );
     }
 
-    private void setTimerValues() {
-        timeCountInMilliSeconds = currentTimerValue + 1000;
-    }
-
     private void resetProgressBarValues() {
         progressBarCircle.setProgress((int) startValue);
     }
-    public void setTimerStartValue (long startValue) {
-        setRunningState(false);
-    }
+
 
     @Override
     public void start() {
@@ -151,10 +128,6 @@ public class TimerFragment extends Fragment implements CounterActivity {
     public void pause() {
         presenter.pauseTimer(timerFragmentId);
         setRunningState(false);
-        long duration = startValue - currentTimerValue - previousDuration;
-        previousDuration = previousDuration + duration;
-        TimerLogEntry entry = new TimerLogEntry(timerId, startTime, duration);
-        databaseHelper.insertTimerData(entry);
     }
 
     @Override
@@ -163,7 +136,6 @@ public class TimerFragment extends Fragment implements CounterActivity {
         disableResetButton();
         currentTimerValue = startValue; // FIXME Remove when the real chronometer is implemented.
         updateTimerText();
-        previousDuration = 0;
         resetCountDownTimer();
         presenter.resetTimer(timerFragmentId);
     }
@@ -189,14 +161,10 @@ public class TimerFragment extends Fragment implements CounterActivity {
         alarm.alert();
         startPauseTimerButton.setText(R.string.timer_button_stop);
         setRunningState(false);
-        long duration = startValue - currentTimerValue - previousDuration;
-        TimerLogEntry entry = new TimerLogEntry(timerId, startTime, duration);
-        databaseHelper.insertTimerData(entry);
     }
 
     private void setRunningState(boolean run) {
         if (run) {
-            startTime = LocalDateTime.now();
             startPauseTimerButton.setText(R.string.timer_button_pause);
             disableResetButton();
             isTimerRunning = true;
