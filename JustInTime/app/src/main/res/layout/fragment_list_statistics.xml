@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/tagInfoSwitch"
-        android:minHeight="250dp"
+        android:minHeight="350dp"
         xmlns:android="http://schemas.android.com/apk/res/android"
         />
 

@@ -288,9 +288,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public long getTagTime(String tag){
 
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_TIMER_TAGS, new String[]{COLUMN_NAME_TIMERID}, tag + " = " + COLUMN_NAME_TAG, null, COLUMN_NAME_TIMERID, null, null);
+        Cursor cursor = db.rawQuery("select duration from timer_data where timer_id in (select timer_id from timer_tags where tag = ?)",new String[]{tag});
+        //Cursor cursor = db.query(TABLE_TIMER_TAGS, new String[]{COLUMN_NAME_TIMERID}, tag + " = " + COLUMN_NAME_TAG, null, COLUMN_NAME_TIMERID, null, null);
+        cursor.moveToFirst();
+        int allTimePerTag = 0;
+        while(!cursor.isAfterLast()) {
+            allTimePerTag += cursor.getLong(cursor.getColumnIndex(COLUMN_NAME_DURATION));
+            cursor.moveToNext();
+        }
 
-
-        return 5;
+        return allTimePerTag;
     }
 }
