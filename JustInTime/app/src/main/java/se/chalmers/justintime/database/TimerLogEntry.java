@@ -6,17 +6,16 @@ import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.ZoneOffset;
 
 /**
+ * Used to create and read and write timer data from and to the database.
  * Created by David on 2017-04-04.
  */
 
 public class TimerLogEntry {
-    private int databaseRowId;
     private  int timerId;
     private LocalDateTime startTime;
     private long duration;
 
-    public TimerLogEntry(int databaseRowId, int timerId, LocalDateTime startTime, long duration) {
-        this.databaseRowId = databaseRowId;
+    public TimerLogEntry(int timerId, LocalDateTime startTime, long duration) {
         this.timerId = timerId;
         this.startTime = startTime;
         this.duration = duration;
@@ -24,18 +23,9 @@ public class TimerLogEntry {
 
     public TimerLogEntry(Cursor cursor) {
         cursor.moveToFirst();
-        this.databaseRowId = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_NAME_ID));
         this.timerId = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_NAME_TIMERID));
         this.startTime = LocalDateTime.ofEpochSecond(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_NAME_START_TIME)),0, ZoneOffset.UTC);
         this.duration = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_NAME_DURATION));
-    }
-
-    public int getDatabaseRowId() {
-        return databaseRowId;
-    }
-
-    public void setDatabaseRowId(int databaseRowId) {
-        this.databaseRowId = databaseRowId;
     }
 
     public int getTimerId() {
