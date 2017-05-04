@@ -180,7 +180,7 @@ public class DatabaseHelperTest {
     @Test
     public void populateWithMockValues() throws Exception {
         databaseHelper.resetDatabase();
-        int id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
+        int id = databaseHelper.insertTimer("Timer A", new String[]{"Other", "Running"});
         TimerLogEntry entry = new TimerLogEntry(id, LocalDateTime.now(), 5000);
         databaseHelper.insertTimerData(entry);
 

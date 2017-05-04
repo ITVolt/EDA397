@@ -6,18 +6,30 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import se.chalmers.justintime.R;
 import se.chalmers.justintime.alert.SharedPreference;
 import se.chalmers.justintime.database.DatabaseHelper;
 
 public class ListStatisticsFragment extends Fragment {
 
+    Boolean isClickedGeneral = false, isClickedTag = false;
     View view;
-    Switch timerInfo,generalInfo;
+    Button tagInfo, generalInfo;
     TextView timerInfoText, appInfoText;
+    PieChart tagPieChart;
     SharedPreference mPreferences;
     DatabaseHelper db;
     private OnFragmentInteractionListener mListener;
@@ -45,21 +57,24 @@ public class ListStatisticsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_list_statistics, container, false);
-        timerInfo = (Switch) view.findViewById(R.id.timerInfoSwitch);
-        generalInfo = (Switch) view.findViewById(R.id.generalInfoSwitch);
+        tagInfo = (Button) view.findViewById(R.id.tagInfoSwitch);
+        generalInfo = (Button) view.findViewById(R.id.generalInfoSwitch);
         timerInfoText = (TextView) view.findViewById(R.id.timerInfoText);
         appInfoText = (TextView) view.findViewById(R.id.appInfoText);
+        tagPieChart = (PieChart) view.findViewById(R.id.tagPieChart);
         timerInfoText.setVisibility(View.GONE);
         appInfoText.setVisibility(View.GONE);
+        tagPieChart.setVisibility(View.GONE);
         setOnSwitchChangeListener();
         return view;
     }
 
     private void setOnSwitchChangeListener() {
-        timerInfo.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+        generalInfo.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
+            public void onClick(View v) {
+                if(!isClickedGeneral){
                     String totalDuration = db.getTotalDuration();
                     if(totalDuration==null)
                     {
@@ -69,13 +84,50 @@ public class ListStatisticsFragment extends Fragment {
                     appInfoText.setText("Used : " + mPreferences.getAppUsageCount() + " times");
                     timerInfoText.setVisibility(View.VISIBLE);
                     appInfoText.setVisibility(View.VISIBLE);
+                    isClickedGeneral = true;
                 }
                 else{
                     timerInfoText.setVisibility(View.GONE);
                     appInfoText.setVisibility(View.GONE);
+                    isClickedGeneral = false;
                 }
             }
         });
+        tagInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!isClickedTag) {
+                    tagPieChart.setVisibility(View.VISIBLE);
+                    showPieChart();
+                    isClickedTag = true;
+                } else {
+                    tagPieChart.setVisibility(View.GONE);
+                    isClickedTag = false;
+                }
+            }
+        });
+    }
+
+    private void showPieChart() {
+
+        String[] tags = db.getTags();
+
+        List<PieEntry> entries = new ArrayList<>();
+
+        for (String tag : tags) {
+            entries.add(new PieEntry(18.5f, tag));
+        }
+
+//
+//        entries.add(new PieEntry(18.5f, "Green"));
+//        entries.add(new PieEntry(26.7f, "Yellow"));
+//        entries.add(new PieEntry(24.0f, "Red"));
+//        entries.add(new PieEntry(30.8f, "Blue"));
+
+        PieDataSet set = new PieDataSet(entries, "Election Results");
+        PieData data = new PieData(set);
+        tagPieChart.setData(data);
+        tagPieChart.invalidate(); // refresh
     }
 
     // TODO: Rename method, update argument and hook method into UI event
