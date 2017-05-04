@@ -38,7 +38,7 @@ public class ListStatisticsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPreferences = new SharedPreference(getContext());
-        db = new DatabaseHelper(this.getContext());
+        db = DatabaseHelper.getInstance(this.getContext());
     }
 
     @Override

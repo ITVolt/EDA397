@@ -19,7 +19,6 @@ import se.chalmers.justintime.database.TimerLogEntry;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -33,7 +32,7 @@ public class DatabaseHelperTest {
     @Before
     public void setUp() throws Exception {
         Context appContext = InstrumentationRegistry.getTargetContext();
-        databaseHelper = new DatabaseHelper(appContext);
+        databaseHelper = DatabaseHelper.getInstance(appContext);
         AndroidThreeTen.init(appContext);
     }
 

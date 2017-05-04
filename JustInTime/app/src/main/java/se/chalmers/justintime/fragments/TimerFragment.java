@@ -109,7 +109,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         alarm = ab.getAlarmInstance();
 
         setButtonOnClickListeners();
-        databaseHelper = new DatabaseHelper(this.getContext());
+        databaseHelper = DatabaseHelper.getInstance(this.getContext());
         timerId = databaseHelper.insertTimer("Basic timer", new String[]{"Undefined"});
         progressBarCircle = (ProgressBar) view.findViewById(R.id.progressBarCircle);
         startValue = 90000;

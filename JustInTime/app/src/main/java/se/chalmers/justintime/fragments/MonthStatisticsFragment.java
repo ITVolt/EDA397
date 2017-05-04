@@ -56,7 +56,7 @@ public class MonthStatisticsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_month, container, false);
 
         // Gather the monthly statistics.
-        populateMonthData(new DatabaseHelper(view.getContext()).getAllTimerInfo());
+        populateMonthData(DatabaseHelper.getInstance(this.getContext()).getAllTimerInfo());
 
         // TODO WeekDetailedStatisticsFragment is reused, create a new for month to use here instead.
         final ListView listview = (ListView) view.findViewById(R.id.month_list_view);
