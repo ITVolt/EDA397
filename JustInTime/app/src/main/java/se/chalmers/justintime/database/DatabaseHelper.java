@@ -2,7 +2,9 @@ package se.chalmers.justintime.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -97,7 +99,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @return The id of the new timer.
      */
     public int insertTimer(String label, String[] tags) {
-        if (label == null || tags == null) throw new NullPointerException("Label and tags are not allowed to be null.");
+        if (label == null || label.isEmpty() || tags == null || tags.length == 0) {
+            throw new IllegalArgumentException("Label and tags are not allowed to be null or empty.");
+        }
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -120,6 +124,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_NAME_DURATION, timerLogEntry.getDuration());
         db.insert(TABLE_TIMER_DATA, null, contentValues);
         return true;
+    }
+
+    /**
+     * Sets the given tags to the given timer. Any old tags will be removed and replaced by
+     * the new ones.
+     * @param timerId The id of the timer to set the tags to.
+     * @param tags The tags to set to the timer.
+     */
+    public void setTimerTags(int timerId, String[] tags) {
+        if (tags == null || tags.length == 0) throw new IllegalArgumentException("Tags are not allowed to be null or empty.");
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_TIMER_TAGS, COLUMN_NAME_TIMERID + " = " + timerId, null);
+        ContentValues contentValues = new ContentValues();
+        for (String tag : tags) {
+            contentValues.put(COLUMN_NAME_TIMERID, timerId);
+            contentValues.put(COLUMN_NAME_TAG, tag);
+            db.insert(TABLE_TIMER_TAGS, null, contentValues);
+        }
+    }
+
+    /**
+     * Changes the label of the given timer.
+     * @param timerId The id of the timer.
+     * @param newLabel The new label for the timer.
+     */
+    public void updateTimerLabel(int timerId, String newLabel) {
+        if (newLabel == null || newLabel.isEmpty()) throw new IllegalArgumentException("Label is not allowed to be null or empty.");
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_NAME_LABEL, newLabel);
+        int changed = db.update(TABLE_TIMERS, contentValues, COLUMN_NAME_TIMERID + " = " + timerId, null);
+        if (changed < 1) {
+            throw new IllegalArgumentException("No timer with id '" + timerId + "' was found.");
+        } else if (changed > 1) {
+            throw new SQLiteConstraintException("Too many rows were affected by the update (" + changed + ")");
+        }
     }
 
     public Cursor getData() {
@@ -146,12 +188,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Gets the label of the given timer.
-     * @param timerID The id of the timer.
+     * @param timerId The id of the timer.
      * @return The label set to the timer.
      */
-    public String getTimerLabel(int timerID) {
+    public String getTimerLabel(int timerId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_TIMERS, new String[]{COLUMN_NAME_LABEL}, COLUMN_NAME_TIMERID + " = " + timerID, null, null, null, null);
+        Cursor cursor = db.query(TABLE_TIMERS, new String[]{COLUMN_NAME_LABEL}, COLUMN_NAME_TIMERID + " = " + timerId, null, null, null, null);
         cursor.moveToFirst();
         String label = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_LABEL));
         cursor.close();
@@ -160,12 +202,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Gets all the tags related to the given timer.
-     * @param timerID The id of the timer.
+     * @param timerId The id of the timer.
      * @return The tags of the timer as an array of Strings.
      */
-    public String[] getTimerTags(int timerID) {
+    public String[] getTimerTags(int timerId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_TIMER_TAGS, new String[]{COLUMN_NAME_TAG}, COLUMN_NAME_TIMERID + " = " + timerID, null, null, null, null);
+        Cursor cursor = db.query(TABLE_TIMER_TAGS, new String[]{COLUMN_NAME_TAG}, COLUMN_NAME_TIMERID + " = " + timerId, null, null, null, null);
         String[] tags = new String[cursor.getCount()];
         cursor.moveToFirst();
         int i = 0;
@@ -179,18 +221,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Gets all information about a single timer.
-     * @param timerID The id of the timer.
+     * @param timerId The id of the timer.
      * @return A TimerInfoBundle with all the information about the timer.
      */
-    public TimerInfoBundle getTimerInfo(int timerID) {
+    public TimerInfoBundle getTimerInfo(int timerId) {
         ArrayList<TimerLogEntry> times = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_TIMER_DATA, new String[]{COLUMN_NAME_START_TIME, COLUMN_NAME_DURATION}, COLUMN_NAME_TIMERID + " = " + timerID, null, null, null, null);
+        Cursor cursor = db.query(TABLE_TIMER_DATA, new String[]{COLUMN_NAME_START_TIME, COLUMN_NAME_DURATION}, COLUMN_NAME_TIMERID + " = " + timerId, null, null, null, null);
 
         cursor.moveToFirst();
         while(!cursor.isAfterLast()) {
-            times.add(new TimerLogEntry(timerID,
+            times.add(new TimerLogEntry(timerId,
                     LocalDateTime.ofEpochSecond(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_START_TIME)),0, ZoneOffset.UTC),
                     cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_DURATION))));
 
@@ -198,7 +240,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         cursor.close();
 
-        return new TimerInfoBundle(timerID, getTimerLabel(timerID), times, getTimerTags(timerID));
+        return new TimerInfoBundle(timerId, getTimerLabel(timerId), times, getTimerTags(timerId));
     }
 
     /**
@@ -212,20 +254,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_TIMERS, new String[]{COLUMN_NAME_TIMERID}, null, null, null, null, null);
-        int[] timerIDs = new int[cursor.getCount()];
+        int[] timerIds = new int[cursor.getCount()];
         int idColumn = cursor.getColumnIndex(COLUMN_NAME_TIMERID);
 
         cursor.moveToFirst();
         int i = 0;
         while(!cursor.isAfterLast()) {
-            timerIDs[i++] = cursor.getInt(idColumn);
+            timerIds[i++] = cursor.getInt(idColumn);
             cursor.moveToNext();
         }
         cursor.close();
 
         TimerInfoBundle[] timerInfoBundles = new TimerInfoBundle[cursor.getCount()];
-        for (i = 0; i < timerIDs.length; i++) {
-            timerInfoBundles[i] = getTimerInfo(timerIDs[i]);
+        for (i = 0; i < timerIds.length; i++) {
+            timerInfoBundles[i] = getTimerInfo(timerIds[i]);
         }
 
         return timerInfoBundles;

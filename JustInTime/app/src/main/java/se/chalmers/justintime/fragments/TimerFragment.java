@@ -3,14 +3,18 @@ package se.chalmers.justintime.fragments;
 
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.InputType;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -37,12 +41,16 @@ public class TimerFragment extends Fragment implements CounterActivity {
     public static long currentTimerValue;
     private long previousDuration;
     private LocalDateTime startTime;
+    private String label;
+    private String[] tags;
 
     private boolean isTimerRunning = false;
     private SharedPreference preferences;
 
-    // private BasicTimer timer;    FIXME For when the real chronometer is implemented.
     private TextView timerText;
+    private TextView timerLabel;
+    private TextView timerTagText;
+    private TextView timerTagList;
 
     private Button startPauseTimerButton;
     private Button resetTimerButton;
@@ -96,10 +104,19 @@ public class TimerFragment extends Fragment implements CounterActivity {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_timer, container, false);
 
-        timerText = (TextView) view.findViewById(R.id.basicTimerTV);
+        this.label = "Basic timer";
+        this.tags = new String[]{"Undefined"};
 
+        timerText = (TextView) view.findViewById(R.id.basicTimerTV);
         startPauseTimerButton = (Button) view.findViewById(R.id.timerStartPauseButton);
         resetTimerButton = (Button) view.findViewById(R.id.timerResetButton);
+        timerLabel = (TextView) view.findViewById(R.id.timerLabelTV);
+        timerTagText = (TextView) view.findViewById(R.id.timerTagLabelTV);
+        timerTagList = (TextView) view.findViewById(R.id.timerTagsTV);
+
+        timerLabel.setText(label);
+        updateTagListText();
+
         setRunningState(isTimerRunning);
         // Set up the alarm.
         preferences = new SharedPreference(view.getContext());
@@ -110,7 +127,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
         setButtonOnClickListeners();
         databaseHelper = DatabaseHelper.getInstance(this.getContext());
-        timerId = databaseHelper.insertTimer("Basic timer", new String[]{"Undefined"});
+        timerId = databaseHelper.insertTimer(label, tags);
         progressBarCircle = (ProgressBar) view.findViewById(R.id.progressBarCircle);
         startValue = 90000;
         timeCountInMilliSeconds = startValue;
@@ -184,6 +201,20 @@ public class TimerFragment extends Fragment implements CounterActivity {
         }
     }
 
+    private void updateTagListText() {
+        StringBuilder tagText = new StringBuilder();
+        if (tags.length > 0) {
+            tagText.append(tags[0]);
+            if (tags.length > 1) {
+                tagText.append("\n").append(tags[1]);
+                if (tags.length > 2) {
+                    tagText.append("\n+").append(tags.length-2);
+                }
+            }
+        }
+        timerTagList.setText(tagText.toString());
+    }
+
     public void onTimerFinish() {
         Log.d("TimerFragment", "onTimerFinish: Time's up!");
         alarm.alert();
@@ -207,6 +238,49 @@ public class TimerFragment extends Fragment implements CounterActivity {
         }
     }
 
+    private void timerLabelDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+        builder.setTitle("Enter new label");
+
+        // Set up the input
+        final EditText input = new EditText(view.getContext());
+        input.setText(label);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                label = (input.getText().toString());
+                databaseHelper.updateTimerLabel(timerId, label);
+                timerLabel.setText(label);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    private void timerTagDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+        builder.setTitle("More stuff coming soon");
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+
+        builder.show();
+    }
+
     private void setButtonOnClickListeners() {
         startPauseTimerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -222,6 +296,24 @@ public class TimerFragment extends Fragment implements CounterActivity {
             @Override
             public void onClick(View v) {
                 reset();
+            }
+        });
+        timerLabel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                timerLabelDialog();
+            }
+        });
+        timerTagText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                timerTagDialog();
+            }
+        });
+        timerTagList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                timerTagDialog();
             }
         });
     }
