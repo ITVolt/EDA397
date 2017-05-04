@@ -27,9 +27,10 @@ public class TimerService extends Service implements Ticker {
     private NotificationManager notificationManager;
     private Messenger client;
     private TimerService self = this;
+
     private final static int ONGOING_NOTIFICATION = 1;
 
-    private boolean isForeground = false;
+    private boolean serviceInForeground = false;
 
     /**
      * For testing purposes only
@@ -70,6 +71,13 @@ public class TimerService extends Service implements Ticker {
      * arg1: id of timer
      */
     public final static int RESET_TIMER = 13;
+    /**
+     * Timer starts sending periodic messages about its state to the client
+     * arg1: id of timer
+     */
+    public final static int START_SENDING_UPDATES = 14;
+
+    public final static int STOP_SENDING_UPDATES = 15;
 
     /**
      * Notifiy client that the time have changed
@@ -101,12 +109,13 @@ public class TimerService extends Service implements Ticker {
                     Log.d("TimerService", "Setting client " + client);
                     break;
                 case ENTER_FOREGROUND:
-                    isForeground = true;
-                   // showForegroundNotification();
+                    serviceInForeground = true;
+                    timerHandler.stopSendingUpdates();
+                    // showForegroundNotification();
                     break;
                 case LEAVE_FORGROUND:
-                    isForeground = false;
-                   // stopForeground(true);
+                    serviceInForeground = false;
+                    // stopForeground(true);
                     break;
                 case NEW_TIMER:
                     final Bundle bundle = message.getData();
@@ -122,8 +131,15 @@ public class TimerService extends Service implements Ticker {
                     timerHandler.stopTimer(message.arg1);
                     break;
                 case RESET_TIMER:
-                    long time  =timerHandler.resetTimer(message.arg1);
+                    long time = timerHandler.resetTimer(message.arg1);
                     onTick(time);
+                    break;
+                case START_SENDING_UPDATES:
+                    timerHandler.startSendingUpdates(message.arg1);
+                    break;
+                case STOP_SENDING_UPDATES:
+                    timerHandler.stopSendingUpdates();
+                    break;
                 default:
                     super.handleMessage(message);
             }
@@ -207,21 +223,24 @@ public class TimerService extends Service implements Ticker {
 
     @Override
     public void onTick(long time){
-        if(client != null){
-            //Log.d("TimerService", "Sending update to " + client);
+        ParcelableLong l = new ParcelableLong(time);
+        Message message = Message.obtain(null, UPDATE_TIMER);
+        message.getData().putParcelable(UPDATED_TIME, l);
+        sendMessage(message);
+    }
 
-            ParcelableLong l = new ParcelableLong(time);
-            Message message = Message.obtain(null, UPDATE_TIMER);
-            message.getData().putParcelable(UPDATED_TIME, l);
+    @Override
+    public void onFinish() {
+        sendMessage(Message.obtain(null, ALERT_TIMER));
+        if(serviceInForeground){
+            showNotification(2, "Timer has finished");
+        }
+    }
+
+    private void sendMessage(Message message) {
+        if (client != null) {
             try {
                 client.send(message);
-                if(time <= 0){ //If timer is done send alert aswell
-                    client.send(Message.obtain(null, ALERT_TIMER));
-                    if(isForeground){
-                        showNotification(2, "Timer has finished");
-                    }
-                }
-                //Log.d("TimerService", "Sent onTick");
             } catch (RemoteException e) {
                 Log.d("TimerService", "onTick RemoteExeption " + e.getMessage());
                 e.printStackTrace();

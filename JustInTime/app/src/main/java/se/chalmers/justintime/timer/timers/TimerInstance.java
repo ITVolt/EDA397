@@ -19,6 +19,13 @@ public class TimerInstance implements Runnable{
     private List<String> tags;
     private ScheduledFuture future;
 
+    public void setSendingUpdates(boolean sendingUpdates) {
+        isSendingUpdates = sendingUpdates;
+        ticker.onTick(currentTimer.getRemainingTime()); //Make a tick with the current time to inform the fragment about the current state
+    }
+
+    private boolean isSendingUpdates = false;
+
     public TimerInstance(int id, AbstractTimer timer, Ticker ticker) {
         this.id = id;
         this.ticker = ticker;
@@ -41,8 +48,11 @@ public class TimerInstance implements Runnable{
     public void run() {
         currentTimer.update();
         long remainingTime = currentTimer.getRemainingTime();
-        ticker.onTick(remainingTime);
+        if (isSendingUpdates) {
+            ticker.onTick(remainingTime);
+        }
         if(remainingTime < 0){
+            ticker.onFinish();
             future.cancel(false);
         }
     }

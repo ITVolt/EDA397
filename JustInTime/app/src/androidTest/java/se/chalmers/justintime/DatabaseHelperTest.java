@@ -96,86 +96,31 @@ public class DatabaseHelperTest {
     public void insertTimerData() throws Exception {
         databaseHelper.resetDatabase();
         int id = databaseHelper.insertTimer("", new String[0]);
-        TimerLogEntry entry = new TimerLogEntry(1337 ,id, LocalDateTime.now(), 1);
+        TimerLogEntry entry = new TimerLogEntry(id, LocalDateTime.now(), 1);
         databaseHelper.insertTimerData(entry);
-        TimerLogEntry timerLogEntry = databaseHelper.getEntryById(1337);
-        assertTrue(timerLogEntry.getTimerId() == id);
+        TimerInfoBundle timerInfo = databaseHelper.getTimerInfo(id);
+        assertEquals(id, timerInfo.getId());
         databaseHelper.resetDatabase();
-    }
-
-    @Test
-    public void getNextAvailableId() throws Exception {
-        databaseHelper.resetDatabase();
-        int id = databaseHelper.insertTimer("", new String[0]);
-        TimerLogEntry entry1 = new TimerLogEntry(1 ,id, LocalDateTime.now(), 60);
-        id = databaseHelper.insertTimer("", new String[0]);
-        TimerLogEntry entry2 = new TimerLogEntry(2 ,id, LocalDateTime.now(), 120);
-        id = databaseHelper.insertTimer("", new String[0]);
-        TimerLogEntry entry3 = new TimerLogEntry(3 ,id, LocalDateTime.now(), 180);
-        id = databaseHelper.insertTimer("", new String[0]);
-        TimerLogEntry entry4 = new TimerLogEntry(4 ,id, LocalDateTime.now(), 240);
-        databaseHelper.insertTimerData(entry1);
-        databaseHelper.insertTimerData(entry2);
-        databaseHelper.insertTimerData(entry3);
-        databaseHelper.insertTimerData(entry4);
-        assertTrue(databaseHelper.getNextAvailableId() == 5);
-    }
-
-    @Test
-    public void getNextAvailablePauseId() throws Exception {
-        databaseHelper.resetDatabase();
-        int id = databaseHelper.insertTimer("", new String[0]);
-        TimerLogEntry entry1 = new TimerLogEntry(1 ,id, LocalDateTime.now(), 60);
-        TimerLogEntry entry2 = new TimerLogEntry(2 ,id, LocalDateTime.now(), 120);
-        id = databaseHelper.insertTimer("", new String[0]);
-        TimerLogEntry entry3 = new TimerLogEntry(3 ,id, LocalDateTime.now(), 180);
-        TimerLogEntry entry4 = new TimerLogEntry(4 ,id, LocalDateTime.now(), 240);
-        databaseHelper.insertTimerData(entry1);
-        databaseHelper.insertTimerData(entry2);
-        databaseHelper.insertTimerData(entry3);
-        databaseHelper.insertTimerData(entry4);
-        assertTrue(databaseHelper.getNextAvailablePauseId() == 3);
-
     }
 
     @Test
     public void insertEntries() throws Exception {
         databaseHelper.resetDatabase();
         int id = databaseHelper.insertTimer("", new String[0]);
-        TimerLogEntry entry1 = new TimerLogEntry(1 ,id, LocalDateTime.now(), 60);
-        TimerLogEntry entry2 = new TimerLogEntry(2 ,id, LocalDateTime.now(), 120);
+        TimerLogEntry entry1 = new TimerLogEntry(id, LocalDateTime.now(), 60);
+        TimerLogEntry entry2 = new TimerLogEntry(id, LocalDateTime.now(), 120);
         id = databaseHelper.insertTimer("", new String[0]);
-        TimerLogEntry entry3 = new TimerLogEntry(3 ,id, LocalDateTime.now(), 180);
-        TimerLogEntry entry4 = new TimerLogEntry(4 ,id, LocalDateTime.now(), 240);
+        TimerLogEntry entry3 = new TimerLogEntry(id, LocalDateTime.now(), 180);
+        TimerLogEntry entry4 = new TimerLogEntry(id, LocalDateTime.now(), 240);
         databaseHelper.insertTimerData(entry1);
         databaseHelper.insertTimerData(entry2);
         databaseHelper.insertTimerData(entry3);
         databaseHelper.insertTimerData(entry4);
         id = databaseHelper.insertTimer("", new String[0]);
-        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, LocalDateTime.now(), 30);
+        TimerLogEntry entry = new TimerLogEntry(id, LocalDateTime.now(), 30);
         databaseHelper.insertTimerData(entry);
-        assertTrue(databaseHelper.getEntryById(5).getTimerId() == 3);
-        assertTrue(databaseHelper.getEntryById(5).getDuration() == 30);
-    }
-
-    @Test
-    public void insertFirstEntry() throws Exception {
-        databaseHelper.resetDatabase();
-        int id = databaseHelper.insertTimer("", new String[0]);
-        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, LocalDateTime.now(), 30);
-        databaseHelper.insertTimerData(entry);
-
-        id = databaseHelper.insertTimer("", new String[0]);
-        TimerLogEntry entry2 = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, LocalDateTime.now(), 30);
-        databaseHelper.insertTimerData(entry2);
-
-        TimerLogEntry entry3 = new TimerLogEntry(databaseHelper.getNextAvailableId(), databaseHelper.getEntryById(2).getTimerId() , LocalDateTime.now(), 30);
-        databaseHelper.insertTimerData(entry3);
-
-        assertTrue(databaseHelper.getEntryById(1).getTimerId() == 1);
-        assertTrue(databaseHelper.getEntryById(2).getTimerId() == 2);
-        assertTrue(databaseHelper.getEntryById(3).getTimerId() == 2);
-
+        assertEquals(3, databaseHelper.getTimerInfo(id).getId());
+        assertEquals(30, databaseHelper.getTimerInfo(id).getTotalDuration());
     }
 
     @Test
@@ -183,7 +128,7 @@ public class DatabaseHelperTest {
         databaseHelper.resetDatabase();
         int id = databaseHelper.insertTimer("Timer A", new String[]{"Studies", "Calculus"});
         LocalDateTime date = LocalDateTime.now();
-        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, date, 30);
+        TimerLogEntry entry = new TimerLogEntry(id, date, 30);
         databaseHelper.insertTimerData(entry);
         TimerInfoBundle timerInfoBundle = databaseHelper.getTimerInfo(id);
         assertEquals("Label", "Timer A", timerInfoBundle.getLabel());
@@ -200,15 +145,15 @@ public class DatabaseHelperTest {
         TimerLogEntry entry;
         LocalDateTime date = LocalDateTime.now();
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, date, 5000);
+        entry = new TimerLogEntry(id, date, 5000);
         databaseHelper.insertTimerData(entry);
         id = databaseHelper.insertTimer("Timer B", new String[0]);
-        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, date, 6000);
+        entry = new TimerLogEntry(id, date, 6000);
         databaseHelper.insertTimerData(entry);
         id = databaseHelper.insertTimer("Productivity", new String[]{"Studies", "Calculus"});
-        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, date.minusDays(2), 15000);
+        entry = new TimerLogEntry(id, date.minusDays(2), 15000);
         databaseHelper.insertTimerData(entry);
-        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, date.minusDays(1), 20000);
+        entry = new TimerLogEntry(id, date.minusDays(1), 20000);
         databaseHelper.insertTimerData(entry);
         TimerInfoBundle[] timers = databaseHelper.getAllTimerInfo();
         assertEquals("Numbers of unique timers", 3, timers.length);
@@ -237,71 +182,71 @@ public class DatabaseHelperTest {
     public void populateWithMockValues() throws Exception {
         databaseHelper.resetDatabase();
         int id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        TimerLogEntry entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, LocalDateTime.now(), 5000);
+        TimerLogEntry entry = new TimerLogEntry(id, LocalDateTime.now(), 5000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, LocalDateTime.now().minusDays(1), 15000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(1), 15000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, LocalDateTime.now().minusDays(2), 20000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(2), 20000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, LocalDateTime.now().minusDays(3), 10000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(3), 10000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, LocalDateTime.now().minusDays(4), 11000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(4), 11000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, LocalDateTime.now().minusDays(5), 12000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(5), 12000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, LocalDateTime.now().minusDays(6), 13000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(6), 13000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, LocalDateTime.now().minusDays(7), 4000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(7), 4000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, LocalDateTime.now().minusDays(8), 8000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(8), 8000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, LocalDateTime.now().minusDays(9), 9000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(9), 9000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, LocalDateTime.now().minusDays(10), 14000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(10), 14000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, LocalDateTime.now().minusDays(11), 17000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(11), 17000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, LocalDateTime.now().minusDays(12), 22000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(12), 22000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, LocalDateTime.now().minusDays(13), 13000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(13), 13000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, LocalDateTime.now().minusDays(14), 5000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(14), 5000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, LocalDateTime.now().minusDays(15), 7000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(15), 7000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        entry = new TimerLogEntry(databaseHelper.getNextAvailableId(), id, LocalDateTime.now().minusDays(16), 5000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(16), 5000);
         databaseHelper.insertTimerData(entry);
     }
 

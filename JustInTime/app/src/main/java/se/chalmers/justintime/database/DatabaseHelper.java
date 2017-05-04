@@ -5,15 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.SparseArray;
 
 import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.ZoneOffset;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Locale;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -26,7 +23,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 4;
     private static final String DATABASE_NAME = "Database.db";
 
-    static final String COLUMN_NAME_ID = "id";
     static final String COLUMN_NAME_TIMERID = "timer_id";
     static final String COLUMN_NAME_START_TIME = "start_time";
     static final String COLUMN_NAME_DURATION = "duration";
@@ -39,8 +35,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private final String[] COLUMNS = {COLUMN_NAME_START_TIME, COLUMN_NAME_DURATION, COLUMN_NAME_TIMERID};
 
-    private int nextAvailableId = -1;
-
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -49,7 +43,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         dropAllTables(db);
         createAllTables(db);
-        nextAvailableId = -1;
     }
 
     @Override
@@ -62,7 +55,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         dropAllTables(db);
         createAllTables(db);
-        nextAvailableId = -1;
     }
 
     private void createAllTables(SQLiteDatabase db) {
@@ -70,10 +62,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "(" + COLUMN_NAME_TIMERID + " INTEGER PRIMARY KEY, " +
                 COLUMN_NAME_LABEL + " TEXT );");
         db.execSQL(" CREATE TABLE " + TABLE_TIMER_DATA +
-                "(" + COLUMN_NAME_ID + " INTEGER PRIMARY KEY, " +
-                COLUMN_NAME_TIMERID + " INTEGER, " +
+                "(" + COLUMN_NAME_TIMERID + " INTEGER, " +
                 COLUMN_NAME_START_TIME + " DATETIME, " +
-                COLUMN_NAME_DURATION + " INTEGER );");
+                COLUMN_NAME_DURATION + " INTEGER, " +
+                "FOREIGN KEY(" + COLUMN_NAME_TIMERID + ") " +
+                "REFERENCES " + TABLE_TIMERS + "(" + COLUMN_NAME_TIMERID + "));");
         db.execSQL(" CREATE TABLE " + TABLE_TIMER_TAGS +
                 "(" + COLUMN_NAME_TIMERID + " INTEGER, " +
                 COLUMN_NAME_TAG + " TEXT, " +
@@ -85,32 +78,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TIMERS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TIMER_DATA);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TIMER_TAGS);
-    }
-
-    public int getNextAvailableId(){
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select * from " + TABLE_TIMER_DATA, null);
-        if (nextAvailableId == -1){
-
-            nextAvailableId = res.getCount() + 1;
-        }
-        res.close();
-        return nextAvailableId;
-    }
-
-    public int getNextAvailablePauseId(){
-        int nextAvailablePauseId;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select * from " + TABLE_TIMER_DATA, null);
-        res.moveToFirst();
-        Set<Integer> noDuplicatesPauseId = new HashSet<>();
-        while (!res.isAfterLast()){
-            noDuplicatesPauseId.add((res.getInt(res.getColumnIndex(COLUMN_NAME_TIMERID))));
-            res.moveToNext();
-        }
-        nextAvailablePauseId = noDuplicatesPauseId.size() + 1;
-        res.close();
-        return nextAvailablePauseId;
     }
 
     /**
@@ -138,31 +105,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean insertTimerData(TimerLogEntry timerLogEntry) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(COLUMN_NAME_ID, timerLogEntry.getDatabaseRowId());
         contentValues.put(COLUMN_NAME_TIMERID, timerLogEntry.getTimerId());
         contentValues.put(COLUMN_NAME_START_TIME, timerLogEntry.getStartTime().toEpochSecond(ZoneOffset.UTC));
         contentValues.put(COLUMN_NAME_DURATION, timerLogEntry.getDuration());
-        nextAvailableId = getNextAvailableId() + 1;
         db.insert(TABLE_TIMER_DATA, null, contentValues);
         return true;
-    }
-
-    private Cursor getData(int timerId) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("select * from " + TABLE_TIMER_DATA + " where " + COLUMN_NAME_ID + " = " + timerId , null);
-    }
-
-    public TimerLogEntry getEntryById(int timeId) {
-        return new TimerLogEntry(getData(timeId));
-    }
-
-    public void updateTimer(TimerLogEntry timerLogEntry) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(COLUMN_NAME_START_TIME, String.valueOf(timerLogEntry.getStartTime()));
-        contentValues.put(COLUMN_NAME_DURATION, String.valueOf(timerLogEntry.getDuration()));
-
-        db.update(TABLE_TIMER_DATA, contentValues, COLUMN_NAME_ID + " = ? ", new String[]{String.valueOf(timerLogEntry.getDatabaseRowId())});
     }
 
     public Cursor getData() {
@@ -233,8 +180,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.moveToFirst();
         while(!cursor.isAfterLast()) {
-            times.add(new TimerLogEntry(-1,
-                    timerID,
+            times.add(new TimerLogEntry(timerID,
                     LocalDateTime.ofEpochSecond(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_START_TIME)),0, ZoneOffset.UTC),
                     cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_DURATION))));
 
@@ -242,7 +188,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         cursor.close();
 
-        return new TimerInfoBundle(getTimerLabel(timerID), times, getTimerTags(timerID));
+        return new TimerInfoBundle(timerID, getTimerLabel(timerID), times, getTimerTags(timerID));
     }
 
     /**
@@ -273,34 +219,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return timerInfoBundles;
-        /*
-        ArrayList<TimerInfoBundle> timerInfoBundles = new ArrayList<>();
-        SparseArray<ArrayList<TimerLogEntry>> timers = new SparseArray<>();
-        ArrayList<TimerLogEntry> timer;
-        Cursor cursor = getData();
-        cursor.moveToFirst();
-        int id;
-        while(!cursor.isAfterLast()) {
-            id = cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_TIMERID));
-            timer = timers.get(id);
-            if (timer == null) {
-                timers.append(id, new ArrayList<TimerLogEntry>());
-                timer = timers.get(id);
-            }
-            timer.add(new TimerLogEntry(-1,
-                    id,
-                    LocalDateTime.ofEpochSecond(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_START_TIME)),0, ZoneOffset.UTC),
-                    cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_DURATION))));
-            cursor.moveToNext();
-        }
-        cursor.close();
-        for (int i=0; i<timers.size(); i++) {
-            timer = timers.valueAt(i);
-            timerInfoBundles.add(new TimerInfoBundle("Undefined",
-                    timer.toArray(new TimerLogEntry[timer.size()]),
-                    new String[] {"Undefined"}));
-        }
-        return timerInfoBundles.toArray(new TimerInfoBundle[timerInfoBundles.size()]);
-        */
     }
 }
