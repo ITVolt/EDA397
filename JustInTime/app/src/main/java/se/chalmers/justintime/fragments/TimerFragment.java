@@ -32,10 +32,9 @@ import se.chalmers.justintime.alert.AlarmBuilder;
 public class TimerFragment extends Fragment implements CounterActivity {
 
     private long startValue;
-    //private long currentTimerValue;
+
     public static long currentTimerValue;
-    private long previousDuration;
-    private LocalDateTime startTime;
+
     private String label;
     private String[] tags;
 
@@ -60,7 +59,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
     private ProgressBar progressBarCircle;
 
-    private int timerFragmentId;
+    private int timerId;
 
 
     public TimerFragment() {
@@ -141,12 +140,12 @@ public class TimerFragment extends Fragment implements CounterActivity {
     @Override
     public void start() {
         setRunningState(true);
-        presenter.startTimer(timerFragmentId);
+        presenter.startTimer(timerId);
     }
 
     @Override
     public void pause() {
-        presenter.pauseTimer(timerFragmentId);
+        presenter.pauseTimer(timerId);
         setRunningState(false);
     }
 
@@ -157,7 +156,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         currentTimerValue = startValue; // FIXME Remove when the real chronometer is implemented.
         updateTimerText();
         resetCountDownTimer();
-        presenter.resetTimer(timerFragmentId);
+        presenter.resetTimer(timerId);
     }
 
     @Override
@@ -224,7 +223,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 label = (input.getText().toString());
-                databaseHelper.updateTimerLabel(timerId, label);
+                presenter.updateTimerLabel(timerId, label);
                 timerLabel.setText(label);
             }
         });
@@ -359,11 +358,11 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
     public void setPresenter(Presenter presenter) {
         this.presenter = presenter;
-        presenter.startSendingUpdates(timerFragmentId);
-        this.isTimerRunning = presenter.getRunningState(timerFragmentId);
+        presenter.startSendingUpdates(timerId);
+        this.isTimerRunning = presenter.getRunningState(timerId);
     }
 
-    public void setTimerFragmentId(int timerFragmentId) {
-        this.timerFragmentId = timerFragmentId;
+    public void setTimerId(int timerId) {
+        this.timerId = timerId;
     }
 }

@@ -1,5 +1,6 @@
 package se.chalmers.justintime;
 
+import android.content.Context;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import se.chalmers.justintime.database.DatabaseHelper;
 import se.chalmers.justintime.fragments.TimerFragment;
 import se.chalmers.justintime.timer.TimerService;
 
@@ -18,14 +20,15 @@ import se.chalmers.justintime.timer.TimerService;
 
 public class Presenter {
 
-
     private TimerFragment timerFragment;
     private Messenger timerService;
-    public Map<Integer, Boolean> states;
-    public int timerAid;
+    private Map<Integer, Boolean> states;
+    private int timerAid;
+    private DatabaseHelper databaseHelper;
 
 
-    public Presenter(TimerFragment fragment) {
+    public Presenter(TimerFragment fragment, Context context) {
+        databaseHelper = DatabaseHelper.getInstance(context);
         this.timerFragment = fragment;
         states = new HashMap<>(100);
     }
@@ -103,10 +106,14 @@ public class Presenter {
     public void setTimerId(int timerId) {
         timerAid = timerId;
         states.put(timerId, false);
-        timerFragment.setTimerFragmentId(timerId);
+        timerFragment.setTimerId(timerId);
     }
 
     public void setAid() {
-        timerFragment.setTimerFragmentId(timerAid);
+        timerFragment.setTimerId(timerAid);
+    }
+
+    public void updateTimerLabel(int timerId, String label) {
+        databaseHelper.updateTimerLabel(timerId, label);
     }
 }
