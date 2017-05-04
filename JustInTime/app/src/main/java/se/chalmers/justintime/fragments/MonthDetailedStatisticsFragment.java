@@ -114,6 +114,7 @@ public class MonthDetailedStatisticsFragment extends Fragment{
         xAxis.setTextColor(getResources().getColor(R.color.colorAccent));
         xAxis.setDrawAxisLine(true);
         xAxis.setDrawGridLines(false);
+        xAxis.setAxisMinimum(1f);
         //xAxis.setValueFormatter(formatter);
         chart.animateY(300);
 

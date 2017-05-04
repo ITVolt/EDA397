@@ -23,6 +23,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Created by David on 2017-04-04.
+ * Updated by Patrik on 2017-05-04.
  */
 @RunWith(AndroidJUnit4.class)
 public class DatabaseHelperTest {
@@ -55,36 +56,72 @@ public class DatabaseHelperTest {
             fail(); //Should throw exception for null parameters.
         } catch (Exception ignored) {}
         try {
-            databaseHelper.insertTimer(null, new String[0]);
+            databaseHelper.insertTimer(null, new String[]{"not null"});
             fail(); //Should throw exception for null parameters.
         } catch (Exception ignored) {}
         try {
             databaseHelper.insertTimer("not null", null);
             fail(); //Should throw exception for null parameters.
         } catch (Exception ignored) {}
-        assertEquals("Id of timer test: ", 1, databaseHelper.insertTimer("timer 1", new String[0]));
-        assertEquals("Id of timer test: ", 2, databaseHelper.insertTimer("timer 2", new String[0]));
-        assertEquals("Id of timer test: ", 3, databaseHelper.insertTimer("timer 2", new String[0]));
+        try {
+            databaseHelper.insertTimer("", new String[]{"not empty"});
+            fail(); //Should throw exception for empty parameters.
+        } catch (Exception ignored) {}
+        try {
+            databaseHelper.insertTimer("not empty", new String[0]);
+            fail(); //Should throw exception for empty parameters.
+        } catch (Exception ignored) {}
+        assertEquals("Id of timer test: ", 1, databaseHelper.insertTimer("timer 1", new String[]{"Undefined"}));
+        assertEquals("Id of timer test: ", 2, databaseHelper.insertTimer("timer 2", new String[]{"Undefined"}));
+        assertEquals("Id of timer test: ", 3, databaseHelper.insertTimer("timer 2", new String[]{"Undefined"}));
     }
 
     @Test
     public void readTimerLabel() throws Exception {
         databaseHelper.resetDatabase();
-        int id = databaseHelper.insertTimer("timer 1", new String[0]);
+        int id = databaseHelper.insertTimer("timer 1", new String[]{"Undefined"});
         assertEquals("Normal conditions", "timer 1", databaseHelper.getTimerLabel(id));
-        id = databaseHelper.insertTimer("", new String[0]);
-        assertEquals("Empty string", "", databaseHelper.getTimerLabel(id));
+        id = databaseHelper.insertTimer("Undefined", new String[]{"Undefined"});
+        assertEquals("Empty string", "Undefined", databaseHelper.getTimerLabel(id));
+    }
+
+    @Test
+    public void updateTimerLabel() throws Exception {
+        databaseHelper.resetDatabase();
+        int id = databaseHelper.insertTimer("old timer", new String[]{"Undefined"});
+        assertEquals("Normal conditions", "old timer", databaseHelper.getTimerLabel(id));
+        databaseHelper.updateTimerLabel(id, "new timer");
+        assertEquals("Changed label", "new timer", databaseHelper.getTimerLabel(id));
+        try {
+            databaseHelper.updateTimerLabel(id, null);
+            fail(); //Should throw exception for null parameters.
+        } catch (Exception ignored) {}
+        try {
+            databaseHelper.updateTimerLabel(id, "");
+            fail(); //Should throw exception for empty parameters.
+        } catch (Exception ignored) {}
+    }
+
+    @Test
+    public void setTimerTags() throws Exception {
+        databaseHelper.resetDatabase();
+        int id = databaseHelper.insertTimer("Undefined", new String[]{"Tag 1"});
+        String[] tags = databaseHelper.getTimerTags(id);
+        assertEquals("1 tag", 1, tags.length);
+        databaseHelper.setTimerTags(id, new String[]{"Tag 2", "Tag 3"});
+        tags = databaseHelper.getTimerTags(id);
+        assertEquals("1 tag", 2, tags.length);
+        assertEquals("changed tag", "Tag 2", tags[0]);
+        assertEquals("changed tag", "Tag 3", tags[1]);
     }
 
     @Test
     public void readTimerTags() throws Exception {
-        int id = databaseHelper.insertTimer("timer A", new String[0]);
-        assertEquals("No tags", 0, databaseHelper.getTimerTags(id).length);
-        id = databaseHelper.insertTimer("", new String[]{"Tag 1"});
+        int id = databaseHelper.insertTimer("Undefined", new String[]{"Tag 1"});
         String[] tags = databaseHelper.getTimerTags(id);
         assertEquals("1 tag", 1, tags.length);
         assertEquals("Tag 1", tags[0]);
-        id = databaseHelper.insertTimer("", new String[]{"Tag 1", "Tag 2"});
+        id = databaseHelper.insertTimer("Undefined", new String[]{"Tag 1", "Tag 2"});
         tags = databaseHelper.getTimerTags(id);
         assertEquals("2 tags", 2, tags.length);
         assertEquals("Tag 1", tags[0]);
@@ -94,7 +131,7 @@ public class DatabaseHelperTest {
     @Test
     public void insertTimerData() throws Exception {
         databaseHelper.resetDatabase();
-        int id = databaseHelper.insertTimer("", new String[0]);
+        int id = databaseHelper.insertTimer("Undefined", new String[]{"Undefined"});
         TimerLogEntry entry = new TimerLogEntry(id, LocalDateTime.now(), 1);
         databaseHelper.insertTimerData(entry);
         TimerInfoBundle timerInfo = databaseHelper.getTimerInfo(id);
@@ -105,17 +142,17 @@ public class DatabaseHelperTest {
     @Test
     public void insertEntries() throws Exception {
         databaseHelper.resetDatabase();
-        int id = databaseHelper.insertTimer("", new String[0]);
+        int id = databaseHelper.insertTimer("Undefined", new String[]{"Undefined"});
         TimerLogEntry entry1 = new TimerLogEntry(id, LocalDateTime.now(), 60);
         TimerLogEntry entry2 = new TimerLogEntry(id, LocalDateTime.now(), 120);
-        id = databaseHelper.insertTimer("", new String[0]);
+        id = databaseHelper.insertTimer("Undefined", new String[]{"Undefined"});
         TimerLogEntry entry3 = new TimerLogEntry(id, LocalDateTime.now(), 180);
         TimerLogEntry entry4 = new TimerLogEntry(id, LocalDateTime.now(), 240);
         databaseHelper.insertTimerData(entry1);
         databaseHelper.insertTimerData(entry2);
         databaseHelper.insertTimerData(entry3);
         databaseHelper.insertTimerData(entry4);
-        id = databaseHelper.insertTimer("", new String[0]);
+        id = databaseHelper.insertTimer("Undefined", new String[]{"Undefined"});
         TimerLogEntry entry = new TimerLogEntry(id, LocalDateTime.now(), 30);
         databaseHelper.insertTimerData(entry);
         assertEquals(3, databaseHelper.getTimerInfo(id).getId());
@@ -146,7 +183,7 @@ public class DatabaseHelperTest {
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
         entry = new TimerLogEntry(id, date, 5000);
         databaseHelper.insertTimerData(entry);
-        id = databaseHelper.insertTimer("Timer B", new String[0]);
+        id = databaseHelper.insertTimer("Timer B", new String[]{"Undefined"});
         entry = new TimerLogEntry(id, date, 6000);
         databaseHelper.insertTimerData(entry);
         id = databaseHelper.insertTimer("Productivity", new String[]{"Studies", "Calculus"});
@@ -163,7 +200,7 @@ public class DatabaseHelperTest {
         assertEquals("Duration", Long.valueOf(5000), timers[0].getTimes().get(0).second);
 
         assertEquals("Label", "Timer B", timers[1].getLabel());
-        assertEquals("Tag", 0, timers[1].getTags().length);
+        assertEquals("Tag", 1, timers[1].getTags().length);
         assertEquals("Date", date.toEpochSecond(ZoneOffset.UTC), timers[1].getTimes().get(0).first.toEpochSecond(ZoneOffset.UTC));
         assertEquals("Duration", Long.valueOf(6000), timers[1].getTimes().get(0).second);
 
@@ -180,7 +217,7 @@ public class DatabaseHelperTest {
     @Test
     public void populateWithMockValues() throws Exception {
         databaseHelper.resetDatabase();
-        int id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
+        int id = databaseHelper.insertTimer("Timer A", new String[]{"Other", "Running"});
         TimerLogEntry entry = new TimerLogEntry(id, LocalDateTime.now(), 5000);
         databaseHelper.insertTimerData(entry);
 
