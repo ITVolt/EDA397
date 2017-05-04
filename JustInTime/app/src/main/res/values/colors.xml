@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#263238</color>  <!--#34495E Buttons etc-->
-    <color name="colorPrimaryDark">#212121</color>  <!--#ECF0F1 BG -->
-    <color name="primary_light">#C5CAE9</color> <!-- -->
-    <color name="colorAccent">#FF5722</color> <!--#E67E22 text-->
+    <color name="colorPrimary">#607C8A</color>  <!--#34495E Buttons etc-->
+    <color name="colorPrimaryDark">#263238</color>  <!--#ECF0F1 BG -->
+    <color name="primary_light">#CFD6DE</color> <!-- -->
+    <color name="colorAccent">#ff6e40</color> <!--#E67E22 text-->
     <color name="primary_text">#212121</color>  <!-- -->
-    <color name="secondary_text">#757575</color>
+    <color name="secondary_text">#747474</color>
     <color name="icons">#ffffff</color>
     <color name="divider">#BDBDBD</color>
-    <color name="modernblue">#2980b9</color>
 </resources>
-
 

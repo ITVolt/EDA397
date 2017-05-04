@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -47,6 +48,9 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
     private Button startPauseTimerButton;
     private Button resetTimerButton;
+
+    private ImageButton playPausButton;
+    private ImageButton resetButton;
 
     private Alarm alarm;
     private StringBuilder strBuilder = new StringBuilder(8);
@@ -94,6 +98,8 @@ public class TimerFragment extends Fragment implements CounterActivity {
         this.label = "Basic timer";
         this.tags = new String[]{"Undefined"};
 
+        playPausButton = (ImageButton) view.findViewById(R.id.imageButton);
+        resetButton = (ImageButton) view.findViewById(R.id.imageButton2);
         timerText = (TextView) view.findViewById(R.id.basicTimerTV);
         startPauseTimerButton = (Button) view.findViewById(R.id.timerStartPauseButton);
         resetTimerButton = (Button) view.findViewById(R.id.timerResetButton);
@@ -189,6 +195,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         timerTagList.setText(tagText.toString());
     }
 
+
     public void onTimerFinish() {
         Log.d("TimerFragment", "onTimerFinish: Time's up!");
         alarm.alert();
@@ -252,17 +259,19 @@ public class TimerFragment extends Fragment implements CounterActivity {
     }
 
     private void setButtonOnClickListeners() {
-        startPauseTimerButton.setOnClickListener(new View.OnClickListener() {
+        playPausButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isTimerRunning) {
+                    playPausButton.setImageResource(R.drawable.ic_play_arrow_black_48dp);
                     pause();
                 } else {
                     start();
+                    playPausButton.setImageResource(R.drawable.ic_pause_black_48dp);
                 }
             }
         });
-        resetTimerButton.setOnClickListener(new View.OnClickListener() {
+        resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 reset();
@@ -289,16 +298,16 @@ public class TimerFragment extends Fragment implements CounterActivity {
     }
 
     private void enableResetButton() {
-        resetTimerButton.setEnabled(true);
+        resetButton.setEnabled(true);
         Animator animator = AnimatorInflater.loadAnimator(view.getContext(), R.animator.fade_in);
-        animator.setTarget(resetTimerButton);
+        animator.setTarget(resetButton);
         animator.start();
     }
 
     private void disableResetButton() {
-        resetTimerButton.setEnabled(false);
+        resetButton.setEnabled(false);
         Animator animator = AnimatorInflater.loadAnimator(view.getContext(), R.animator.fade_out);
-        animator.setTarget(resetTimerButton);
+        animator.setTarget(resetButton);
         animator.start();
     }
 
