@@ -16,7 +16,7 @@ import se.chalmers.justintime.database.DatabaseHelper;
 public class ListStatisticsFragment extends Fragment {
 
     View view;
-    Switch timerInfo, appInfo;
+    Switch timerInfo,generalInfo;
     TextView timerInfoText, appInfoText;
     SharedPreference mPreferences;
     DatabaseHelper db;
@@ -46,11 +46,11 @@ public class ListStatisticsFragment extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_list_statistics, container, false);
         timerInfo = (Switch) view.findViewById(R.id.timerInfoSwitch);
-        appInfo = (Switch) view.findViewById(R.id.appInfoSwitch);
+        generalInfo = (Switch) view.findViewById(R.id.generalInfoSwitch);
         timerInfoText = (TextView) view.findViewById(R.id.timerInfoText);
         appInfoText = (TextView) view.findViewById(R.id.appInfoText);
-        timerInfoText.setVisibility(View.INVISIBLE);
-        appInfoText.setVisibility(View.INVISIBLE);
+        timerInfoText.setVisibility(View.GONE);
+        appInfoText.setVisibility(View.GONE);
         setOnSwitchChangeListener();
         return view;
     }
@@ -66,22 +66,13 @@ public class ListStatisticsFragment extends Fragment {
                         totalDuration = "0 Hour";
                     }
                     timerInfoText.setText("Used for : " + totalDuration );
-                    timerInfoText.setVisibility(View.VISIBLE);
-                }
-                else{
-                    timerInfoText.setVisibility(View.INVISIBLE);
-                }
-            }
-        });
-        appInfo.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
                     appInfoText.setText("Used : " + mPreferences.getAppUsageCount() + " times");
+                    timerInfoText.setVisibility(View.VISIBLE);
                     appInfoText.setVisibility(View.VISIBLE);
                 }
                 else{
-                    appInfoText.setVisibility(View.INVISIBLE);
+                    timerInfoText.setVisibility(View.GONE);
+                    appInfoText.setVisibility(View.GONE);
                 }
             }
         });
