@@ -67,10 +67,6 @@ public class DatabaseHelperTest {
             databaseHelper.insertTimer("", new String[]{"not empty"});
             fail(); //Should throw exception for empty parameters.
         } catch (Exception ignored) {}
-        try {
-            databaseHelper.insertTimer("not empty", new String[0]);
-            fail(); //Should throw exception for empty parameters.
-        } catch (Exception ignored) {}
         assertEquals("Id of timer test: ", 1, databaseHelper.insertTimer("timer 1", new String[]{"Undefined"}));
         assertEquals("Id of timer test: ", 2, databaseHelper.insertTimer("timer 2", new String[]{"Undefined"}));
         assertEquals("Id of timer test: ", 3, databaseHelper.insertTimer("timer 2", new String[]{"Undefined"}));

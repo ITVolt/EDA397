@@ -99,8 +99,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @return The id of the new timer.
      */
     public int insertTimer(String label, String[] tags) {
-        if (label == null || label.isEmpty() || tags == null || tags.length == 0) {
-            throw new IllegalArgumentException("Label and tags are not allowed to be null or empty.");
+        if (label == null || label.isEmpty() || tags == null) {
+            throw new IllegalArgumentException("Label and tags are not allowed to be null.");
         }
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -133,7 +133,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param tags The tags to set to the timer.
      */
     public void setTimerTags(int timerId, String[] tags) {
-        if (tags == null || tags.length == 0) throw new IllegalArgumentException("Tags are not allowed to be null or empty.");
+        if (tags == null) throw new IllegalArgumentException("Tags are not allowed to be null.");
 
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_TIMER_TAGS, COLUMN_NAME_TIMERID + " = " + timerId, null);
