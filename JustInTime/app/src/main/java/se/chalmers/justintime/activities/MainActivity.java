@@ -203,6 +203,18 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_settings) {
             Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
         }
+          else if(id == R.id.nav_share){
+            Intent i = new Intent(Intent.ACTION_SEND);
+            i.setType("message/rfc822");
+            i.putExtra(Intent.EXTRA_SUBJECT, "Check out this cool timer app!");
+            i.putExtra(Intent.EXTRA_TEXT   , "Download Tima here https://play.google.com/store/apps/details?id=com.group5.tima\n\n sent from Tima");
+
+            try {
+                startActivity(Intent.createChooser(i, "Send mail..."));
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+            }
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
