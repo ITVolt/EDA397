@@ -10,14 +10,21 @@ import android.support.v4.app.Fragment;
 import android.text.InputType;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import se.chalmers.justintime.Presenter;
 import se.chalmers.justintime.R;
@@ -96,7 +103,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         view = inflater.inflate(R.layout.fragment_timer, container, false);
 
         this.label = "Basic timer";
-        this.tags = new String[]{"Undefined"};
+        this.tags = new String[0];
 
         playPausButton = (ImageButton) view.findViewById(R.id.imageButton);
         resetButton = (ImageButton) view.findViewById(R.id.imageButton2);
@@ -181,6 +188,14 @@ public class TimerFragment extends Fragment implements CounterActivity {
         }
     }
 
+    private void setNewTags(String[] newTags) {
+        if (!Arrays.equals(tags, newTags)) {
+            presenter.setTimerTags(timerId, newTags);
+            tags = newTags;
+            updateTagListText();
+        }
+    }
+
     private void updateTagListText() {
         StringBuilder tagText = new StringBuilder();
         if (tags.length > 0) {
@@ -191,6 +206,8 @@ public class TimerFragment extends Fragment implements CounterActivity {
                     tagText.append("\n+").append(tags.length-2);
                 }
             }
+        } else {
+            tagText.append("<no tags set>");
         }
         timerTagList.setText(tagText.toString());
     }
@@ -229,7 +246,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                label = (input.getText().toString());
+                label = input.getText().toString().trim();
                 presenter.updateTimerLabel(timerId, label);
                 timerLabel.setText(label);
             }
@@ -245,17 +262,106 @@ public class TimerFragment extends Fragment implements CounterActivity {
     }
 
     private void timerTagDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-        builder.setTitle("More stuff coming soon");
+        final AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+        final boolean hasTags;
+        builder.setTitle("Tags");
 
-        // Set up the buttons
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_list_item_1);
+        if (tags.length == 0) {
+            hasTags = false;
+            arrayAdapter.add("<No tags set>");
+        } else {
+            hasTags = true;
+            arrayAdapter.addAll(tags);
+        }
+
+        builder.setAdapter(arrayAdapter, null);
+
+        if (hasTags) {
+            builder.setNegativeButton("Remove tag", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    removeTagDialog();
+                }
+            });
+        }
+
+        builder.setNeutralButton("Add tag", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                addTagDialog();
+            }
+        });
+
+        builder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
             }
         });
 
         builder.show();
+    }
+
+    private void removeTagDialog() {
+        final AlertDialog.Builder builderInner = new AlertDialog.Builder(view.getContext());
+        builderInner.setTitle("Select to remove");
+        final boolean[] checked = new boolean[tags.length];
+
+        builderInner.setMultiChoiceItems(tags, checked, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                checked[which] = isChecked;
+            }
+        });
+
+        builderInner.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builderInner.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                ArrayList<String> remaining = new ArrayList<>();
+                for (int i = 0; i < tags.length; i++) {
+                    if (!checked[i]) {
+                        remaining.add(tags[i]);
+                    }
+                }
+                setNewTags(remaining.toArray(new String[remaining.size()]));
+            }
+        });
+        builderInner.show();
+    }
+
+    private void addTagDialog() {
+        AlertDialog.Builder builderInner = new AlertDialog.Builder(view.getContext());
+        builderInner.setTitle("Enter new tag");
+
+        final EditText input = new EditText(view.getContext());
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setSelection(0);
+        builderInner.setView(input);
+
+        builderInner.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String[] newTags = Arrays.copyOf(tags, tags.length+1);
+                newTags[newTags.length-1] = input.getText().toString().trim();
+                setNewTags(newTags);
+            }
+        });
+        builderInner.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builderInner.show();
     }
 
     private void setButtonOnClickListeners() {

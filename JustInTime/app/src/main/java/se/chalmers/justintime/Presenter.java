@@ -116,4 +116,8 @@ public class Presenter {
     public void updateTimerLabel(int timerId, String label) {
         databaseHelper.updateTimerLabel(timerId, label);
     }
+
+    public void setTimerTags(int timerId, String[] newTags) {
+        databaseHelper.setTimerTags(timerId, newTags);
+    }
 }

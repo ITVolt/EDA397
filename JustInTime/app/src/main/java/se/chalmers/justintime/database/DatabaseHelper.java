@@ -44,8 +44,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    public static DatabaseHelper getInstance(Context context) {
-        if (instance == null) {
+    public static DatabaseHelper getInstance(Context context){
+        if(instance == null){
             instance = new DatabaseHelper(context);
         }
         return instance;
@@ -94,14 +94,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Inserts a new timer into the database.
-     *
      * @param label The label of the new timer.
-     * @param tags  The tags of the new timer.
+     * @param tags The tags of the new timer.
      * @return The id of the new timer.
      */
     public int insertTimer(String label, String[] tags) {
-        if (label == null || label.isEmpty() || tags == null || tags.length == 0) {
-            throw new IllegalArgumentException("Label and tags are not allowed to be null or empty.");
+        if (label == null || label.isEmpty() || tags == null) {
+            throw new IllegalArgumentException("Label and tags are not allowed to be null.");
         }
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -130,13 +129,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /**
      * Sets the given tags to the given timer. Any old tags will be removed and replaced by
      * the new ones.
-     *
      * @param timerId The id of the timer to set the tags to.
-     * @param tags    The tags to set to the timer.
+     * @param tags The tags to set to the timer.
      */
     public void setTimerTags(int timerId, String[] tags) {
-        if (tags == null || tags.length == 0)
-            throw new IllegalArgumentException("Tags are not allowed to be null or empty.");
+        if (tags == null) throw new IllegalArgumentException("Tags are not allowed to be null.");
 
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_TIMER_TAGS, COLUMN_NAME_TIMERID + " = " + timerId, null);
@@ -150,13 +147,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Changes the label of the given timer.
-     *
-     * @param timerId  The id of the timer.
+     * @param timerId The id of the timer.
      * @param newLabel The new label for the timer.
      */
     public void updateTimerLabel(int timerId, String newLabel) {
-        if (newLabel == null || newLabel.isEmpty())
-            throw new IllegalArgumentException("Label is not allowed to be null or empty.");
+        if (newLabel == null || newLabel.isEmpty()) throw new IllegalArgumentException("Label is not allowed to be null or empty.");
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -174,11 +169,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.query(TABLE_TIMER_DATA, COLUMNS, null, null, null, null, null);
     }
 
-    public String getTotalDuration() {
+    public String getTotalDuration(){
         Cursor cursor = getData();//db.rawQuery("select * from " + TABLE_TIMER_DATA, null);
         cursor.moveToFirst();
         int duration = 0;
-        while (!cursor.isAfterLast()) {
+        while(!cursor.isAfterLast()) {
             duration += cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_DURATION));
             cursor.moveToNext();
         }
@@ -186,14 +181,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         long hour = TimeUnit.MILLISECONDS.toHours(duration);
         long minute = TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(duration));
         long second = TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration));
-        durationInHour = String.format(Locale.ENGLISH, "%02d:%02d:%02d", hour, minute, second).concat("  Hours");
+        durationInHour = String.format(Locale.ENGLISH, "%02d:%02d:%02d",hour, minute, second).concat("  Hours");
         cursor.close();
         return durationInHour;
     }
 
     /**
      * Gets the label of the given timer.
-     *
      * @param timerId The id of the timer.
      * @return The label set to the timer.
      */
@@ -208,7 +202,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Gets all the tags related to the given timer.
-     *
      * @param timerId The id of the timer.
      * @return The tags of the timer as an array of Strings.
      */
@@ -218,7 +211,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String[] tags = new String[cursor.getCount()];
         cursor.moveToFirst();
         int i = 0;
-        while (!cursor.isAfterLast()) {
+        while(!cursor.isAfterLast()) {
             tags[i++] = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_TAG));
             cursor.moveToNext();
         }
@@ -228,7 +221,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Gets all information about a single timer.
-     *
      * @param timerId The id of the timer.
      * @return A TimerInfoBundle with all the information about the timer.
      */
@@ -239,9 +231,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.query(TABLE_TIMER_DATA, new String[]{COLUMN_NAME_START_TIME, COLUMN_NAME_DURATION}, COLUMN_NAME_TIMERID + " = " + timerId, null, null, null, null);
 
         cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
+        while(!cursor.isAfterLast()) {
             times.add(new TimerLogEntry(timerId,
-                    LocalDateTime.ofEpochSecond(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_START_TIME)), 0, ZoneOffset.UTC),
+                    LocalDateTime.ofEpochSecond(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_START_TIME)),0, ZoneOffset.UTC),
                     cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_DURATION))));
 
             cursor.moveToNext();
@@ -256,7 +248,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * returned as a separate TimerInfoBundle for each timer with all information about it in
      * the bundle.
      * (Could be optimized by doing a single query to the database with UNIONS and ORDER BY.)
-     *
      * @return An array with all information separated into the different timers that logged it.
      */
     public TimerInfoBundle[] getAllTimerInfo() {
@@ -268,7 +259,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.moveToFirst();
         int i = 0;
-        while (!cursor.isAfterLast()) {
+        while(!cursor.isAfterLast()) {
             timerIds[i++] = cursor.getInt(idColumn);
             cursor.moveToNext();
         }
@@ -281,14 +272,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return timerInfoBundles;
     }
-
     public String[] getTags() {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_TIMER_TAGS, new String[]{COLUMN_NAME_TAG}, null, null, COLUMN_NAME_TAG, null, null);
         String[] tags = new String[cursor.getCount()];
         cursor.moveToFirst();
         int i = 0;
-        while (!cursor.isAfterLast()) {
+        while(!cursor.isAfterLast()) {
             tags[i++] = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_TAG));
             cursor.moveToNext();
         }
@@ -299,15 +289,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public long getTagTime(String tag) {
 
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select duration from timer_data where timer_id in (select timer_id from timer_tags where tag = ?)", new String[]{tag});
+        Cursor cursor = db.rawQuery("select duration from timer_data where timer_id in (select timer_id from timer_tags where tag = ?)",new String[]{tag});
         //Cursor cursor = db.query(TABLE_TIMER_TAGS, new String[]{COLUMN_NAME_TIMERID}, tag + " = " + COLUMN_NAME_TAG, null, COLUMN_NAME_TIMERID, null, null);
         cursor.moveToFirst();
         int allTimePerTag = 0;
-        while (!cursor.isAfterLast()) {
+        while(!cursor.isAfterLast()) {
             allTimePerTag += cursor.getLong(cursor.getColumnIndex(COLUMN_NAME_DURATION));
             cursor.moveToNext();
         }
-        cursor.close();
+
         return allTimePerTag;
     }
 }
