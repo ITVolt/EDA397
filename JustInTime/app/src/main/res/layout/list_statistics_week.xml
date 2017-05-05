@@ -13,7 +13,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:textSize="18sp"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:text="@string/week"
         android:id="@+id/weekTV" />
 
@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:textSize="18sp"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         tools:text="XX"
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@+id/weekTV" />
@@ -33,7 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="12sp"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         tools:text="year"
         android:layout_below="@+id/weekTV"
         android:layout_alignParentStart="true" />
@@ -46,7 +46,7 @@
         android:layout_marginStart="16dp"
         android:layout_toEndOf="@+id/weekNbrTV"
         android:text="@string/total"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:textSize="12sp" />
 
     <TextView
@@ -54,7 +54,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:text="Tag 1"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
         android:layout_below="@+id/weekTotalTV"
         android:layout_alignStart="@+id/weekTotalTV" />
@@ -63,7 +63,7 @@
         android:id="@+id/weekTag2TV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
         tools:text="Tag 2"
         android:layout_below="@+id/weekTag1TV"
@@ -75,7 +75,7 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/weekTag2TV"
         android:layout_below="@+id/weekTag2TV"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
         tools:text="Others" />
 
@@ -85,7 +85,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         tools:text="time"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@+id/weekTotalTV" />
@@ -96,7 +96,7 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/weekTotalTimeTV"
         tools:text="time"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
         android:layout_below="@+id/weekTotalTimeTV"
         android:layout_toEndOf="@+id/weekTotalTV" />
@@ -107,7 +107,7 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/weekTotalTimeTV"
         tools:text="time"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
         android:layout_below="@+id/weekTag1TimeTV"
         android:layout_toEndOf="@+id/weekTotalTV" />
@@ -119,7 +119,7 @@
         android:layout_alignStart="@+id/weekTotalTimeTV"
         android:layout_below="@+id/weekTag2TimeTV"
         android:layout_toEndOf="@+id/weekTotalTV"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
         tools:text="time" />
 

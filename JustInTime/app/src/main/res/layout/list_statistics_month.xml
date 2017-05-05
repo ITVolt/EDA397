@@ -13,7 +13,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:textSize="18sp"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:text="@string/month"
         android:id="@+id/monthTV" />
 
@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="12sp"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         tools:text="year"
         android:layout_below="@+id/monthTV"
         android:layout_alignParentStart="true" />
@@ -35,7 +35,7 @@
         android:layout_marginStart="16dp"
         android:layout_toEndOf="@+id/monthTV"
         android:text="@string/total"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:textSize="12sp" />
 
     <TextView
@@ -43,7 +43,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:text="Tag 1"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
         android:layout_below="@+id/monthTotalTV"
         android:layout_alignStart="@+id/monthTotalTV" />
@@ -52,7 +52,7 @@
         android:id="@+id/monthTag2TV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
         tools:text="Tag 2"
         android:layout_below="@+id/monthTag1TV"
@@ -64,7 +64,7 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/monthTag2TV"
         android:layout_below="@+id/monthTag2TV"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
         tools:text="Others" />
 
@@ -74,7 +74,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         tools:text="time"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@+id/monthTotalTV" />
@@ -85,7 +85,7 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/monthTotalTimeTV"
         tools:text="time"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
         android:layout_below="@+id/monthTotalTimeTV"
         android:layout_toEndOf="@+id/monthTotalTV" />
@@ -96,7 +96,7 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/monthTotalTimeTV"
         tools:text="time"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
         android:layout_below="@+id/monthTag1TimeTV"
         android:layout_toEndOf="@+id/monthTotalTV" />
@@ -108,7 +108,7 @@
         android:layout_alignStart="@+id/monthTotalTimeTV"
         android:layout_below="@+id/monthTag2TimeTV"
         android:layout_toEndOf="@+id/monthTotalTV"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
         tools:text="time" />
 

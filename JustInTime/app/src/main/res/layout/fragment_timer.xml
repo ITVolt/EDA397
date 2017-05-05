@@ -90,7 +90,7 @@
         android:progress="100"
         android:progressDrawable="@drawable/drawable_circle"
         android:rotation="-90"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="52dp"
         app:layout_constraintBottom_toTopOf="@+id/timerResetButton"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
