@@ -16,9 +16,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +39,7 @@ import static android.content.ContentValues.TAG;
 
 public class ListStatisticsFragment extends Fragment {
 
-    Boolean isClickedGeneral = false, isClickedTag = false;
+    Boolean isClickedGeneral = true, isClickedTag = false;
     View view;
     ListView tagListView ;
     Button tagInfo, generalInfo;
@@ -77,8 +79,12 @@ public class ListStatisticsFragment extends Fragment {
         appInfoText = (TextView) view.findViewById(R.id.appInfoText);
         tagPieChart = (PieChart) view.findViewById(R.id.tagPieChart);
         tagListView = (ListView) view.findViewById(R.id.tagList);
-        timerInfoText.setVisibility(View.GONE);
-        appInfoText.setVisibility(View.GONE);
+        tagInfo.getBackground().setAlpha(20);
+        generalInfo.getBackground().setAlpha(20);
+        tagPieChart.setUsePercentValues(true); //Show the values in percent
+        tagPieChart.setCenterText("Time per Tag");
+        timerInfoText.setText("Used for : " + db.getTotalDuration());
+        appInfoText.setText("App Used : " + mPreferences.getAppUsageCount() + " times");
         tagPieChart.setVisibility(View.GONE);
         tagListView.setVisibility(View.GONE);
         setOnSwitchChangeListener();
@@ -95,8 +101,6 @@ public class ListStatisticsFragment extends Fragment {
                     if (totalDuration == null) {
                         totalDuration = "0 Hour";
                     }
-                    timerInfoText.setText("Used for : " + totalDuration);
-                    appInfoText.setText("Used : " + mPreferences.getAppUsageCount() + " times");
                     timerInfoText.setVisibility(View.VISIBLE);
                     appInfoText.setVisibility(View.VISIBLE);
                     isClickedGeneral = true;
@@ -175,10 +179,14 @@ public class ListStatisticsFragment extends Fragment {
 
         PieDataSet set = new PieDataSet(entries, "Time per Tag");
         PieData data = new PieData(set);
+        tagPieChart.setNoDataText("No Data");
         tagPieChart.setData(data);
+        tagPieChart.animateY(5000);
+        tagPieChart.getLegend().setEnabled(false);
+        set.setColors(ColorTemplate.COLORFUL_COLORS);
         data.setValueTextSize(20f);
         //data.setValueTextColor(getResources().getColor(R.color.colorAccent));
-        set.setValueTextColor(getResources().getColor(R.color.colorAccent));
+        set.setValueTextColor(getResources().getColor(R.color.colorPrimaryDark));
         tagPieChart.invalidate(); // refresh
     }
 
