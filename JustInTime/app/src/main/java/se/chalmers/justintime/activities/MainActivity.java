@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         TimerFragment timerFragment = TimerFragment.newInstance();
@@ -131,6 +132,14 @@ public class MainActivity extends AppCompatActivity
         bindService(new Intent(this, TimerService.class), connection, Context.BIND_AUTO_CREATE);
         isBound = true;
         Log.d("Messaging", "Binding ");
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem item= menu.findItem(R.id.action_settings);
+        item.setVisible(false);
+        super.onPrepareOptionsMenu(menu);
+        return true;
     }
 
     void doUnbindService() {

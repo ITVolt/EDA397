@@ -10,40 +10,43 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
         android:textSize="18sp"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:text="@string/month"
-        android:id="@+id/monthTV" />
+        android:id="@+id/monthTV"
+        android:layout_marginStart="13dp"
+        android:layout_alignTop="@+id/monthTotalTV"
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:id="@+id/monthYearTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="12sp"
-        android:textColor="@color/secondary_text"
-        tools:text="year"
+        android:textColor="@color/small_text"
+        tools:text="Year"
         android:layout_below="@+id/monthTV"
-        android:layout_alignParentStart="true" />
+        android:layout_alignStart="@+id/monthTV"
+        android:layout_marginTop="6dp" />
 
     <TextView
         android:id="@+id/monthTotalTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="16dp"
-        android:layout_toEndOf="@+id/monthTV"
         android:text="@string/total"
-        android:textColor="@color/secondary_text"
-        android:textSize="12sp" />
+        android:textColor="@color/small_text"
+        android:textSize="12sp"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="7dp"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/monthTV" />
 
     <TextView
         android:id="@+id/monthTag1TV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:text="Tag 1"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
         android:layout_below="@+id/monthTotalTV"
         android:layout_alignStart="@+id/monthTotalTV" />
@@ -52,7 +55,7 @@
         android:id="@+id/monthTag2TV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
         tools:text="Tag 2"
         android:layout_below="@+id/monthTag1TV"
@@ -64,7 +67,7 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/monthTag2TV"
         android:layout_below="@+id/monthTag2TV"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
         tools:text="Others" />
 
@@ -72,20 +75,20 @@
         android:id="@+id/monthTotalTimeTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        tools:text="time"
-        android:textColor="@color/secondary_text"
+        tools:text="Time"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/monthTotalTV" />
+        android:layout_marginStart="50dp"
+        android:layout_above="@+id/monthTag1TV"
+        android:layout_toEndOf="@+id/monthTagOthersTV" />
 
     <TextView
         android:id="@+id/monthTag1TimeTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/monthTotalTimeTV"
-        tools:text="time"
-        android:textColor="@color/secondary_text"
+        tools:text="Time"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
         android:layout_below="@+id/monthTotalTimeTV"
         android:layout_toEndOf="@+id/monthTotalTV" />
@@ -95,8 +98,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/monthTotalTimeTV"
-        tools:text="time"
-        android:textColor="@color/secondary_text"
+        tools:text="Time"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
         android:layout_below="@+id/monthTag1TimeTV"
         android:layout_toEndOf="@+id/monthTotalTV" />
@@ -108,19 +111,8 @@
         android:layout_alignStart="@+id/monthTotalTimeTV"
         android:layout_below="@+id/monthTag2TimeTV"
         android:layout_toEndOf="@+id/monthTotalTV"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:textSize="12sp"
-        tools:text="time" />
-
-    <ImageView
-        android:id="@+id/monthGraphImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        app:srcCompat="@android:drawable/ic_menu_report_image"
-        android:layout_toEndOf="@+id/monthTotalTimeTV"
-        tools:ignore="ContentDescription" />
+        tools:text="Time" />
 
 </RelativeLayout>
