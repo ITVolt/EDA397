@@ -30,10 +30,12 @@
 
         <ListView
             android:id="@+id/tagList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/tagPieChart"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:background="@color/colorPrimaryDark"
+             />
 
         <Button
             android:id="@+id/generalInfoSwitch"
@@ -52,6 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/generalInfoSwitch"
+            android:gravity="center"
             android:text="AppInformation"
             android:textColor="@color/secondary_text"
             android:textSize="18sp"
@@ -63,6 +66,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/appInfoText"
+            android:gravity="center"
             android:text="TimerInformation"
             android:textColor="@color/secondary_text"
             android:textSize="18sp"
