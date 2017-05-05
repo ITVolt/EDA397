@@ -14,16 +14,20 @@ import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.jakewharton.threetenabp.AndroidThreeTen;
+
+import java.util.ArrayList;
+
 import se.chalmers.justintime.R;
 import se.chalmers.justintime.activities.MainActivity;
-import se.chalmers.justintime.timer.timers.TimerInstance;
 
 /**
  * Created by Nieo on 08/04/17.
  */
 
-public class TimerService extends Service implements Ticker {
-    private TimerHandler timerHandler = new TimerHandler();
+public class TimerService extends Service implements Messager {
+
+    private TimerHandler timerHandler = new TimerHandler(this, this);
     private NotificationManager notificationManager;
     private Messenger client;
     private TimerService self = this;
@@ -80,6 +84,12 @@ public class TimerService extends Service implements Ticker {
     public final static int STOP_SENDING_UPDATES = 15;
 
     /**
+     * Id of a newly created timer
+     * arg1: id
+     */
+    public static final int TIMER_ID = 16;
+
+    /**
      * Notifiy client that the time have changed
      */
     public final static int UPDATE_TIMER = 20;
@@ -88,6 +98,11 @@ public class TimerService extends Service implements Ticker {
      * Notify client that a timer have finnished
      */
     public final static int ALERT_TIMER = 21;
+
+
+    public static final String TIMER_NAME = "TIMER_NAME";
+    public static final String TIMER_TAGS = "TIMER_TAGS";
+    public static final String TIMER_DURATIONS = "TIMER_DURATIONS";
 
 
     private class MessagingHandler extends Handler{
@@ -120,19 +135,19 @@ public class TimerService extends Service implements Ticker {
                 case NEW_TIMER:
                     final Bundle bundle = message.getData();
                     bundle.setClassLoader(getClassLoader());
-                    ParcelableTimer timerData = bundle.getParcelable(NEW_TIMER_INFO);
-                    TimerInstance timerInstance = new TimerInstance(timerData, self);
-                    timerHandler.addTimer(timerInstance);
+                    String name = (String) bundle.getSerializable(TIMER_NAME);
+                    String[] tags = (String[]) bundle.getSerializable(TIMER_TAGS);
+                    ArrayList<Long> durations = (ArrayList<Long>) bundle.getSerializable(TIMER_DURATIONS);
+                    timerHandler.addTimer(name, tags, durations);
                     break;
                 case START_TIMER:
                     timerHandler.startTimer(message.arg1);
                     break;
                 case PAUSE_TIMER:
-                    timerHandler.stopTimer(message.arg1);
+                    timerHandler.pauseTimer(message.arg1);
                     break;
                 case RESET_TIMER:
-                    long time = timerHandler.resetTimer(message.arg1);
-                    onTick(time);
+                    timerHandler.resetTimer(message.arg1);
                     break;
                 case START_SENDING_UPDATES:
                     timerHandler.startSendingUpdates(message.arg1);
@@ -159,6 +174,7 @@ public class TimerService extends Service implements Ticker {
     @Override
     public void onCreate() {
         notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        AndroidThreeTen.init(this);
     }
 
     @Override
@@ -176,26 +192,26 @@ public class TimerService extends Service implements Ticker {
     /**
      * Show a notification while this service is running.
      */
-    private void showNotification(int notificationId, CharSequence text) {
+    public void showNotification(int notificationId, CharSequence text) {
+        if(serviceInForeground){
+            // The PendingIntent to launch our activity if the user selects this notification
+            PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                    new Intent(this, MainActivity.class), 0);
 
+            // Set the info for the views that show in the notification panel.
+            Notification notification = new Notification.Builder(this)
+                    .setSmallIcon(R.drawable.logo)  // the status icon
+                    .setTicker(text)  // the status text
+                    .setWhen(System.currentTimeMillis())  // the time stamp
+                    .setContentTitle(getText(R.string.local_service_label))  // the label of the entry
+                    .setContentText(text)  // the contents of the entry
+                    .setContentIntent(contentIntent)  // The intent to send when the entry is clicked
+                    .build();
 
-        // The PendingIntent to launch our activity if the user selects this notification
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, MainActivity.class), 0);
-
-        // Set the info for the views that show in the notification panel.
-        Notification notification = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.logo)  // the status icon
-                .setTicker(text)  // the status text
-                .setWhen(System.currentTimeMillis())  // the time stamp
-                .setContentTitle(getText(R.string.local_service_label))  // the label of the entry
-                .setContentText(text)  // the contents of the entry
-                .setContentIntent(contentIntent)  // The intent to send when the entry is clicked
-                .build();
-
-        // Send the notification.
-        // We use a string id because it is a unique number.  We use it later to cancel.
-        notificationManager.notify(notificationId, notification);
+            // Send the notification.
+            // We use a string id because it is a unique number.  We use it later to cancel.
+            notificationManager.notify(notificationId, notification);
+        }
     }
 
     private void showForegroundNotification(){
@@ -221,23 +237,8 @@ public class TimerService extends Service implements Ticker {
         startForeground(ONGOING_NOTIFICATION, notification);
     }
 
-    @Override
-    public void onTick(long time){
-        ParcelableLong l = new ParcelableLong(time);
-        Message message = Message.obtain(null, UPDATE_TIMER);
-        message.getData().putParcelable(UPDATED_TIME, l);
-        sendMessage(message);
-    }
 
-    @Override
-    public void onFinish() {
-        sendMessage(Message.obtain(null, ALERT_TIMER));
-        if(serviceInForeground){
-            showNotification(2, "Timer has finished");
-        }
-    }
-
-    private void sendMessage(Message message) {
+    public void sendMessage(Message message) {
         if (client != null) {
             try {
                 client.send(message);

@@ -34,7 +34,6 @@ import se.chalmers.justintime.alert.SharedPreference;
 import se.chalmers.justintime.fragments.StatisticsFragment;
 import se.chalmers.justintime.fragments.TimerFragment;
 import se.chalmers.justintime.fragments.TimerSequenceFragment;
-import se.chalmers.justintime.timer.ParcelableLong;
 import se.chalmers.justintime.timer.TimerService;
 
 
@@ -64,12 +63,13 @@ public class MainActivity extends AppCompatActivity
                 case TimerService.UPDATE_TIMER:
                     Bundle bundle = msg.getData();
                     bundle.setClassLoader(getClassLoader());
-                    ParcelableLong time = bundle.getParcelable(TimerService.UPDATED_TIME);
-                    presenter.updateTimer(time.getL());
+                    presenter.updateTimer((long)bundle.getSerializable(TimerService.UPDATED_TIME));
                     break;
                 case TimerService.ALERT_TIMER:
                     presenter.alert();
                     break;
+                case TimerService.TIMER_ID:
+                    presenter.setTimerId(msg.arg1);
                 default:
                     super.handleMessage(msg);
             }
@@ -97,8 +97,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         TimerFragment timerFragment = TimerFragment.newInstance();
-        timerFragment.setTimerFragmentId(1);
-        presenter = new Presenter(timerFragment);
+        presenter = new Presenter(timerFragment, this);
         timerFragment.setPresenter(presenter);
         jumpToFragment(timerFragment);
     }
@@ -181,12 +180,8 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         if (id == R.id.nav_timerA) {
             TimerFragment timerFragment = TimerFragment.newInstance();
-            timerFragment.setTimerFragmentId(1);
-            if(presenter != null){
-                presenter.setFragment(timerFragment);
-            }else{
-                presenter = new Presenter(timerFragment);
-            }
+            presenter.setFragment(timerFragment);
+            presenter.setAid();
             timerFragment.setPresenter(presenter);
             jumpToFragment(timerFragment);
         } else if (id == R.id.nav_timerB) {

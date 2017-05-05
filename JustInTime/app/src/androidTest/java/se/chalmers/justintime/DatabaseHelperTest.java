@@ -213,23 +213,23 @@ public class DatabaseHelperTest {
     @Test
     public void populateWithMockValues() throws Exception {
         databaseHelper.resetDatabase();
-        int id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
+        int id = databaseHelper.insertTimer("Timer A", new String[]{"Running"});
         TimerLogEntry entry = new TimerLogEntry(id, LocalDateTime.now(), 5000);
         databaseHelper.insertTimerData(entry);
 
-        id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
+        id = databaseHelper.insertTimer("Timer A", new String[]{"Other1"});
         entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(1), 15000);
         databaseHelper.insertTimerData(entry);
 
-        id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
+        id = databaseHelper.insertTimer("Timer A", new String[]{"Other1"});
         entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(2), 20000);
         databaseHelper.insertTimerData(entry);
 
-        id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
+        id = databaseHelper.insertTimer("Timer A", new String[]{"Other1"});
         entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(3), 10000);
         databaseHelper.insertTimerData(entry);
 
-        id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
+        id = databaseHelper.insertTimer("Timer A", new String[]{"Other2"});
         entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(4), 11000);
         databaseHelper.insertTimerData(entry);
 
@@ -237,11 +237,11 @@ public class DatabaseHelperTest {
         entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(5), 12000);
         databaseHelper.insertTimerData(entry);
 
-        id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
+        id = databaseHelper.insertTimer("Timer A", new String[]{"Other2"});
         entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(6), 13000);
         databaseHelper.insertTimerData(entry);
 
-        id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
+        id = databaseHelper.insertTimer("Timer A", new String[]{"Other2"});
         entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(7), 4000);
         databaseHelper.insertTimerData(entry);
 
@@ -253,7 +253,7 @@ public class DatabaseHelperTest {
         entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(9), 9000);
         databaseHelper.insertTimerData(entry);
 
-        id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
+        id = databaseHelper.insertTimer("Timer A", new String[]{"Other10"});
         entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(10), 14000);
         databaseHelper.insertTimerData(entry);
 
@@ -261,11 +261,11 @@ public class DatabaseHelperTest {
         entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(11), 17000);
         databaseHelper.insertTimerData(entry);
 
-        id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
+        id = databaseHelper.insertTimer("Timer A", new String[]{"Other30"});
         entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(12), 22000);
         databaseHelper.insertTimerData(entry);
 
-        id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
+        id = databaseHelper.insertTimer("Timer A", new String[]{"Other3"});
         entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(13), 13000);
         databaseHelper.insertTimerData(entry);
 
