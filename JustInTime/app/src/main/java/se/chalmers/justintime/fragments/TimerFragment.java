@@ -190,7 +190,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
     private void setNewTags(String[] newTags) {
         if (!Arrays.equals(tags, newTags)) {
-            databaseHelper.setTimerTags(timerId, newTags);  //FIXME Move this to an appropriate class.
+            presenter.setTimerTags(timerId, newTags);
             tags = newTags;
             updateTagListText();
         }
