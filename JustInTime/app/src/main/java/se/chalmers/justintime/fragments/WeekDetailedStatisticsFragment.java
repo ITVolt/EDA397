@@ -36,7 +36,7 @@ import se.chalmers.justintime.database.TimerInfoBundle;
  * Use the {@link WeekDetailedStatisticsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class WeekDetailedStatisticsFragment extends Fragment{
+public class WeekDetailedStatisticsFragment extends Fragment {
 
     private View view;
     StatisticsBundle data;
@@ -66,7 +66,7 @@ public class WeekDetailedStatisticsFragment extends Fragment{
         view = inflater.inflate(R.layout.fragment_week_statistics_detailed_line_chart, container, false);
         showChart();
 
-        button = (Button)view.findViewById(R.id.button);
+        button = (Button) view.findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -108,7 +108,7 @@ public class WeekDetailedStatisticsFragment extends Fragment{
         des.setEnabled(false);
 
         // the labels that should be drawn on the XAxis
-        final String[] daysFormat = new String[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+        final String[] daysFormat = new String[]{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
         IAxisValueFormatter formatter = new IAxisValueFormatter() {
 
@@ -168,13 +168,13 @@ public class WeekDetailedStatisticsFragment extends Fragment{
         }
         // creating list of entry
         ArrayList<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(0, days.get(DayOfWeek.MONDAY)/1000));
-        entries.add(new Entry(1, days.get(DayOfWeek.TUESDAY)/1000));
-        entries.add(new Entry(2, days.get(DayOfWeek.WEDNESDAY)/1000));
-        entries.add(new Entry(3, days.get(DayOfWeek.THURSDAY)/1000));
-        entries.add(new Entry(4, days.get(DayOfWeek.FRIDAY)/1000));
-        entries.add(new Entry(5, days.get(DayOfWeek.SATURDAY)/1000));
-        entries.add(new Entry(6, days.get(DayOfWeek.SUNDAY)/1000));
+        entries.add(new Entry(0, days.get(DayOfWeek.MONDAY) / 1000));
+        entries.add(new Entry(1, days.get(DayOfWeek.TUESDAY) / 1000));
+        entries.add(new Entry(2, days.get(DayOfWeek.WEDNESDAY) / 1000));
+        entries.add(new Entry(3, days.get(DayOfWeek.THURSDAY) / 1000));
+        entries.add(new Entry(4, days.get(DayOfWeek.FRIDAY) / 1000));
+        entries.add(new Entry(5, days.get(DayOfWeek.SATURDAY) / 1000));
+        entries.add(new Entry(6, days.get(DayOfWeek.SUNDAY) / 1000));
         return entries;
     }
 

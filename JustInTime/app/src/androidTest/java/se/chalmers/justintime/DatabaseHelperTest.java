@@ -218,7 +218,7 @@ public class DatabaseHelperTest {
     public void populateWithMockValues() throws Exception {
         databaseHelper.resetDatabase();
         int id = databaseHelper.insertTimer("Timer A", new String[]{"Running"});
-        TimerLogEntry entry = new TimerLogEntry(id, LocalDateTime.now(), 5000);
+        TimerLogEntry entry = new TimerLogEntry(id, LocalDateTime.now(), 50000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other1"});
