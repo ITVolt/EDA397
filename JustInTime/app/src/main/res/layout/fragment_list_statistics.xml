@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/tagPieChart"
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/small_text"
              />
 
         <Button
@@ -56,7 +56,7 @@
             android:layout_below="@+id/generalInfoSwitch"
             android:gravity="center"
             android:text="AppInformation"
-            android:textColor="@color/secondary_text"
+            android:textColor="@color/small_text"
             android:textSize="18sp"
             android:textStyle="italic" />
 
@@ -68,9 +68,31 @@
             android:layout_below="@+id/appInfoText"
             android:gravity="center"
             android:text="TimerInformation"
-            android:textColor="@color/secondary_text"
+            android:textColor="@color/small_text"
             android:textSize="18sp"
             android:textStyle="italic" />
+        <Button
+            android:id="@+id/allInfoSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/timerInfoText"
+            android:text="ALl data"
+            android:textColor="@color/secondary_text"
+            android:textSize="24sp"
+            android:textStyle="bold|italic" />
+        <TableLayout
+            android:id="@+id/table_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/allInfoSwitch"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/border"
+            android:layout_marginLeft="55dp"
+            >
+        </TableLayout>
 
     </RelativeLayout>
 

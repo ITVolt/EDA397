@@ -1,36 +1,43 @@
 package se.chalmers.justintime.fragments;
 
+import android.database.Cursor;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.utils.ColorTemplate;
+
+import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.ZoneOffset;
+import org.threeten.bp.format.DateTimeFormatter;
+import org.threeten.bp.format.FormatStyle;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import se.chalmers.justintime.R;
-import se.chalmers.justintime.StatisticsBundle;
 import se.chalmers.justintime.alert.SharedPreference;
 import se.chalmers.justintime.database.DatabaseHelper;
 import se.chalmers.justintime.TagListAdapter;
@@ -39,12 +46,15 @@ import static android.content.ContentValues.TAG;
 
 public class ListStatisticsFragment extends Fragment {
 
-    Boolean isClickedGeneral = true, isClickedTag = false;
+    Boolean isClickedGeneral = true, isClickedTag = false, isClickedAllInfo = false;
     View view;
     ListView tagListView ;
-    Button tagInfo, generalInfo;
+    Button tagInfo, generalInfo, allInfo;
     TextView timerInfoText, appInfoText;
     PieChart tagPieChart;
+    TableLayout allInfoTable;
+    TextView textView_0, textView_1, textView_2 , textView2, textView02, textView03;
+    TableRow row02, tableRow;
     SharedPreference mPreferences;
     DatabaseHelper db;
     Map<String, Boolean> tagsToShow = new HashMap<>();
@@ -75,19 +85,24 @@ public class ListStatisticsFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_list_statistics, container, false);
         tagInfo = (Button) view.findViewById(R.id.tagInfoSwitch);
         generalInfo = (Button) view.findViewById(R.id.generalInfoSwitch);
+        allInfo = (Button)  view.findViewById(R.id.allInfoSwitch);
         timerInfoText = (TextView) view.findViewById(R.id.timerInfoText);
         appInfoText = (TextView) view.findViewById(R.id.appInfoText);
         tagPieChart = (PieChart) view.findViewById(R.id.tagPieChart);
         tagListView = (ListView) view.findViewById(R.id.tagList);
+        allInfoTable = (TableLayout) view.findViewById(R.id.table_main);
         tagInfo.getBackground().setAlpha(20);
         generalInfo.getBackground().setAlpha(20);
+        allInfo.getBackground().setAlpha(20);
         tagPieChart.setUsePercentValues(true); //Show the values in percent
         tagPieChart.setCenterText("Time per Tag");
         timerInfoText.setText("Used for : " + db.getTotalDuration());
         appInfoText.setText("App Used : " + mPreferences.getAppUsageCount() + " times");
         tagPieChart.setVisibility(View.GONE);
         tagListView.setVisibility(View.GONE);
+        allInfoTable.setVisibility(View.GONE);
         setOnSwitchChangeListener();
+        showAllData(db);
         return view;
     }
 
@@ -125,6 +140,19 @@ public class ListStatisticsFragment extends Fragment {
                     tagPieChart.setVisibility(View.GONE);
                     tagListView.setVisibility(View.GONE);
                     isClickedTag = false;
+                }
+            }
+        });
+        allInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!isClickedAllInfo) {
+                    allInfoTable.setVisibility(View.VISIBLE);
+                    isClickedAllInfo = true;
+
+                } else {
+                    allInfoTable.setVisibility(View.GONE);
+                    isClickedAllInfo = false;
                 }
             }
         });
@@ -253,6 +281,66 @@ public class ListStatisticsFragment extends Fragment {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
+    }
+
+    private void showAllData(DatabaseHelper db){
+        TableLayout.LayoutParams tableRowParams=
+                new TableLayout.LayoutParams
+                        (TableLayout.LayoutParams.FILL_PARENT,TableLayout.LayoutParams.WRAP_CONTENT);
+
+        int leftMargin=10;
+        int topMargin=10;
+        int rightMargin=10;
+        int bottomMargin=5;
+
+        tableRowParams.setMargins(leftMargin, topMargin, rightMargin, bottomMargin);
+
+        row02 = new TableRow(getContext());
+        row02.setLayoutParams(tableRowParams);
+        textView02 = new TextView(getContext());
+        textView02.setText(" No ");
+        textView02.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
+        row02.addView(textView02);
+
+        textView03 = new TextView(getContext());
+        textView03.setText("      Start Time ");
+        textView03.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
+        row02.addView(textView03);
+
+        textView2 = new TextView(getContext());
+        textView2.setText(" Duration (sec) ");
+        textView2.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
+        row02.addView(textView2);
+        allInfoTable.addView(row02);
+
+        Cursor cursor = db.getData();
+        cursor.moveToFirst();
+        int max = cursor.getCount();
+
+        for (int i = 1; i < max + 1; i++) {
+            tableRow = new TableRow(getContext());
+            tableRow.setLayoutParams(tableRowParams);
+            textView_0 = new TextView(getContext());
+            textView_1 = new TextView(getContext());
+            textView_2 = new TextView(getContext());
+            textView_0.setText(" " + i + " ");
+            textView_0.setGravity(Gravity.CENTER);
+            tableRow.addView(textView_0);
+
+            LocalDateTime start = LocalDateTime.ofEpochSecond(cursor.getLong(cursor.getColumnIndex("start_time")), 0, ZoneOffset.UTC);
+            textView_1.setText(start.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(new Locale("en", "IN"))));
+            textView_1.setGravity(Gravity.CENTER);
+            tableRow.addView(textView_1);
+
+            String duration = " " + cursor.getLong(cursor.getColumnIndex("duration"))/1000 + "";
+            textView_2.setText(duration);
+            textView_2.setGravity(Gravity.CENTER);
+            tableRow.addView(textView_2);
+            allInfoTable.addView(tableRow);
+            cursor.moveToNext();
+
+        }
+        cursor.close();
     }
 
     @Override
