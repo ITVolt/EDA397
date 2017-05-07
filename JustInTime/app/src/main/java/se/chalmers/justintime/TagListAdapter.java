@@ -40,7 +40,7 @@ public class TagListAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
+    public Map.Entry<String, Long> getItem(int position) {
         return tags.get(position);
     }
 
@@ -75,19 +75,25 @@ public class TagListAdapter extends BaseAdapter {
             int days = (int) (time/DateUtils.DAY_IN_MILLIS);
             text.append(days).append(" d ");
             time -= days*DateUtils.DAY_IN_MILLIS;
-            text.append(time/DateUtils.HOUR_IN_MILLIS).append(" h");
+            int hours = (int) (time/DateUtils.HOUR_IN_MILLIS);
+            if (hours < 10) text.append("0");
+            text.append(hours).append(" h");
         // 12 h 54 m
         } else if (time >= DateUtils.HOUR_IN_MILLIS) {
             int hours = (int) (time/DateUtils.HOUR_IN_MILLIS);
             text.append(hours).append(" h ");
             time -= hours*DateUtils.HOUR_IN_MILLIS;
-            text.append(time/DateUtils.MINUTE_IN_MILLIS).append(" m");
+            int minutes = (int) (time/DateUtils.MINUTE_IN_MILLIS);
+            if (minutes < 10) text.append("0");
+            text.append(minutes).append(" m");
         // 54 m 32 s
         } else if (time >= DateUtils.MINUTE_IN_MILLIS) {
             int minutes = (int) (time/DateUtils.MINUTE_IN_MILLIS);
             text.append(minutes).append(" m ");
             time -= minutes*DateUtils.MINUTE_IN_MILLIS;
-            text.append(time/DateUtils.SECOND_IN_MILLIS).append(" s");
+            int seconds = (int) (time/DateUtils.SECOND_IN_MILLIS);
+            if (seconds < 10) text.append("0");
+            text.append(seconds).append(" s");
         // 32 s
         } else if (time >= DateUtils.SECOND_IN_MILLIS) {
             text.append(time/DateUtils.SECOND_IN_MILLIS).append(" s");

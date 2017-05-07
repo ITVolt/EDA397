@@ -9,44 +9,16 @@
         android:background="@color/colorPrimaryDark"
         tools:context="se.chalmers.justintime.fragments.StatisticsFragment">
 
-        <Button
-            android:id="@+id/tagInfoSwitch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:text="Tag Specific Info"
-            android:textColor="@color/secondary_text"
-            android:textSize="24sp"
-            android:textStyle="bold|italic" />
-
-        <com.github.mikephil.charting.charts.PieChart xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/tagPieChart"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/tagInfoSwitch"
-            android:minHeight="350dp" />
-
-        <ListView
-            android:id="@+id/tagList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/tagPieChart"
-            android:background="@color/small_text"
-             />
 
         <Button
             android:id="@+id/generalInfoSwitch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/tagList"
+            android:layout_alignParentTop="true"
             android:text="General Information"
             android:textColor="@color/secondary_text"
-            android:textSize="24sp"
-            android:textStyle="bold|italic" />
+            android:textSize="12dp" />
 
         <TextView
             android:id="@+id/appInfoText"
@@ -71,27 +43,52 @@
             android:textColor="@color/small_text"
             android:textSize="18sp"
             android:textStyle="italic" />
+
+        <Button
+            android:id="@+id/tagInfoSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/timerInfoText"
+            android:text="Tag Specific Info"
+            android:textColor="@color/secondary_text"
+            android:textSize="12sp"/>
+
+        <com.github.mikephil.charting.charts.PieChart xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/tagPieChart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/tagInfoSwitch"
+            android:minHeight="250dp" />
+
+        <ListView
+            android:id="@+id/tagList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/tagPieChart"
+            android:background="@color/small_text" />
+
         <Button
             android:id="@+id/allInfoSwitch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/timerInfoText"
-            android:text="ALl data"
+            android:layout_below="@+id/tagList"
+            android:text="All data"
             android:textColor="@color/secondary_text"
-            android:textSize="24sp"
-            android:textStyle="bold|italic" />
+            android:textSize="12sp"/>
+
         <TableLayout
             android:id="@+id/table_main"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/allInfoSwitch"
             android:layout_centerHorizontal="true"
+            android:layout_marginStart="55dp"
             android:background="@drawable/border"
-            android:layout_marginLeft="55dp"
-            >
+            android:gravity="center">
         </TableLayout>
 
     </RelativeLayout>

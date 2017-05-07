@@ -5,6 +5,8 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.Pair;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -19,10 +21,15 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 
 import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.ZoneOffset;
@@ -48,12 +55,12 @@ public class ListStatisticsFragment extends Fragment {
 
     Boolean isClickedGeneral = true, isClickedTag = false, isClickedAllInfo = false;
     View view;
-    ListView tagListView ;
+    ListView tagListView;
     Button tagInfo, generalInfo, allInfo;
     TextView timerInfoText, appInfoText;
     PieChart tagPieChart;
     TableLayout allInfoTable;
-    TextView textView_0, textView_1, textView_2 , textView2, textView02, textView03;
+    TextView textView_0, textView_1, textView_2, textView2, textView02, textView03;
     TableRow row02, tableRow;
     SharedPreference mPreferences;
     DatabaseHelper db;
@@ -85,7 +92,7 @@ public class ListStatisticsFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_list_statistics, container, false);
         tagInfo = (Button) view.findViewById(R.id.tagInfoSwitch);
         generalInfo = (Button) view.findViewById(R.id.generalInfoSwitch);
-        allInfo = (Button)  view.findViewById(R.id.allInfoSwitch);
+        allInfo = (Button) view.findViewById(R.id.allInfoSwitch);
         timerInfoText = (TextView) view.findViewById(R.id.timerInfoText);
         appInfoText = (TextView) view.findViewById(R.id.appInfoText);
         tagPieChart = (PieChart) view.findViewById(R.id.tagPieChart);
@@ -157,6 +164,7 @@ public class ListStatisticsFragment extends Fragment {
             }
         });
     }
+
     private void showTagListView() {
 
         String[] tags = db.getTags();
@@ -164,6 +172,20 @@ public class ListStatisticsFragment extends Fragment {
         totalTimePerTag = getTotalTimePerTag(tags);
         List<Map.Entry<String, Long>> totalTimePerTagEntrySet = new ArrayList<Map.Entry<String, Long>>(
                 totalTimePerTag.entrySet());
+
+        Collections.sort(totalTimePerTagEntrySet, new Comparator<Map.Entry<String, Long>>() {
+
+            @Override
+            public int compare(Map.Entry<String, Long> o1, Map.Entry<String, Long> o2) {
+                if (o1.getValue() < o2.getValue()) {
+                    return 1;
+                } else if (o1.getValue() > o2.getValue()) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
+
         TagListAdapter adapter = new TagListAdapter(view.getContext(), totalTimePerTagEntrySet);
 
         // Assign adapter to ListView
@@ -175,7 +197,6 @@ public class ListStatisticsFragment extends Fragment {
                 Boolean keep = !tagsToShow.get(((Map.Entry<String, Long>) tagListView.getItemAtPosition(position)).getKey());
                 tagsToShow.put(((Map.Entry<String, Long>) tagListView.getItemAtPosition(position)).getKey(), keep);
                 showPieChart(true);
-
             }
         });
     }
@@ -200,21 +221,32 @@ public class ListStatisticsFragment extends Fragment {
             if (tagsToShow.get(entry.getKey())) {
                 String tag = entry.getKey();
                 Long value = entry.getValue();
-                Log.d("Check : ", tag + " : " + value);
                 entries.add(new PieEntry(value, tag));
             }
         }
+        IValueFormatter formatter = new IValueFormatter() {
+
+            @Override
+            public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+                return formatTime( (long) entry.getY());
+            }
+        };
+
 
         PieDataSet set = new PieDataSet(entries, "Time per Tag");
         PieData data = new PieData(set);
+        data.setValueFormatter(formatter);
         tagPieChart.setNoDataText("No Data");
         tagPieChart.setData(data);
-        tagPieChart.animateY(5000);
+        tagPieChart.animateY(500);
         tagPieChart.getLegend().setEnabled(false);
-        set.setColors(ColorTemplate.COLORFUL_COLORS);
+        set.setColors(ColorTemplate.JOYFUL_COLORS);
+        set.setXValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
+        set.setSliceSpace(3f);
+        set.setSelectionShift(0f);
         data.setValueTextSize(20f);
-        //data.setValueTextColor(getResources().getColor(R.color.colorAccent));
-        set.setValueTextColor(getResources().getColor(R.color.colorPrimaryDark));
+        data.setValueTextColor(getResources().getColor(R.color.secondary_text));
+        //set.setValueTextColor(getResources().getColor(R.color.colorPrimaryDark));
         tagPieChart.invalidate(); // refresh
     }
 
@@ -283,15 +315,15 @@ public class ListStatisticsFragment extends Fragment {
         }
     }
 
-    private void showAllData(DatabaseHelper db){
-        TableLayout.LayoutParams tableRowParams=
+    private void showAllData(DatabaseHelper db) {
+        TableLayout.LayoutParams tableRowParams =
                 new TableLayout.LayoutParams
-                        (TableLayout.LayoutParams.FILL_PARENT,TableLayout.LayoutParams.WRAP_CONTENT);
+                        (TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
 
-        int leftMargin=10;
-        int topMargin=10;
-        int rightMargin=10;
-        int bottomMargin=5;
+        int leftMargin = 10;
+        int topMargin = 10;
+        int rightMargin = 10;
+        int bottomMargin = 5;
 
         tableRowParams.setMargins(leftMargin, topMargin, rightMargin, bottomMargin);
 
@@ -316,6 +348,30 @@ public class ListStatisticsFragment extends Fragment {
         Cursor cursor = db.getData();
         cursor.moveToFirst();
         int max = cursor.getCount();
+        List<Pair> allTimes = new ArrayList<>();
+        List<Long> allStartTimes = new ArrayList<>();
+
+
+        for (int i = 1; i < max +1; i++) {
+
+            allTimes.add(new Pair((cursor.getLong(cursor.getColumnIndex("start_time"))), cursor.getLong(cursor.getColumnIndex("duration"))));
+            cursor.moveToNext();
+        }
+        cursor.close();
+
+        Collections.sort(allTimes, new Comparator<Pair>() {
+            @Override
+            public int compare(Pair o1, Pair o2) {
+                if ((Long)o1.first < (Long)o2.first) {
+                    return 1;
+                } else if ((Long)o1.first > (Long)o2.first) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
+
+
 
         for (int i = 1; i < max + 1; i++) {
             tableRow = new TableRow(getContext());
@@ -327,20 +383,18 @@ public class ListStatisticsFragment extends Fragment {
             textView_0.setGravity(Gravity.CENTER);
             tableRow.addView(textView_0);
 
-            LocalDateTime start = LocalDateTime.ofEpochSecond(cursor.getLong(cursor.getColumnIndex("start_time")), 0, ZoneOffset.UTC);
+            LocalDateTime start = LocalDateTime.ofEpochSecond(((Long)allTimes.get(i-1).first), 0, ZoneOffset.UTC);
             textView_1.setText(start.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(new Locale("en", "IN"))));
             textView_1.setGravity(Gravity.CENTER);
             tableRow.addView(textView_1);
 
-            String duration = " " + cursor.getLong(cursor.getColumnIndex("duration"))/1000 + "";
+            String duration = " " + formatTime((Long)allTimes.get(i-1).second) + "";
             textView_2.setText(duration);
             textView_2.setGravity(Gravity.CENTER);
             tableRow.addView(textView_2);
             allInfoTable.addView(tableRow);
-            cursor.moveToNext();
 
         }
-        cursor.close();
     }
 
     @Override
@@ -352,5 +406,43 @@ public class ListStatisticsFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+    private String formatTime(long time) {
+        StringBuilder text = new StringBuilder();
+        text.setLength(0);
+
+        // 1 d 12 h
+        if (time >= DateUtils.DAY_IN_MILLIS) {
+            int days = (int) (time/DateUtils.DAY_IN_MILLIS);
+            text.append(days).append(" d ");
+            time -= days*DateUtils.DAY_IN_MILLIS;
+            int hours = (int) (time/DateUtils.HOUR_IN_MILLIS);
+            if (hours < 10) text.append("0");
+            text.append(hours).append(" h");
+            // 12 h 54 m
+        } else if (time >= DateUtils.HOUR_IN_MILLIS) {
+            int hours = (int) (time/DateUtils.HOUR_IN_MILLIS);
+            text.append(hours).append(" h ");
+            time -= hours*DateUtils.HOUR_IN_MILLIS;
+            int minutes = (int) (time/DateUtils.MINUTE_IN_MILLIS);
+            if (minutes < 10) text.append("0");
+            text.append(minutes).append(" m");
+            // 54 m 32 s
+        } else if (time >= DateUtils.MINUTE_IN_MILLIS) {
+            int minutes = (int) (time/DateUtils.MINUTE_IN_MILLIS);
+            text.append(minutes).append(" m ");
+            time -= minutes*DateUtils.MINUTE_IN_MILLIS;
+            int seconds = (int) (time/DateUtils.SECOND_IN_MILLIS);
+            if (seconds < 10) text.append("0");
+            text.append(seconds).append(" s");
+            // 32 s
+        } else if (time >= DateUtils.SECOND_IN_MILLIS) {
+            text.append(time/DateUtils.SECOND_IN_MILLIS).append(" s");
+            // -
+        } else {
+            text.append("-");
+        }
+
+        return text.toString();
     }
 }
