@@ -3,8 +3,8 @@ package se.chalmers.justintime.fragments;
 
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
-import android.content.Context;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,14 +19,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -37,9 +35,6 @@ import se.chalmers.justintime.R;
 import se.chalmers.justintime.activities.CounterActivity;
 import se.chalmers.justintime.alert.Alarm;
 import se.chalmers.justintime.alert.AlarmBuilder;
-import se.chalmers.justintime.alert.SharedPreference;
-import se.chalmers.justintime.database.DatabaseHelper;
-import se.chalmers.justintime.database.TimerLogEntry;
 
 /**
  * This fragment shows a basic timer counting down from a time to zero.
@@ -56,7 +51,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
     private boolean isTimerRunning = false;
 
-    private TextView timerText;
+    private EditText timerText;
     private TextView timerLabel;
     private TextView timerTagText;
     private TextView timerTagList;
@@ -158,7 +153,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
         playPausButton = (ImageButton) view.findViewById(R.id.imageButton);
         resetButton = (ImageButton) view.findViewById(R.id.imageButton2);
-        timerText = (TextView) view.findViewById(R.id.basicTimerTV);
+        timerText = (EditText) view.findViewById(R.id.basicTimerTV);
         startPauseTimerButton = (Button) view.findViewById(R.id.timerStartPauseButton);
         resetTimerButton = (Button) view.findViewById(R.id.timerResetButton);
         timerLabel = (TextView) view.findViewById(R.id.timerLabelTV);
@@ -336,7 +331,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         alarm.alert();
         startPauseTimerButton.setText(R.string.timer_button_stop);
         disableStartPauseTimerButton();
-        presenter.pauseTimer(timerFragmentId);
+        presenter.pauseTimer(timerId);
         setRunningState(false);
     }
 
