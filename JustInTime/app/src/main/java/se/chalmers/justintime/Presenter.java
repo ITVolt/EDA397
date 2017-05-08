@@ -1,5 +1,6 @@
 package se.chalmers.justintime;
 
+import android.content.Context;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
@@ -9,8 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import se.chalmers.justintime.database.DatabaseHelper;
 import se.chalmers.justintime.fragments.TimerFragment;
-import se.chalmers.justintime.timer.ParcelableTimer;
 import se.chalmers.justintime.timer.TimerService;
 
 /**
@@ -19,22 +20,25 @@ import se.chalmers.justintime.timer.TimerService;
 
 public class Presenter {
 
-
     private TimerFragment timerFragment;
     private Messenger timerService;
-    public Map<Integer, Boolean> states;
+    private Map<Integer, Boolean> states;
+    private int timerAid;
+    private DatabaseHelper databaseHelper;
 
-    public Presenter(TimerFragment fragment) {
+
+    public Presenter(TimerFragment fragment, Context context) {
+        databaseHelper = DatabaseHelper.getInstance(context);
         this.timerFragment = fragment;
-        states = new HashMap<>(3);
-        states.put(1, false);
+        states = new HashMap<>(100);
     }
 
-    public void newTimer(ArrayList<Long> durations, int id){
+    public void newTimer(String name, String[] tags, ArrayList<Long> durations){
         Log.d("Presenter", "newTimer");
-        ParcelableTimer timer = new ParcelableTimer(id, durations);
         Message message = Message.obtain(null, TimerService.NEW_TIMER);
-        message.getData().putParcelable(TimerService.NEW_TIMER_INFO, timer);
+        message.getData().putSerializable(TimerService.TIMER_NAME, name);
+        message.getData().putSerializable(TimerService.TIMER_TAGS, tags);
+        message.getData().putSerializable(TimerService.TIMER_DURATIONS, durations);
         sendMessage(message);
     }
 
@@ -46,8 +50,9 @@ public class Presenter {
         this.timerService = timerService;
         //TODO remove this when you can add timers
         ArrayList<Long> duration = new ArrayList<>();
-        duration.add(0L + 90000);
-        newTimer(duration, 1);
+        duration.add(90000L);
+        String[] tags = new String[]{"A tag"};
+        newTimer("A Timer", tags, duration);
     }
 
     private void sendMessage(Message message){
@@ -95,6 +100,24 @@ public class Presenter {
     }
 
     public boolean getRunningState(int id) {
-        return states.get(id);
+        return states.get(id) != null && states.get(id);
+    }
+
+    public void setTimerId(int timerId) {
+        timerAid = timerId;
+        states.put(timerId, false);
+        timerFragment.setTimerId(timerId);
+    }
+
+    public void setAid() {
+        timerFragment.setTimerId(timerAid);
+    }
+
+    public void updateTimerLabel(int timerId, String label) {
+        databaseHelper.updateTimerLabel(timerId, label);
+    }
+
+    public void setTimerTags(int timerId, String[] newTags) {
+        databaseHelper.setTimerTags(timerId, newTags);
     }
 }

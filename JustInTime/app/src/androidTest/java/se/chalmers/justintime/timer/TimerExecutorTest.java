@@ -1,5 +1,7 @@
 package se.chalmers.justintime.timer;
 
+import android.os.Message;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.Before;
@@ -20,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 public class TimerExecutorTest {
     private TimerHandler timerHandler;
     private TimerInstance basicTimer,basicTimer1, timerThatWillNotFinish;
+
     @Before
     public void setUp() throws Exception {
         Ticker ticker = new Ticker() {
@@ -29,11 +32,23 @@ public class TimerExecutorTest {
             }
 
             @Override
-            public void onFinish() {
+            public void onFinish(TimerInstance timerInstance) {
 
             }
         };
-        timerHandler = new TimerHandler();
+        Messager mockMessager = new Messager() {
+            @Override
+            public void sendMessage(Message message) {
+
+            }
+
+            @Override
+            public void showNotification(int id, CharSequence text) {
+
+            }
+        };
+
+        timerHandler = new TimerHandler(mockMessager, InstrumentationRegistry.getTargetContext());
         basicTimer = new TimerInstance(1, new BasicTimer(200),ticker);
         basicTimer1 = new TimerInstance(2, new BasicTimer(200),ticker);
         timerThatWillNotFinish = new TimerInstance(3, new BasicTimer(2000L),ticker);
@@ -62,7 +77,7 @@ public class TimerExecutorTest {
         timerHandler.addTimer(timerThatWillNotFinish);
         timerHandler.startTimer(3);
         Thread.sleep(300);
-        timerHandler.stopTimer(3);
+        timerHandler.pauseTimer(3);
         long l = timerThatWillNotFinish.getRemainingTime();
         Thread.sleep(300);
         long l2 = timerThatWillNotFinish.getRemainingTime();
@@ -75,7 +90,7 @@ public class TimerExecutorTest {
         timerHandler.addTimer(timerThatWillNotFinish);
         timerHandler.startTimer(3);
         Thread.sleep(100);
-        timerHandler.stopTimer(3);
+        timerHandler.pauseTimer(3);
         long pause = timerThatWillNotFinish.getRemainingTime();
         timerHandler.startTimer(3);
         Thread.sleep(100);

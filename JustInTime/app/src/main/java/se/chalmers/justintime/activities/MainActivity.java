@@ -34,7 +34,6 @@ import se.chalmers.justintime.alert.SharedPreference;
 import se.chalmers.justintime.fragments.StatisticsFragment;
 import se.chalmers.justintime.fragments.TimerFragment;
 import se.chalmers.justintime.fragments.TimerSequenceFragment;
-import se.chalmers.justintime.timer.ParcelableLong;
 import se.chalmers.justintime.timer.TimerService;
 
 
@@ -64,12 +63,13 @@ public class MainActivity extends AppCompatActivity
                 case TimerService.UPDATE_TIMER:
                     Bundle bundle = msg.getData();
                     bundle.setClassLoader(getClassLoader());
-                    ParcelableLong time = bundle.getParcelable(TimerService.UPDATED_TIME);
-                    presenter.updateTimer(time.getL());
+                    presenter.updateTimer((long)bundle.getSerializable(TimerService.UPDATED_TIME));
                     break;
                 case TimerService.ALERT_TIMER:
                     presenter.alert();
                     break;
+                case TimerService.TIMER_ID:
+                    presenter.setTimerId(msg.arg1);
                 default:
                     super.handleMessage(msg);
             }
@@ -94,11 +94,11 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         TimerFragment timerFragment = TimerFragment.newInstance();
-        timerFragment.setTimerFragmentId(1);
-        presenter = new Presenter(timerFragment);
+        presenter = new Presenter(timerFragment, this);
         timerFragment.setPresenter(presenter);
         jumpToFragment(timerFragment);
     }
@@ -132,6 +132,14 @@ public class MainActivity extends AppCompatActivity
         bindService(new Intent(this, TimerService.class), connection, Context.BIND_AUTO_CREATE);
         isBound = true;
         Log.d("Messaging", "Binding ");
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem item= menu.findItem(R.id.action_settings);
+        item.setVisible(false);
+        super.onPrepareOptionsMenu(menu);
+        return true;
     }
 
     void doUnbindService() {
@@ -181,12 +189,8 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         if (id == R.id.nav_timerA) {
             TimerFragment timerFragment = TimerFragment.newInstance();
-            timerFragment.setTimerFragmentId(1);
-            if(presenter != null){
-                presenter.setFragment(timerFragment);
-            }else{
-                presenter = new Presenter(timerFragment);
-            }
+            presenter.setFragment(timerFragment);
+            presenter.setAid();
             timerFragment.setPresenter(presenter);
             jumpToFragment(timerFragment);
         } else if (id == R.id.nav_timerB) {
@@ -198,6 +202,18 @@ public class MainActivity extends AppCompatActivity
             jumpToFragment(StatisticsFragment.newInstance());
         } else if (id == R.id.nav_settings) {
             Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+        }
+          else if(id == R.id.nav_share){
+            Intent i = new Intent(Intent.ACTION_SEND);
+            i.setType("message/rfc822");
+            i.putExtra(Intent.EXTRA_SUBJECT, "Check out this cool timer app!");
+            i.putExtra(Intent.EXTRA_TEXT   , "Download Tima here https://play.google.com/store/apps/details?id=com.group5.tima\n\n sent from Tima");
+
+            try {
+                startActivity(Intent.createChooser(i, "Send mail..."));
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

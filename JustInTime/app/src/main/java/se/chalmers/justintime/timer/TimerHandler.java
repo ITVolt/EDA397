@@ -1,5 +1,7 @@
 package se.chalmers.justintime.timer;
 
+import android.content.Context;
+import android.os.Message;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -8,25 +10,43 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import se.chalmers.justintime.database.DatabaseHelper;
+import se.chalmers.justintime.database.TimerLogEntry;
 import se.chalmers.justintime.timer.timers.TimerInstance;
+
+import static se.chalmers.justintime.timer.TimerService.ALERT_TIMER;
+import static se.chalmers.justintime.timer.TimerService.UPDATED_TIME;
 
 /**
  * Created by David on 2017-04-20.
  */
 
-public class TimerHandler {
+public class TimerHandler implements Ticker {
 
     private List<TimerInstance> timers;
     private ScheduledThreadPoolExecutor timerSchedulerExecutor;
+    private DatabaseHelper databaseHelper;
+    private Messager messager;
 
-    public TimerHandler() {
+
+    public TimerHandler(Messager messager, Context context) {
+        this.messager = messager;
         this.timers = new ArrayList<>();
 //      The parameter indicates the maximum allowed number of threads/timers
         timerSchedulerExecutor = new ScheduledThreadPoolExecutor(100);
+        databaseHelper = DatabaseHelper.getInstance(context);
+
     }
 
     public void addTimer(TimerInstance timerInstance) {
         timers.add(timerInstance);
+    }
+
+    public void addTimer(String name, String[] tags, ArrayList<Long> durations) {
+        int id = databaseHelper.insertTimer(name , tags);
+        TimerInstance timerInstance = new TimerInstance(id, durations, this);
+        timers.add(timerInstance);
+        messager.sendMessage(Message.obtain(null, TimerService.TIMER_ID, id, 0));
     }
 
     public void startTimer(int id) {
@@ -42,16 +62,21 @@ public class TimerHandler {
 
     private void scheduleTimerWithFixedRate(TimerInstance timer, long fixedRateInMilliSeconds) {
         ScheduledFuture sf = timerSchedulerExecutor.scheduleAtFixedRate(timer, 0, fixedRateInMilliSeconds, TimeUnit.MILLISECONDS);
-        timer.setFuture(sf);
+        timer.start(sf);
     }
 
     public boolean removeTimer(int timerId) {
-        return stopTimer(timerId) && timers.remove(findById(timerId));
+        return pauseTimer(timerId) && timers.remove(findById(timerId));
     }
 
-    public boolean stopTimer(int timerId) {
+    public boolean pauseTimer(int timerId) {
         TimerInstance t = findById(timerId);
-        return t != null && t.stop();
+        if(t != null){
+            TimerLogEntry entry = new TimerLogEntry(timerId, t.getStartTime(), t.getDuration());
+            databaseHelper.insertTimerData(entry);
+            return t.stop();
+        }
+        return false;
     }
 
     private TimerInstance findById(int id){
@@ -64,7 +89,10 @@ public class TimerHandler {
     }
 
     public long resetTimer(int timerId) {
-        return findById(timerId).reset();
+        TimerInstance t = findById(timerId);
+        t.reset();
+        onTick(t.getRemainingTime());
+        return t.getRemainingTime();
     }
 
     /**
@@ -81,5 +109,21 @@ public class TimerHandler {
         if (t != null) {
             t.setSendingUpdates(true);
         }
+    }
+
+
+    @Override
+    public void onTick(long time){
+        Message message = Message.obtain(null, TimerService.UPDATE_TIMER);
+        message.getData().putSerializable(UPDATED_TIME, time);
+        messager.sendMessage(message);
+    }
+
+    @Override
+    public void onFinish(TimerInstance timerInstance) {
+        messager.sendMessage(Message.obtain(null, ALERT_TIMER));
+        messager.showNotification(2, "Timer has finished");
+        TimerLogEntry entry = new TimerLogEntry(timerInstance.getId(), timerInstance.getStartTime(), timerInstance.getDuration());
+        databaseHelper.insertTimerData(entry);
     }
 }

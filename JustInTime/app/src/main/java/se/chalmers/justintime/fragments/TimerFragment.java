@@ -4,8 +4,11 @@ package se.chalmers.justintime.fragments;
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.content.Context;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.InputType;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -13,11 +16,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import org.threeten.bp.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,22 +50,25 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
     private long startValue;
     public static long currentTimerValue;
-    private long previousDuration;
-    private LocalDateTime startTime;
+
+    private String label;
+    private String[] tags;
 
     private boolean isTimerRunning = false;
-    private SharedPreference preferences;
 
-    private EditText timerText;
+    private TextView timerText;
+    private TextView timerLabel;
+    private TextView timerTagText;
+    private TextView timerTagList;
 
     private Button startPauseTimerButton;
     private Button resetTimerButton;
 
+    private ImageButton playPausButton;
+    private ImageButton resetButton;
+
     private Alarm alarm;
     private StringBuilder strBuilder = new StringBuilder(8);
-
-    private DatabaseHelper databaseHelper;
-    private int currentPauseId;
 
     private View view;
 
@@ -67,8 +78,8 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private long timeCountInMilliSeconds;
 
     private ProgressBar progressBarCircle;
+
     private int timerId;
-    private int timerFragmentId;
 
     public Map<Integer,String> map = new HashMap<>();
 
@@ -142,19 +153,30 @@ public class TimerFragment extends Fragment implements CounterActivity {
             }
         });
 
+        this.label = "Basic timer";
+        this.tags = new String[0];
+
+        playPausButton = (ImageButton) view.findViewById(R.id.imageButton);
+        resetButton = (ImageButton) view.findViewById(R.id.imageButton2);
+        timerText = (TextView) view.findViewById(R.id.basicTimerTV);
         startPauseTimerButton = (Button) view.findViewById(R.id.timerStartPauseButton);
         resetTimerButton = (Button) view.findViewById(R.id.timerResetButton);
+        timerLabel = (TextView) view.findViewById(R.id.timerLabelTV);
+        timerTagText = (TextView) view.findViewById(R.id.timerTagLabelTV);
+        timerTagList = (TextView) view.findViewById(R.id.timerTagsTV);
+
+        timerLabel.setText(label);
+        updateTagListText();
+
         setRunningState(isTimerRunning);
         // Set up the alarm.
-        preferences = new SharedPreference(view.getContext());
+
         AlarmBuilder ab = new AlarmBuilder(view.getContext());
         ab.setUseSound(true);
         ab.setUseVibration(true);
         alarm = ab.getAlarmInstance();
 
         setButtonOnClickListeners();
-        databaseHelper = new DatabaseHelper(this.getContext());
-        timerId = databaseHelper.insertTimer("Basic timer", new String[]{"Undefined"});
         progressBarCircle = (ProgressBar) view.findViewById(R.id.progressBarCircle);
         disableResetButton();
         return view;
@@ -238,28 +260,21 @@ public class TimerFragment extends Fragment implements CounterActivity {
         progressBarCircle.setProgress((int) (timeCountInMilliSeconds) );
     }
 
-    private void setTimerValues() {
-        timeCountInMilliSeconds = currentTimerValue + 1000;
-    }
-
     private void resetProgressBarValues() {
         progressBarCircle.setProgress((int) startValue);
     }
 
+
     @Override
     public void start() {
         setRunningState(true);
-        presenter.startTimer(timerFragmentId);
+        presenter.startTimer(timerId);
     }
 
     @Override
     public void pause() {
-        presenter.pauseTimer(timerFragmentId);
+        presenter.pauseTimer(timerId);
         setRunningState(false);
-        long duration = startValue - currentTimerValue - previousDuration;
-        previousDuration = previousDuration + duration;
-        TimerLogEntry entry = new TimerLogEntry(timerId, startTime, duration);
-        databaseHelper.insertTimerData(entry);
     }
 
     @Override
@@ -271,9 +286,8 @@ public class TimerFragment extends Fragment implements CounterActivity {
         disableResetButton();
         currentTimerValue = startValue; // FIXME Remove when the real chronometer is implemented.
         updateTimerText();
-        previousDuration = 0;
         resetCountDownTimer();
-        presenter.resetTimer(timerFragmentId);
+        presenter.resetTimer(timerId);
     }
 
     @Override
@@ -292,6 +306,31 @@ public class TimerFragment extends Fragment implements CounterActivity {
         }
     }
 
+    private void setNewTags(String[] newTags) {
+        if (!Arrays.equals(tags, newTags)) {
+            presenter.setTimerTags(timerId, newTags);
+            tags = newTags;
+            updateTagListText();
+        }
+    }
+
+    private void updateTagListText() {
+        StringBuilder tagText = new StringBuilder();
+        if (tags.length > 0) {
+            tagText.append(tags[0]);
+            if (tags.length > 1) {
+                tagText.append("\n").append(tags[1]);
+                if (tags.length > 2) {
+                    tagText.append("\n+").append(tags.length-2);
+                }
+            }
+        } else {
+            tagText.append("<no tags set>");
+        }
+        timerTagList.setText(tagText.toString());
+    }
+
+
     public void onTimerFinish() {
         Log.d("TimerFragment", "onTimerFinish: Time's up!");
         alarm.alert();
@@ -299,14 +338,10 @@ public class TimerFragment extends Fragment implements CounterActivity {
         disableStartPauseTimerButton();
         presenter.pauseTimer(timerFragmentId);
         setRunningState(false);
-        long duration = startValue - currentTimerValue - previousDuration;
-        TimerLogEntry entry = new TimerLogEntry(timerId, startTime, duration);
-        databaseHelper.insertTimerData(entry);
     }
 
     private void setRunningState(boolean run) {
         if (run) {
-            startTime = LocalDateTime.now();
             startPauseTimerButton.setText(R.string.timer_button_pause);
             disableResetButton();
             isTimerRunning = true;
@@ -317,36 +352,188 @@ public class TimerFragment extends Fragment implements CounterActivity {
         }
     }
 
+    private void timerLabelDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+        builder.setTitle("Enter new label");
+
+        // Set up the input
+        final EditText input = new EditText(view.getContext());
+        input.setText(label);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                label = input.getText().toString().trim();
+                presenter.updateTimerLabel(timerId, label);
+                timerLabel.setText(label);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    private void timerTagDialog() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+        final boolean hasTags;
+        builder.setTitle("Tags");
+
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_list_item_1);
+        if (tags.length == 0) {
+            hasTags = false;
+            arrayAdapter.add("<No tags set>");
+        } else {
+            hasTags = true;
+            arrayAdapter.addAll(tags);
+        }
+
+        builder.setAdapter(arrayAdapter, null);
+
+        if (hasTags) {
+            builder.setNegativeButton("Remove tag", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    removeTagDialog();
+                }
+            });
+        }
+
+        builder.setNeutralButton("Add tag", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                addTagDialog();
+            }
+        });
+
+        builder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.show();
+    }
+
+    private void removeTagDialog() {
+        final AlertDialog.Builder builderInner = new AlertDialog.Builder(view.getContext());
+        builderInner.setTitle("Select to remove");
+        final boolean[] checked = new boolean[tags.length];
+
+        builderInner.setMultiChoiceItems(tags, checked, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                checked[which] = isChecked;
+            }
+        });
+
+        builderInner.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builderInner.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                ArrayList<String> remaining = new ArrayList<>();
+                for (int i = 0; i < tags.length; i++) {
+                    if (!checked[i]) {
+                        remaining.add(tags[i]);
+                    }
+                }
+                setNewTags(remaining.toArray(new String[remaining.size()]));
+            }
+        });
+        builderInner.show();
+    }
+
+    private void addTagDialog() {
+        AlertDialog.Builder builderInner = new AlertDialog.Builder(view.getContext());
+        builderInner.setTitle("Enter new tag");
+
+        final EditText input = new EditText(view.getContext());
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setSelection(0);
+        builderInner.setView(input);
+
+        builderInner.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String[] newTags = Arrays.copyOf(tags, tags.length+1);
+                newTags[newTags.length-1] = input.getText().toString().trim();
+                setNewTags(newTags);
+            }
+        });
+        builderInner.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builderInner.show();
+    }
+
     private void setButtonOnClickListeners() {
-        startPauseTimerButton.setOnClickListener(new View.OnClickListener() {
+        playPausButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isTimerRunning) {
+                    playPausButton.setImageResource(R.drawable.ic_play_arrow_black_48dp);
                     pause();
                 } else {
                     start();
+                    playPausButton.setImageResource(R.drawable.ic_pause_black_48dp);
                 }
             }
         });
-        resetTimerButton.setOnClickListener(new View.OnClickListener() {
+        resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 reset();
             }
         });
+        timerLabel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                timerLabelDialog();
+            }
+        });
+        timerTagText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                timerTagDialog();
+            }
+        });
+        timerTagList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                timerTagDialog();
+            }
+        });
     }
 
     private void enableResetButton() {
-        resetTimerButton.setEnabled(true);
+        resetButton.setEnabled(true);
         Animator animator = AnimatorInflater.loadAnimator(view.getContext(), R.animator.fade_in);
-        animator.setTarget(resetTimerButton);
+        animator.setTarget(resetButton);
         animator.start();
     }
 
     private void disableResetButton() {
-        resetTimerButton.setEnabled(false);
+        resetButton.setEnabled(false);
         Animator animator = AnimatorInflater.loadAnimator(view.getContext(), R.animator.fade_out);
-        animator.setTarget(resetTimerButton);
+        animator.setTarget(resetButton);
         animator.start();
     }
 
@@ -422,11 +609,11 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
     public void setPresenter(Presenter presenter) {
         this.presenter = presenter;
-        presenter.startSendingUpdates(timerFragmentId);
-        this.isTimerRunning = presenter.getRunningState(timerFragmentId);
+        presenter.startSendingUpdates(timerId);
+        this.isTimerRunning = presenter.getRunningState(timerId);
     }
 
-    public void setTimerFragmentId(int timerFragmentId) {
-        this.timerFragmentId = timerFragmentId;
+    public void setTimerId(int timerId) {
+        this.timerId = timerId;
     }
 }

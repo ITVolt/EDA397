@@ -1,51 +1,98 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="se.chalmers.justintime.fragments.StatisticsFragment"
-    android:background="#ffffff">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 
-    <TextView
-        android:id="@+id/timerInfoText"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/timerInfoSwitch"
-        android:textSize="18sp"
-        android:textStyle="italic" />
-
-    <Switch
-        android:id="@+id/timerInfoSwitch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:text="Timer Information"
-        android:textSize="24sp"
-        android:textStyle="bold|italic" />
-
-    <Switch
-        android:id="@+id/appInfoSwitch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/timerInfoText"
-        android:text="App Information"
-        android:textSize="24sp"
-        android:textStyle="bold|italic" />
-
-    <TextView
-        android:id="@+id/appInfoText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/appInfoSwitch"
-        android:textSize="18sp"
-        android:textStyle="italic" />
+        android:background="@color/colorPrimaryDark"
+        tools:context="se.chalmers.justintime.fragments.StatisticsFragment">
 
 
-</RelativeLayout>
+        <Button
+            android:id="@+id/generalInfoSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:text="General Information"
+            android:textColor="@color/secondary_text"
+            android:textSize="12dp" />
 
+        <TextView
+            android:id="@+id/appInfoText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/generalInfoSwitch"
+            android:gravity="center"
+            android:text="AppInformation"
+            android:textColor="@color/small_text"
+            android:textSize="18sp"
+            android:textStyle="italic" />
 
+        <TextView
+            android:id="@+id/timerInfoText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/appInfoText"
+            android:gravity="center"
+            android:text="TimerInformation"
+            android:textColor="@color/small_text"
+            android:textSize="18sp"
+            android:textStyle="italic" />
+
+        <Button
+            android:id="@+id/tagInfoSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/timerInfoText"
+            android:text="Tag Specific Info"
+            android:textColor="@color/secondary_text"
+            android:textSize="12sp"/>
+
+        <com.github.mikephil.charting.charts.PieChart xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/tagPieChart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/tagInfoSwitch"
+            android:minHeight="250dp" />
+
+        <ListView
+            android:id="@+id/tagList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/tagPieChart"
+            android:background="@color/small_text" />
+
+        <Button
+            android:id="@+id/allInfoSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/tagList"
+            android:text="All data"
+            android:textColor="@color/secondary_text"
+            android:textSize="12sp"/>
+
+        <TableLayout
+            android:id="@+id/table_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/allInfoSwitch"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="55dp"
+            android:background="@drawable/border"
+            android:gravity="center">
+        </TableLayout>
+
+    </RelativeLayout>
+
+</ScrollView>
 
 

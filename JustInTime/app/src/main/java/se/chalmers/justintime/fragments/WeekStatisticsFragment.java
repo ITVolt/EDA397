@@ -16,14 +16,14 @@ import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.temporal.TemporalField;
 import org.threeten.bp.temporal.WeekFields;
 
+import java.util.ArrayList;
+import java.util.Locale;
+
 import se.chalmers.justintime.R;
 import se.chalmers.justintime.StatisticsBundle;
 import se.chalmers.justintime.WeekListAdapter;
 import se.chalmers.justintime.database.DatabaseHelper;
 import se.chalmers.justintime.database.TimerInfoBundle;
-
-import java.util.ArrayList;
-import java.util.Locale;
 
 /**
  * A fragment representing a list of Items.
@@ -59,7 +59,7 @@ public class WeekStatisticsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_week, container, false);
 
         // Gather the weekly statistics.
-        populateWeekData(new DatabaseHelper(view.getContext()).getAllTimerInfo());
+        populateWeekData(DatabaseHelper.getInstance(this.getContext()).getAllTimerInfo());
 
         final ListView listview = (ListView) view.findViewById(R.id.week_list_view);
         listview.setAdapter(new WeekListAdapter(view.getContext(), weekData));
