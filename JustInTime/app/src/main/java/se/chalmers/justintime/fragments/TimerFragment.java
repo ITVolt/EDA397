@@ -3,18 +3,26 @@ package se.chalmers.justintime.fragments;
 
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import org.threeten.bp.LocalDateTime;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import se.chalmers.justintime.Presenter;
 import se.chalmers.justintime.R;
@@ -40,7 +48,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private boolean isTimerRunning = false;
     private SharedPreference preferences;
 
-    private TextView timerText;
+    private EditText timerText;
 
     private Button startPauseTimerButton;
     private Button resetTimerButton;
@@ -56,12 +64,14 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
     private Presenter presenter;
 
-
     private long timeCountInMilliSeconds;
 
     private ProgressBar progressBarCircle;
     private int timerId;
     private int timerFragmentId;
+
+    public Map<Integer,String> map = new HashMap<>();
+
 
 
     public TimerFragment() {
@@ -93,7 +103,44 @@ public class TimerFragment extends Fragment implements CounterActivity {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_timer, container, false);
 
-        timerText = (TextView) view.findViewById(R.id.basicTimerTV);
+
+        timerText = (EditText) view.findViewById(R.id.basicTimerTV);
+        timerText.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                timerText.setSelection(timerText.getText().length());
+            }
+        });
+
+        timerText.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_DEL) {
+                    timerText.setText(removeNumberFromTimerText());
+                    return true;
+
+                } else if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode != KeyEvent.KEYCODE_DEL && keyCode != KeyEvent.KEYCODE_ENTER) {
+                    timerText.setText(addNumberToTimerText(keyCode-7));
+                    timerText.setSelection(timerText.getText().length());
+                    return true;
+
+                } else if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                    long newTime = convertStringToMilliseconds(timerText.getText().toString());
+                    startValue = newTime;
+                    currentTimerValue = newTime;
+                    timeCountInMilliSeconds  = newTime;
+                    updateTimerText();
+                    setProgressBarValues();
+                    InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(timerText.getWindowToken(), 0);
+                    return true;
+
+                }
+                return false;
+
+            }
+        });
 
         startPauseTimerButton = (Button) view.findViewById(R.id.timerStartPauseButton);
         resetTimerButton = (Button) view.findViewById(R.id.timerResetButton);
@@ -109,13 +156,77 @@ public class TimerFragment extends Fragment implements CounterActivity {
         databaseHelper = new DatabaseHelper(this.getContext());
         timerId = databaseHelper.insertTimer("Basic timer", new String[]{"Undefined"});
         progressBarCircle = (ProgressBar) view.findViewById(R.id.progressBarCircle);
-        startValue = 90000;
-        timeCountInMilliSeconds = startValue;
         disableResetButton();
-        currentTimerValue = startValue; // FIXME Remove when the real chronometer is implemented.
-        updateTimerText();
-        setProgressBarValues();
         return view;
+    }
+
+    public String removeNumberFromTimerText() {
+        addTimerTextToMap();
+
+        map.put(1, map.get(2));
+        map.put(2, map.get(3));
+        map.put(3, map.get(4));
+        map.put(4, map.get(5));
+        map.put(5, map.get(6));
+        map.put(6, "0");
+
+        return map.get(6) + map.get(5) + ":" + map.get(4) + map.get(3) + ":" + map.get(2) + map.get(1);
+    }
+
+    private void addTimerTextToMap() {
+        String currentTimerText = timerText.getText().toString();
+        Character[] c = convertStringToArray(currentTimerText);
+
+        map.put(6, c[0].toString());
+        map.put(5, c[1].toString());
+        map.put(4, c[3].toString());
+        map.put(3, c[4].toString());
+        map.put(2, c[6].toString());
+        map.put(1, c[7].toString());
+    }
+
+    public String addNumberToTimerText(int keyPressed) {
+        addTimerTextToMap();
+
+        map.put(6, map.get(5));
+        map.put(5, map.get(4));
+        map.put(4, map.get(3));
+        map.put(3, map.get(2));
+        map.put(2, map.get(1));
+        map.put(1, String.valueOf(keyPressed));
+
+        return map.get(6) + map.get(5) + ":" + map.get(4) + map.get(3) + ":" + map.get(2) + map.get(1);
+    }
+
+    // Input must be HH:MM:SS
+    private long convertStringToMilliseconds(String textToConvert) {
+
+        Pattern p = Pattern.compile("(\\d+):(\\d+):(\\d+)");
+        Matcher m = p.matcher(textToConvert);
+        if (m.matches()) {
+            int hrs = Integer.parseInt(m.group(1));
+            int min = Integer.parseInt(m.group(2));
+            int sec = Integer.parseInt(m.group(3));
+            long ms = (long) hrs * 60 * 60 * 1000 + min * 60 * 1000 + sec * 1000;
+            System.out.println("hrs="+hrs+ " min="+min+" sec="+sec+" ms="+ms);
+            return ms;
+        }
+        return 0;
+    }
+
+    public Character[] convertStringToArray(String s ) {
+        if ( s == null ) {
+            return null;
+        }
+
+        int len = s.length();
+        Character[] array = new Character[len];
+        for (int i = 0; i < len ; i++) {
+            array[i] = Character.valueOf(s.charAt(i));
+
+        }
+        return array;
+
     }
 
     private void resetCountDownTimer() {
@@ -186,7 +297,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         alarm.alert();
         startPauseTimerButton.setText(R.string.timer_button_stop);
         disableStartPauseTimerButton();
-        presenter.pauseTimer(currentTimerId);
+        presenter.pauseTimer(timerFragmentId);
         setRunningState(false);
         long duration = startValue - currentTimerValue - previousDuration;
         TimerLogEntry entry = new TimerLogEntry(timerId, startTime, duration);
@@ -279,9 +390,11 @@ public class TimerFragment extends Fragment implements CounterActivity {
             s = (int) (time/DateUtils.SECOND_IN_MILLIS);
         }
 
-        if (h>0) {
-            text.append(h).append(":");
+        if (h<=9) {
+            text.append(0);
         }
+        text.append(h).append(":");
+
         if (m<10) {
             text.append(0).append(m).append(":");
         } else {
