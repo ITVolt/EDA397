@@ -57,7 +57,7 @@ import static android.content.ContentValues.TAG;
 
 public class ListStatisticsFragment extends Fragment {
 
-    Boolean isClickedGeneral = true, isClickedTag = false, isClickedAllInfo = false;
+    Boolean isClickedGeneral = true, isClickedTag = true, isClickedAllInfo = false;
     View view;
     ListView tagListView;
     Button tagInfo, generalInfo, allInfo;
@@ -111,11 +111,11 @@ public class ListStatisticsFragment extends Fragment {
         timerInfoText.setText("Used for : " + db.getTotalDuration());
         appInfoText.setText("App Used : " + mPreferences.getAppUsageCount() + " times");
         favoriteTagText.setText("Favorite Tag : " + favoriteTag());
-        tagPieChart.setVisibility(View.GONE);
-        tagListView.setVisibility(View.GONE);
         allInfoTable.setVisibility(View.GONE);
         setOnSwitchChangeListener();
         showAllData(db);
+        showPieChart(false);
+        showTagListView();
         return view;
     }
 
@@ -254,7 +254,7 @@ public class ListStatisticsFragment extends Fragment {
 
             @Override
             public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
-                return DateFormatterUtil.formatTime( (long) entry.getY());
+                return "";//DateFormatterUtil.formatTime( (long) entry.getY());
             }
         };
 
@@ -262,7 +262,7 @@ public class ListStatisticsFragment extends Fragment {
         tagPieChart.setNoDataText("No Data");
         tagPieChart.animateY(500);
         tagPieChart.getLegend().setEnabled(false);
-        set.setColors(ColorTemplate.JOYFUL_COLORS);
+        set.setColors(ColorTemplate.VORDIPLOM_COLORS);
         set.setXValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
         set.setSliceSpace(2f);
         set.setSelectionShift(0f);
@@ -418,17 +418,19 @@ public class ListStatisticsFragment extends Fragment {
         row02 = new TableRow(getContext());
         row02.setLayoutParams(tableRowParams);
         textView02 = new TextView(getContext());
-        textView02.setText(" No. ");
+        textView02.setText("No.");
         textView02.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
         row02.addView(textView02);
 
         textView03 = new TextView(getContext());
-        textView03.setText("      Start Time ");
+        textView03.setText("Start Time");
         textView03.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
+        textView03.setGravity(Gravity.CENTER);
         row02.addView(textView03);
 
         textView2 = new TextView(getContext());
-        textView2.setText(" Duration ");
+        textView2.setText(R.string.Duration);
+        textView2.setGravity(Gravity.RIGHT);
         textView2.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
         row02.addView(textView2);
         allInfoTable.addView(row02);
