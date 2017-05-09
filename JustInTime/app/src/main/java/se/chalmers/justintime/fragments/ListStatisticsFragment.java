@@ -44,11 +44,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import se.chalmers.justintime.DateFormatterUtil;
 import se.chalmers.justintime.R;
 import se.chalmers.justintime.alert.SharedPreference;
 import se.chalmers.justintime.database.DatabaseHelper;
 import se.chalmers.justintime.TagListAdapter;
 
+import static android.R.attr.data;
 import static android.content.ContentValues.TAG;
 
 public class ListStatisticsFragment extends Fragment {
@@ -168,23 +170,11 @@ public class ListStatisticsFragment extends Fragment {
     private void showTagListView() {
 
         String[] tags = db.getTags();
-        Map<String, Long> totalTimePerTag;
-        totalTimePerTag = getTotalTimePerTag(tags);
+        Map<String, Long> totalTimePerTag = getTotalTimePerTag(tags);
         List<Map.Entry<String, Long>> totalTimePerTagEntrySet = new ArrayList<Map.Entry<String, Long>>(
                 totalTimePerTag.entrySet());
 
-        Collections.sort(totalTimePerTagEntrySet, new Comparator<Map.Entry<String, Long>>() {
-
-            @Override
-            public int compare(Map.Entry<String, Long> o1, Map.Entry<String, Long> o2) {
-                if (o1.getValue() < o2.getValue()) {
-                    return 1;
-                } else if (o1.getValue() > o2.getValue()) {
-                    return -1;
-                }
-                return 0;
-            }
-        });
+        sortEntrySet(totalTimePerTagEntrySet);
 
         TagListAdapter adapter = new TagListAdapter(view.getContext(), totalTimePerTagEntrySet);
 
@@ -201,15 +191,14 @@ public class ListStatisticsFragment extends Fragment {
         });
     }
 
-
     private void showPieChart(Boolean update) {
 
         String[] tags = db.getTags();
-        Map<String, Long> totalTimePerTag;
-        totalTimePerTag = getTotalTimePerTag(tags);
-        List<PieEntry> entries = new ArrayList<>();
+        Map<String, Long> totalTimePerTag = getTotalTimePerTag(tags);
         List<Map.Entry<String, Long>> totalTimePerTagEntrySet = new ArrayList<Map.Entry<String, Long>>(
                 totalTimePerTag.entrySet());
+
+        List<PieEntry> entries = new ArrayList<>();
         if (!update) {
             for (String tag : tags) {
                 tagsToShow.put(tag, false);
@@ -224,20 +213,27 @@ public class ListStatisticsFragment extends Fragment {
                 entries.add(new PieEntry(value, tag));
             }
         }
-        IValueFormatter formatter = new IValueFormatter() {
-
-            @Override
-            public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
-                return formatTime( (long) entry.getY());
-            }
-        };
 
 
         PieDataSet set = new PieDataSet(entries, "Time per Tag");
         PieData data = new PieData(set);
+        tagPieChart.setData(data);
+        formatPieChart(data, set);
+
+    }
+
+    private void formatPieChart(PieData data, PieDataSet set) {
+
+        IValueFormatter formatter = new IValueFormatter() {
+
+            @Override
+            public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+                return DateFormatterUtil.formatTime( (long) entry.getY());
+            }
+        };
+
         data.setValueFormatter(formatter);
         tagPieChart.setNoDataText("No Data");
-        tagPieChart.setData(data);
         tagPieChart.animateY(500);
         tagPieChart.getLegend().setEnabled(false);
         set.setColors(ColorTemplate.JOYFUL_COLORS);
@@ -245,7 +241,7 @@ public class ListStatisticsFragment extends Fragment {
         set.setSliceSpace(3f);
         set.setSelectionShift(0f);
         data.setValueTextSize(20f);
-        data.setValueTextColor(getResources().getColor(R.color.secondary_text));
+         data.setValueTextColor(getResources().getColor(R.color.secondary_text));
         //set.setValueTextColor(getResources().getColor(R.color.colorPrimaryDark));
         tagPieChart.invalidate(); // refresh
     }
@@ -267,8 +263,17 @@ public class ListStatisticsFragment extends Fragment {
 
         List<Map.Entry<String, Long>> list = new ArrayList<Map.Entry<String, Long>>(
                 map.entrySet());
+        sortEntrySet(list);
 
-        Collections.sort(list, new Comparator<Map.Entry<String, Long>>() {
+        Log.d(TAG, "getTopFive: " + list.size());
+        topFive = list.subList(0, 5);
+        for (Map.Entry<String, Long> tag : topFive) {
+            tagsToShow.put(tag.getKey(), true);
+        }
+    }
+
+    private void sortEntrySet(List<Map.Entry<String, Long>> entrySet) {
+        Collections.sort(entrySet, new Comparator<Map.Entry<String, Long>>() {
 
             @Override
             public int compare(Map.Entry<String, Long> o1, Map.Entry<String, Long> o2) {
@@ -280,11 +285,108 @@ public class ListStatisticsFragment extends Fragment {
                 return 0;
             }
         });
-        Log.d(TAG, "getTopFive: " + list.size());
-        topFive = list.subList(0, 5);
-        for (Map.Entry<String, Long> tag : topFive) {
-            tagsToShow.put(tag.getKey(), true);
+    }
+
+
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(uri);
         }
+    }
+
+    private void showAllData(DatabaseHelper db) {
+        TableLayout.LayoutParams tableRowParams =
+                new TableLayout.LayoutParams
+                        (TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
+        formatAllDataTable(tableRowParams);
+
+        Cursor cursor = db.getData();
+        cursor.moveToFirst();
+        int max = cursor.getCount();
+        List<Pair> allTimes = new ArrayList<>();
+
+        for (int i = 1; i < max +1; i++) {
+
+            allTimes.add(new Pair((cursor.getLong(cursor.getColumnIndex("start_time"))), cursor.getLong(cursor.getColumnIndex("duration"))));
+            cursor.moveToNext();
+        }
+        cursor.close();
+
+        Collections.sort(allTimes, new Comparator<Pair>() {
+            @Override
+            public int compare(Pair o1, Pair o2) {
+                if ((Long)o1.first < (Long)o2.first) {
+                    return 1;
+                } else if ((Long)o1.first > (Long)o2.first) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
+
+        for (int i = 1; i < max + 1; i++) {
+            tableRow = new TableRow(getContext());
+            tableRow.setLayoutParams(tableRowParams);
+            textView_0 = new TextView(getContext());
+            textView_1 = new TextView(getContext());
+            textView_2 = new TextView(getContext());
+            textView_0.setText(" " + i + " ");
+            textView_0.setGravity(Gravity.CENTER);
+            tableRow.addView(textView_0);
+
+            LocalDateTime start = LocalDateTime.ofEpochSecond(((Long)allTimes.get(i-1).first), 0, ZoneOffset.UTC);
+            textView_1.setText(start.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(new Locale("en", "IN"))));
+            textView_1.setGravity(Gravity.CENTER);
+            tableRow.addView(textView_1);
+
+            String duration = " " + DateFormatterUtil.formatTime((Long)allTimes.get(i-1).second) + "";
+            textView_2.setText(duration);
+            textView_2.setGravity(Gravity.CENTER);
+            tableRow.addView(textView_2);
+            allInfoTable.addView(tableRow);
+
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
+    }
+
+    private void formatAllDataTable(TableLayout.LayoutParams tableRowParams) {
+
+        int leftMargin = 10;
+        int topMargin = 10;
+        int rightMargin = 10;
+        int bottomMargin = 5;
+
+        tableRowParams.setMargins(leftMargin, topMargin, rightMargin, bottomMargin);
+
+        row02 = new TableRow(getContext());
+        row02.setLayoutParams(tableRowParams);
+        textView02 = new TextView(getContext());
+        textView02.setText(" No. ");
+        textView02.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
+        row02.addView(textView02);
+
+        textView03 = new TextView(getContext());
+        textView03.setText("      Start Time ");
+        textView03.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
+        row02.addView(textView03);
+
+        textView2 = new TextView(getContext());
+        textView2.setText(" Duration ");
+        textView2.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
+        row02.addView(textView2);
+        allInfoTable.addView(row02);
     }
 
     public static void setListViewHeightBasedOnChildren(ListView listView) {
@@ -307,142 +409,4 @@ public class ListStatisticsFragment extends Fragment {
         listView.requestLayout();
     }
 
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
-    private void showAllData(DatabaseHelper db) {
-        TableLayout.LayoutParams tableRowParams =
-                new TableLayout.LayoutParams
-                        (TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
-
-        int leftMargin = 10;
-        int topMargin = 10;
-        int rightMargin = 10;
-        int bottomMargin = 5;
-
-        tableRowParams.setMargins(leftMargin, topMargin, rightMargin, bottomMargin);
-
-        row02 = new TableRow(getContext());
-        row02.setLayoutParams(tableRowParams);
-        textView02 = new TextView(getContext());
-        textView02.setText(" No ");
-        textView02.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
-        row02.addView(textView02);
-
-        textView03 = new TextView(getContext());
-        textView03.setText("      Start Time ");
-        textView03.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
-        row02.addView(textView03);
-
-        textView2 = new TextView(getContext());
-        textView2.setText(" Duration (sec) ");
-        textView2.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
-        row02.addView(textView2);
-        allInfoTable.addView(row02);
-
-        Cursor cursor = db.getData();
-        cursor.moveToFirst();
-        int max = cursor.getCount();
-        List<Pair> allTimes = new ArrayList<>();
-        List<Long> allStartTimes = new ArrayList<>();
-
-
-        for (int i = 1; i < max +1; i++) {
-
-            allTimes.add(new Pair((cursor.getLong(cursor.getColumnIndex("start_time"))), cursor.getLong(cursor.getColumnIndex("duration"))));
-            cursor.moveToNext();
-        }
-        cursor.close();
-
-        Collections.sort(allTimes, new Comparator<Pair>() {
-            @Override
-            public int compare(Pair o1, Pair o2) {
-                if ((Long)o1.first < (Long)o2.first) {
-                    return 1;
-                } else if ((Long)o1.first > (Long)o2.first) {
-                    return -1;
-                }
-                return 0;
-            }
-        });
-
-
-
-        for (int i = 1; i < max + 1; i++) {
-            tableRow = new TableRow(getContext());
-            tableRow.setLayoutParams(tableRowParams);
-            textView_0 = new TextView(getContext());
-            textView_1 = new TextView(getContext());
-            textView_2 = new TextView(getContext());
-            textView_0.setText(" " + i + " ");
-            textView_0.setGravity(Gravity.CENTER);
-            tableRow.addView(textView_0);
-
-            LocalDateTime start = LocalDateTime.ofEpochSecond(((Long)allTimes.get(i-1).first), 0, ZoneOffset.UTC);
-            textView_1.setText(start.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(new Locale("en", "IN"))));
-            textView_1.setGravity(Gravity.CENTER);
-            tableRow.addView(textView_1);
-
-            String duration = " " + formatTime((Long)allTimes.get(i-1).second) + "";
-            textView_2.setText(duration);
-            textView_2.setGravity(Gravity.CENTER);
-            tableRow.addView(textView_2);
-            allInfoTable.addView(tableRow);
-
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
-    private String formatTime(long time) {
-        StringBuilder text = new StringBuilder();
-        text.setLength(0);
-
-        // 1 d 12 h
-        if (time >= DateUtils.DAY_IN_MILLIS) {
-            int days = (int) (time/DateUtils.DAY_IN_MILLIS);
-            text.append(days).append(" d ");
-            time -= days*DateUtils.DAY_IN_MILLIS;
-            int hours = (int) (time/DateUtils.HOUR_IN_MILLIS);
-            if (hours < 10) text.append("0");
-            text.append(hours).append(" h");
-            // 12 h 54 m
-        } else if (time >= DateUtils.HOUR_IN_MILLIS) {
-            int hours = (int) (time/DateUtils.HOUR_IN_MILLIS);
-            text.append(hours).append(" h ");
-            time -= hours*DateUtils.HOUR_IN_MILLIS;
-            int minutes = (int) (time/DateUtils.MINUTE_IN_MILLIS);
-            if (minutes < 10) text.append("0");
-            text.append(minutes).append(" m");
-            // 54 m 32 s
-        } else if (time >= DateUtils.MINUTE_IN_MILLIS) {
-            int minutes = (int) (time/DateUtils.MINUTE_IN_MILLIS);
-            text.append(minutes).append(" m ");
-            time -= minutes*DateUtils.MINUTE_IN_MILLIS;
-            int seconds = (int) (time/DateUtils.SECOND_IN_MILLIS);
-            if (seconds < 10) text.append("0");
-            text.append(seconds).append(" s");
-            // 32 s
-        } else if (time >= DateUtils.SECOND_IN_MILLIS) {
-            text.append(time/DateUtils.SECOND_IN_MILLIS).append(" s");
-            // -
-        } else {
-            text.append("-");
-        }
-
-        return text.toString();
-    }
 }

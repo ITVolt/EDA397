@@ -212,7 +212,7 @@ public class DatabaseHelperTest {
 
     @Test
     public void populateWithMockValues() throws Exception {
-        databaseHelper.resetDatabase();
+        //databaseHelper.resetDatabase();
         int id = databaseHelper.insertTimer("Timer A", new String[]{"Running"});
         TimerLogEntry entry = new TimerLogEntry(id, LocalDateTime.now(), 50000);
         databaseHelper.insertTimerData(entry);
@@ -254,7 +254,7 @@ public class DatabaseHelperTest {
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other10"});
-        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(10), 14000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(10), 1400000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
