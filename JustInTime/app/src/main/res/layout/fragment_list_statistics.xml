@@ -17,8 +17,9 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:text="General Information"
-            android:textColor="@color/secondary_text"
-            android:textSize="12dp" />
+            android:textColor="@color/small_text"
+            android:textSize="25dp"
+            android:layout_marginBottom="10dp"/>
 
         <TextView
             android:id="@+id/appInfoText"
@@ -29,8 +30,7 @@
             android:gravity="center"
             android:text="AppInformation"
             android:textColor="@color/small_text"
-            android:textSize="18sp"
-            android:textStyle="italic" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/timerInfoText"
@@ -41,17 +41,27 @@
             android:gravity="center"
             android:text="TimerInformation"
             android:textColor="@color/small_text"
+            android:textSize="18sp"/>
+        <TextView
+            android:id="@+id/favoriteTageText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/timerInfoText"
+            android:gravity="center"
+            android:text=""
+            android:textColor="@color/small_text"
             android:textSize="18sp"
-            android:textStyle="italic" />
+            android:layout_marginBottom="10dp"/>
 
         <Button
             android:id="@+id/tagInfoSwitch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/timerInfoText"
+            android:layout_below="@+id/favoriteTageText"
             android:text="Tag Specific Info"
-            android:textColor="@color/secondary_text"
-            android:textSize="12sp"/>
+            android:textColor="@color/small_text"
+            android:textSize="25sp"/>
 
         <com.github.mikephil.charting.charts.PieChart xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/tagPieChart"
@@ -76,8 +86,8 @@
             android:layout_alignParentStart="true"
             android:layout_below="@+id/tagList"
             android:text="All data"
-            android:textColor="@color/secondary_text"
-            android:textSize="12sp"/>
+            android:textColor="@color/small_text"
+            android:textSize="25sp"/>
 
         <TableLayout
             android:id="@+id/table_main"
