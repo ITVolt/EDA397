@@ -61,7 +61,7 @@ public class ListStatisticsFragment extends Fragment {
     View view;
     ListView tagListView;
     Button tagInfo, generalInfo, allInfo;
-    TextView timerInfoText, appInfoText;
+    TextView timerInfoText, appInfoText, favoriteTagText;
     PieChart tagPieChart;
     TableLayout allInfoTable;
     TextView textView_0, textView_1, textView_2, textView2, textView02, textView03;
@@ -98,6 +98,7 @@ public class ListStatisticsFragment extends Fragment {
         generalInfo = (Button) view.findViewById(R.id.generalInfoSwitch);
         allInfo = (Button) view.findViewById(R.id.allInfoSwitch);
         timerInfoText = (TextView) view.findViewById(R.id.timerInfoText);
+        favoriteTagText = (TextView) view.findViewById(R.id.favoriteTageText);
         appInfoText = (TextView) view.findViewById(R.id.appInfoText);
         tagPieChart = (PieChart) view.findViewById(R.id.tagPieChart);
         tagListView = (ListView) view.findViewById(R.id.tagList);
@@ -109,6 +110,7 @@ public class ListStatisticsFragment extends Fragment {
         tagPieChart.setCenterText("Time per Tag");
         timerInfoText.setText("Used for : " + db.getTotalDuration());
         appInfoText.setText("App Used : " + mPreferences.getAppUsageCount() + " times");
+        favoriteTagText.setText("Favorite Tag : " + favoriteTag());
         tagPieChart.setVisibility(View.GONE);
         tagListView.setVisibility(View.GONE);
         allInfoTable.setVisibility(View.GONE);
@@ -129,10 +131,12 @@ public class ListStatisticsFragment extends Fragment {
                     }
                     timerInfoText.setVisibility(View.VISIBLE);
                     appInfoText.setVisibility(View.VISIBLE);
+                    favoriteTagText.setVisibility(View.VISIBLE);
                     isClickedGeneral = true;
                 } else {
                     timerInfoText.setVisibility(View.GONE);
                     appInfoText.setVisibility(View.GONE);
+                    favoriteTagText.setVisibility(View.GONE);
                     isClickedGeneral = false;
                 }
             }
@@ -295,6 +299,22 @@ public class ListStatisticsFragment extends Fragment {
         for (Map.Entry<String, Long> tag : topFive) {
             tagsToShow.put(tag.getKey(), true);
         }
+    }
+
+
+    private String favoriteTag(){
+        String[] tags = db.getTags();
+        Map<String, Long> totalTimePerTag = getTotalTimePerTag(tags);
+        List<Map.Entry<String, Long>> topFive;
+
+        List<Map.Entry<String, Long>> list = new ArrayList<Map.Entry<String, Long>>(
+                totalTimePerTag.entrySet());
+        sortEntrySet(list);
+
+        Log.d(TAG, "getTopFive: " + list.size());
+        String favorite = list.subList(0, 1).get(0).getKey();
+        return favorite;
+
     }
 
     private void sortEntrySet(List<Map.Entry<String, Long>> entrySet) {
