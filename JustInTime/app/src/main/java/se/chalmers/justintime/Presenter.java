@@ -48,11 +48,6 @@ public class Presenter {
 
     public void setTimerService(Messenger timerService) {
         this.timerService = timerService;
-        //TODO remove this when you can add timers
-        ArrayList<Long> duration = new ArrayList<>();
-        duration.add(90000L);
-        String[] tags = new String[]{"A tag"};
-        newTimer("A Timer", tags, duration);
     }
 
     private void sendMessage(Message message){

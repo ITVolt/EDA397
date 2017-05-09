@@ -66,7 +66,7 @@ public class TimerHandler implements Ticker {
     public boolean removeTimer(int timerId) {
         TimerInstance timerInstance = findById(timerId);
         if (timerInstance != null) {
-            return pauseTimer(timerId) && timers.remove(findById(timerId));
+            return timerInstance.stop() && timers.remove(timerInstance);
         }
         return false;
     }
