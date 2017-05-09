@@ -22,6 +22,8 @@ import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -238,12 +240,15 @@ public class ListStatisticsFragment extends Fragment {
         tagPieChart.getLegend().setEnabled(false);
         set.setColors(ColorTemplate.JOYFUL_COLORS);
         set.setXValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
-        set.setSliceSpace(3f);
+        set.setSliceSpace(2f);
         set.setSelectionShift(0f);
-        data.setValueTextSize(20f);
-         data.setValueTextColor(getResources().getColor(R.color.secondary_text));
-        //set.setValueTextColor(getResources().getColor(R.color.colorPrimaryDark));
+        data.setValueTextSize(12f);
+        data.setValueTextColor(getResources().getColor(R.color.colorPrimaryDark));
         tagPieChart.invalidate(); // refresh
+
+        Description des = tagPieChart.getDescription();
+        des.setEnabled(false);
+
     }
 
     private Map<String, Long> getTotalTimePerTag(String[] tags) {
@@ -338,12 +343,12 @@ public class ListStatisticsFragment extends Fragment {
 
             LocalDateTime start = LocalDateTime.ofEpochSecond(((Long)allTimes.get(i-1).first), 0, ZoneOffset.UTC);
             textView_1.setText(start.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(new Locale("en", "IN"))));
-            textView_1.setGravity(Gravity.CENTER);
+            textView_1.setGravity(Gravity.START);
             tableRow.addView(textView_1);
 
             String duration = " " + DateFormatterUtil.formatTime((Long)allTimes.get(i-1).second) + "";
             textView_2.setText(duration);
-            textView_2.setGravity(Gravity.CENTER);
+            textView_2.setGravity(Gravity.END);
             tableRow.addView(textView_2);
             allInfoTable.addView(tableRow);
 
@@ -365,7 +370,7 @@ public class ListStatisticsFragment extends Fragment {
 
         int leftMargin = 10;
         int topMargin = 10;
-        int rightMargin = 10;
+        int rightMargin = 5;
         int bottomMargin = 5;
 
         tableRowParams.setMargins(leftMargin, topMargin, rightMargin, bottomMargin);

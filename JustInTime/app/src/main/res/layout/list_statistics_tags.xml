@@ -13,7 +13,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:textSize="18sp"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         android:id="@+id/tag" />
 
     <TextView
@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:textSize="18sp"
         android:gravity="end"
-        android:textColor="@color/secondary_text"
+        android:textColor="@color/small_text"
         tools:text="XX"
         android:layout_alignParentTop="true" />
 

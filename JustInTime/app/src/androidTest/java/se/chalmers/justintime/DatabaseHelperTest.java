@@ -212,7 +212,7 @@ public class DatabaseHelperTest {
 
     @Test
     public void populateWithMockValues() throws Exception {
-        //databaseHelper.resetDatabase();
+        databaseHelper.resetDatabase();
         int id = databaseHelper.insertTimer("Timer A", new String[]{"Running"});
         TimerLogEntry entry = new TimerLogEntry(id, LocalDateTime.now(), 50000);
         databaseHelper.insertTimerData(entry);
@@ -234,7 +234,7 @@ public class DatabaseHelperTest {
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(5), 12000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(5).minusHours(12), 12000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other2"});
@@ -242,18 +242,18 @@ public class DatabaseHelperTest {
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other2"});
-        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(7), 4000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(7).minusHours(12), 4000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(8), 8000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(8).minusHours(12), 8000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Other"});
-        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(9), 9000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(9).minusHours(12), 9000);
         databaseHelper.insertTimerData(entry);
 
-        id = databaseHelper.insertTimer("Timer A", new String[]{"Other10"});
+        id = databaseHelper.insertTimer("Timer A", new String[]{"Other19"});
         entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(10), 1400000);
         databaseHelper.insertTimerData(entry);
 
