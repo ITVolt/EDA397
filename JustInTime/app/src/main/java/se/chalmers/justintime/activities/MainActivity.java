@@ -4,14 +4,12 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -185,23 +183,20 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        if (id == R.id.nav_timerA) {
+        if (id == R.id.nav_timer_basic) {
             TimerFragment timerFragment = TimerFragment.newInstance();
             presenter.setFragment(timerFragment);
             presenter.setAid();
             timerFragment.setPresenter(presenter);
             jumpToFragment(timerFragment);
-        } else if (id == R.id.nav_timerB) {
+        } else if (id == R.id.nav_timer_sequential) {
             jumpToFragment(TimerSequenceFragment.newInstance());
-        } else if (id == R.id.nav_timerC) {
-            Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_statistics) {
             presenter.stopSendingUpdates();
             jumpToFragment(StatisticsFragment.newInstance());
-        } else if (id == R.id.nav_settings) {
+        } /*else if (id == R.id.nav_settings) {
             Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
-        }
-          else if(id == R.id.nav_share){
+        } */else if(id == R.id.nav_share){
             Intent i = new Intent(Intent.ACTION_SEND);
             i.setType("message/rfc822");
             i.putExtra(Intent.EXTRA_SUBJECT, "Check out this cool timer app!");
@@ -226,7 +221,6 @@ public class MainActivity extends AppCompatActivity
                 .commit();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onPause() {
         super.onPause();
@@ -241,7 +235,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onPostResume() {
         super.onPostResume();

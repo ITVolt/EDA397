@@ -5,32 +5,30 @@
     <group android:checkableBehavior="single">
 
             <item
-                android:id="@+id/nav_timerA"
+                android:id="@+id/nav_timer_basic"
                 android:icon="@android:drawable/ic_menu_recent_history"
-                android:title="Timer A" />
+                android:title="@string/basic_timer" />
             <item
-                android:id="@+id/nav_timerB"
+                android:id="@+id/nav_timer_sequential"
                 android:icon="@android:drawable/ic_menu_recent_history"
-                android:title="Timer B" />
-            <item
-                android:id="@+id/nav_timerC"
-                android:icon="@android:drawable/ic_menu_recent_history"
-                android:title="Timer C" />
+                android:title="@string/sequential_timer" />
 
         <item android:title="Tools">
             <menu>
                 <item
                 android:id="@+id/nav_statistics"
                 android:icon="?android:attr/actionModePasteDrawable"
-                android:title="Statistics" />
+                android:title="@string/statistics" />
+                <!--
                 <item
                     android:id="@+id/nav_settings"
                     android:icon="@drawable/ic_menu_manage"
                     android:title="Settings" />
+                    -->
                 <item
                     android:id="@+id/nav_share"
                     android:icon="@drawable/ic_menu_share"
-                    android:title="Share" />
+                    android:title="@string/share" />
             </menu>
         </item>
     </group>
