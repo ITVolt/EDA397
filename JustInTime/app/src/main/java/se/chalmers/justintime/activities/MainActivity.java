@@ -68,8 +68,6 @@ public class MainActivity extends AppCompatActivity
                 case TimerService.ALERT_TIMER:
                     presenter.alert();
                     break;
-                case TimerService.TIMER_ID:
-                    presenter.setTimerId(msg.arg1);
                 default:
                     super.handleMessage(msg);
             }

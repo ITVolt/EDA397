@@ -89,18 +89,12 @@ public class TimerService extends Service implements Messager {
     public final static int STOP_SENDING_UPDATES = 15;
 
     /**
-     * Id of a newly created timer
-     * arg1: id
-     */
-    public static final int TIMER_ID = 16;
-
-    /**
      * Notifiy client that the time have changed
      */
     public final static int UPDATE_TIMER = 20;
     public final static String UPDATED_TIME = "UPDATED_TIME";
     /**
-     * Notify client that a timer have finnished
+     * Notify client that a timer have finished
      */
     public final static int ALERT_TIMER = 21;
 

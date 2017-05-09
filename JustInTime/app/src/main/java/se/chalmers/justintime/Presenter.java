@@ -102,12 +102,6 @@ public class Presenter {
         return states.get(id) != null && states.get(id);
     }
 
-    public void setTimerId(int timerId) {
-        timerAid = timerId;
-        states.put(timerId, false);
-        timerFragment.setTimerId(timerId);
-    }
-
     public void setAid() {
         timerFragment.setTimerId(timerAid);
     }
