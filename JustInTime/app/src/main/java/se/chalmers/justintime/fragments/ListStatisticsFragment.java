@@ -169,6 +169,10 @@ public class ListStatisticsFragment extends Fragment {
         });
     }
 
+    public boolean isTagSelected(String tag) {
+        return tagsToShow.get(tag);
+    }
+
     private void showTagListView() {
 
         String[] tags = db.getTags();
@@ -178,16 +182,26 @@ public class ListStatisticsFragment extends Fragment {
 
         sortEntrySet(totalTimePerTagEntrySet);
 
-        TagListAdapter adapter = new TagListAdapter(view.getContext(), totalTimePerTagEntrySet);
+        TagListAdapter adapter = new TagListAdapter(view.getContext(), totalTimePerTagEntrySet, this);
 
         // Assign adapter to ListView
         tagListView.setAdapter(adapter);
+
+
+        for (Map.Entry<String, Long> entry : totalTimePerTagEntrySet) {
+            if (tagsToShow.get(entry.getKey())) {
+                String tag = entry.getKey();
+
+            }
+        }
+
         setListViewHeightBasedOnChildren(tagListView);
         tagListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Boolean keep = !tagsToShow.get(((Map.Entry<String, Long>) tagListView.getItemAtPosition(position)).getKey());
                 tagsToShow.put(((Map.Entry<String, Long>) tagListView.getItemAtPosition(position)).getKey(), keep);
+                tagListView.invalidateViews();
                 showPieChart(true);
             }
         });
@@ -204,8 +218,14 @@ public class ListStatisticsFragment extends Fragment {
         if (!update) {
             for (String tag : tags) {
                 tagsToShow.put(tag, false);
+                if (tags.length <= 5) {
+                    tagsToShow.put(tag, true);
+
+                }
             }
-            selectTopFive(totalTimePerTag);
+            if (tags.length > 5) {
+                selectTopFive(totalTimePerTag);
+            }
         }
 
         for (Map.Entry<String, Long> entry : totalTimePerTagEntrySet) {

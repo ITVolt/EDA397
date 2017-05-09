@@ -1,6 +1,8 @@
 package se.chalmers.justintime;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,9 @@ import java.util.Map;
 
 import se.chalmers.justintime.R;
 import se.chalmers.justintime.StatisticsBundle;
+import se.chalmers.justintime.fragments.ListStatisticsFragment;
+
+import static se.chalmers.justintime.R.color.colorPrimaryDark;
 
 /**
  * Created by Patrik on 2017-04-18.
@@ -25,12 +30,14 @@ public class TagListAdapter extends BaseAdapter {
 
     private final Context context;
     private final LayoutInflater inflater;
+    private final ListStatisticsFragment listStatisticsFragment;
     private List<Map.Entry<String, Long>> tags;
 
 
-    public TagListAdapter(Context context, List<Map.Entry<String, Long>> entries) {
+    public TagListAdapter(Context context, List<Map.Entry<String, Long>> entries, ListStatisticsFragment listStatisticsFragment) {
         this.context = context;
         this.tags = entries;
+        this.listStatisticsFragment = listStatisticsFragment;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -62,6 +69,15 @@ public class TagListAdapter extends BaseAdapter {
 
         TextView time = (TextView) view.findViewById(R.id.time);
         time.setText(DateFormatterUtil.formatTime(entry.getValue()));
+
+        if (listStatisticsFragment.isTagSelected(entry.getKey())) {
+            time.setTextColor(ContextCompat.getColor(context, R.color.small_text));
+            tag.setTextColor(ContextCompat.getColor(context, R.color.small_text));
+        } else {
+            time.setTextColor(ContextCompat.getColor(context, R.color.secondary_text));
+            tag.setTextColor(ContextCompat.getColor(context, R.color.secondary_text));
+        }
+
 
         return view;
     }
