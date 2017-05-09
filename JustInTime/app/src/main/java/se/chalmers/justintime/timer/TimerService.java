@@ -30,7 +30,6 @@ public class TimerService extends Service implements Messager {
     private TimerHandler timerHandler = new TimerHandler(this, this);
     private NotificationManager notificationManager;
     private Messenger client;
-    private TimerService self = this;
 
     private final static int ONGOING_NOTIFICATION = 1;
 
@@ -52,14 +51,20 @@ public class TimerService extends Service implements Messager {
     /**
      * Stop the TimerService from running in the foreground
      */
-    public final static int LEAVE_FORGROUND = 3;
+    public final static int LEAVE_FOREGROUND = 3;
+
+    /**
+     * Removes a timer from the timerhandler
+     * arg1: id of timer to remove
+     */
+    public static final int REMOVE_TIMER = 9;
 
     /**
      * TimerService creates a new timer
-     * Append a ParcelableTimer in the bundle tagged with NEW_TIMER_INFO.
+     * arg1: id of new timer
      */
     public final static int NEW_TIMER = 10;
-    public final static String NEW_TIMER_INFO = "NEW_TIMER";
+    public static final String TIMER_DURATIONS = "TIMER_DURATIONS";
     /**
      * TimerService starts a timer
      * arg1: id of timer
@@ -100,10 +105,6 @@ public class TimerService extends Service implements Messager {
     public final static int ALERT_TIMER = 21;
 
 
-    public static final String TIMER_NAME = "TIMER_NAME";
-    public static final String TIMER_TAGS = "TIMER_TAGS";
-    public static final String TIMER_DURATIONS = "TIMER_DURATIONS";
-
 
     private class MessagingHandler extends Handler{
         @Override
@@ -128,17 +129,18 @@ public class TimerService extends Service implements Messager {
                     timerHandler.stopSendingUpdates();
                     // showForegroundNotification();
                     break;
-                case LEAVE_FORGROUND:
+                case LEAVE_FOREGROUND:
                     serviceInForeground = false;
                     // stopForeground(true);
+                    break;
+                case REMOVE_TIMER:
+                    timerHandler.removeTimer(message.arg1);
                     break;
                 case NEW_TIMER:
                     final Bundle bundle = message.getData();
                     bundle.setClassLoader(getClassLoader());
-                    String name = (String) bundle.getSerializable(TIMER_NAME);
-                    String[] tags = (String[]) bundle.getSerializable(TIMER_TAGS);
                     ArrayList<Long> durations = (ArrayList<Long>) bundle.getSerializable(TIMER_DURATIONS);
-                    timerHandler.addTimer(name, tags, durations);
+                    timerHandler.addTimer(message.arg1, durations);
                     break;
                 case START_TIMER:
                     timerHandler.startTimer(message.arg1);

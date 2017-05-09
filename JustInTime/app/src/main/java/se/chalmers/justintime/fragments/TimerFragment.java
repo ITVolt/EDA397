@@ -133,6 +133,10 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
                 } else if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
                     long newTime = convertStringToMilliseconds(timerText.getText().toString());
+                    presenter.removeTimer(timerId);
+                    ArrayList<Long> durations = new ArrayList<Long>(1);
+                    durations.add(newTime);
+                    timerId = presenter.newTimer(label,tags,durations);
                     startValue = newTime;
                     currentTimerValue = newTime;
                     timeCountInMilliSeconds  = newTime;

@@ -249,7 +249,7 @@ public class MainActivity extends AppCompatActivity
         super.onPostResume();
         doBindService();
         if (timerService != null) {
-            Message message = Message.obtain(null, TimerService.LEAVE_FORGROUND);
+            Message message = Message.obtain(null, TimerService.LEAVE_FOREGROUND);
             try {
                 timerService.send(message);
             } catch (RemoteException e) {
