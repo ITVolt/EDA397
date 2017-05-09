@@ -57,7 +57,6 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private TextView timerTagList;
 
     private Button startPauseTimerButton;
-    private Button resetTimerButton;
 
     private ImageButton playPausButton;
     private ImageButton resetButton;
@@ -77,7 +76,9 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private int timerId;
 
     public Map<Integer,String> map = new HashMap<>();
-
+    private TextView previewNextTimerText;
+    private ImageButton nextTimerButton;
+    private boolean isSequential;
 
 
     public TimerFragment() {
@@ -91,9 +92,10 @@ public class TimerFragment extends Fragment implements CounterActivity {
      * @return A new instance of fragment TimerFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TimerFragment newInstance() {
+    public static TimerFragment newInstance(boolean isSequential) {
         TimerFragment fragment = new TimerFragment();
         Bundle args = new Bundle();
+        args.putBoolean("isSequential",isSequential);
         fragment.setArguments(args);
         return fragment;
     }
@@ -109,6 +111,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_timer, container, false);
 
+        isSequential = getArguments().getBoolean("isSequential");
 
         timerText = (EditText) view.findViewById(R.id.basicTimerTV);
         timerText.setOnClickListener(new View.OnClickListener() {
@@ -118,6 +121,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
                 timerText.setSelection(timerText.getText().length());
             }
         });
+
 
         timerText.setOnKeyListener(new View.OnKeyListener() {
             @Override
@@ -142,6 +146,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
                     timeCountInMilliSeconds  = newTime;
                     updateTimerText();
                     setProgressBarValues();
+                    previewNextTimerText.setText(parseTime( startValue + (60*1000)));
                     InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(timerText.getWindowToken(), 0);
                     return true;
@@ -159,21 +164,27 @@ public class TimerFragment extends Fragment implements CounterActivity {
         resetButton = (ImageButton) view.findViewById(R.id.imageButton2);
         timerText = (EditText) view.findViewById(R.id.basicTimerTV);
         startPauseTimerButton = (Button) view.findViewById(R.id.timerStartPauseButton);
-        resetTimerButton = (Button) view.findViewById(R.id.timerResetButton);
         timerLabel = (TextView) view.findViewById(R.id.timerLabelTV);
         timerTagText = (TextView) view.findViewById(R.id.timerTagLabelTV);
         timerTagList = (TextView) view.findViewById(R.id.timerTagsTV);
+        previewNextTimerText = (TextView) view.findViewById(R.id.previewTV);
+        nextTimerButton = (ImageButton) view.findViewById(R.id.nextButton);
 
         timerLabel.setText(label);
         updateTagListText();
 
         setRunningState(isTimerRunning);
-        // Set up the alarm.
 
         AlarmBuilder ab = new AlarmBuilder(view.getContext());
         ab.setUseSound(true);
         ab.setUseVibration(true);
         alarm = ab.getAlarmInstance();
+
+        if (!isSequential) {
+            nextTimerButton.setVisibility(View.INVISIBLE);
+            previewNextTimerText.setVisibility(View.INVISIBLE);
+        }
+        previewNextTimerText.setText("");//Set it invisible since no initial time set
 
         setButtonOnClickListeners();
         progressBarCircle = (ProgressBar) view.findViewById(R.id.progressBarCircle);
@@ -518,6 +529,23 @@ public class TimerFragment extends Fragment implements CounterActivity {
             @Override
             public void onClick(View v) {
                 timerTagDialog();
+            }
+        });
+        nextTimerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                long newTime = startValue + 60*1000;
+                presenter.removeTimer(timerId);
+                ArrayList<Long> durations = new ArrayList<Long>(1);
+                durations.add(newTime);
+                timerId = presenter.newTimer(label,tags,durations);
+                startValue = newTime;
+                currentTimerValue = newTime;
+                timeCountInMilliSeconds  = newTime;
+                updateTimerText();
+                setProgressBarValues();
+                previewNextTimerText.setText(parseTime( startValue + (60*1000)));
             }
         });
     }

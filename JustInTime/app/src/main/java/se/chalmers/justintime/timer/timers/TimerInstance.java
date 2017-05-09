@@ -62,7 +62,7 @@ public class TimerInstance implements Runnable{
 
     public void setNextTimer() {
         try {
-            currentTimer = sequentialTimers.listIterator().next();
+            currentTimer = sequentialTimers.get(sequentialTimers.indexOf(currentTimer) + 1);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -70,7 +70,7 @@ public class TimerInstance implements Runnable{
 
     public void setPreviousTimer() {
         try {
-            currentTimer = sequentialTimers.listIterator().previous();
+            currentTimer = sequentialTimers.get(sequentialTimers.indexOf(currentTimer) - 1);
         } catch (Exception e) {
             e.printStackTrace();
         }

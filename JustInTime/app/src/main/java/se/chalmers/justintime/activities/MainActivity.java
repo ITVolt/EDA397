@@ -46,9 +46,6 @@ public class MainActivity extends AppCompatActivity
     boolean isBound;
 
     private SharedPreference mPreferences;
-    private long timerLength = 0; // In seconds
-    private long wakeUpTime;
-    private long savedTime;
 
     private class MessagingHandler extends Handler {
         @Override
@@ -93,7 +90,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        TimerFragment timerFragment = TimerFragment.newInstance();
+        TimerFragment timerFragment = TimerFragment.newInstance(false);
         presenter = new Presenter(timerFragment, this);
         timerFragment.setPresenter(presenter);
         jumpToFragment(timerFragment);
@@ -184,13 +181,17 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         if (id == R.id.nav_timer_basic) {
-            TimerFragment timerFragment = TimerFragment.newInstance();
+            TimerFragment timerFragment = TimerFragment.newInstance(false);
             presenter.setFragment(timerFragment);
             presenter.setAid();
             timerFragment.setPresenter(presenter);
             jumpToFragment(timerFragment);
         } else if (id == R.id.nav_timer_sequential) {
-            jumpToFragment(TimerSequenceFragment.newInstance());
+            TimerFragment timerFragment = TimerFragment.newInstance(true);
+            presenter.setFragment(timerFragment);
+            presenter.setAid();
+            timerFragment.setPresenter(presenter);
+            jumpToFragment(timerFragment);
         } else if (id == R.id.nav_statistics) {
             presenter.stopSendingUpdates();
             jumpToFragment(StatisticsFragment.newInstance());

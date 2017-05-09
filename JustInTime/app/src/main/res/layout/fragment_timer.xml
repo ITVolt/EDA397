@@ -158,5 +158,30 @@
         app:layout_constraintVertical_bias="0.949" />
 
 
+    <TextView
+        android:id="@+id/previewTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="17dp"
+        android:text="nextTimer"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintBottom_toTopOf="@+id/nextButton"
+        android:layout_marginRight="22dp"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <ImageButton
+        android:id="@+id/nextButton"
+        android:layout_width="66dp"
+        android:layout_height="49dp"
+        android:layout_marginBottom="40dp"
+        android:layout_marginRight="16dp"
+        android:adjustViewBounds="true"
+        android:background="@null"
+        android:cropToPadding="true"
+        android:tint="#607C8A"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:srcCompat="@drawable/ic_next_arrow_black_48dp" />
+
 
 </android.support.constraint.ConstraintLayout>
