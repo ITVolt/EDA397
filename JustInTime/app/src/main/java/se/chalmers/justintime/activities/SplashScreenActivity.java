@@ -1,20 +1,16 @@
 package se.chalmers.justintime.activities;
 
-import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import se.chalmers.justintime.R;
-
-import static android.R.attr.animation;
 
 public class SplashScreenActivity extends AppCompatActivity {
 

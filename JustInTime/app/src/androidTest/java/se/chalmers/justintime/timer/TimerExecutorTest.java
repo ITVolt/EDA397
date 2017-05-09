@@ -4,6 +4,8 @@ import android.os.Message;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.jakewharton.threetenabp.AndroidThreeTen;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +27,7 @@ public class TimerExecutorTest {
 
     @Before
     public void setUp() throws Exception {
+        AndroidThreeTen.init(InstrumentationRegistry.getTargetContext());
         Ticker ticker = new Ticker() {
             @Override
             public void onTick(long time) {

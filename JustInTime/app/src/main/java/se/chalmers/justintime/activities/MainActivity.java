@@ -68,8 +68,6 @@ public class MainActivity extends AppCompatActivity
                 case TimerService.ALERT_TIMER:
                     presenter.alert();
                     break;
-                case TimerService.TIMER_ID:
-                    presenter.setTimerId(msg.arg1);
                 default:
                     super.handleMessage(msg);
             }
@@ -249,7 +247,7 @@ public class MainActivity extends AppCompatActivity
         super.onPostResume();
         doBindService();
         if (timerService != null) {
-            Message message = Message.obtain(null, TimerService.LEAVE_FORGROUND);
+            Message message = Message.obtain(null, TimerService.LEAVE_FOREGROUND);
             try {
                 timerService.send(message);
             } catch (RemoteException e) {

@@ -42,11 +42,9 @@ public class TimerHandler implements Ticker {
         timers.add(timerInstance);
     }
 
-    public void addTimer(String name, String[] tags, ArrayList<Long> durations) {
-        int id = databaseHelper.insertTimer(name , tags);
+    public void addTimer(Integer id, ArrayList<Long> durations) {
         TimerInstance timerInstance = new TimerInstance(id, durations, this);
         timers.add(timerInstance);
-        messager.sendMessage(Message.obtain(null, TimerService.TIMER_ID, id, 0));
     }
 
     public void startTimer(int id) {
@@ -66,7 +64,11 @@ public class TimerHandler implements Ticker {
     }
 
     public boolean removeTimer(int timerId) {
-        return pauseTimer(timerId) && timers.remove(findById(timerId));
+        TimerInstance timerInstance = findById(timerId);
+        if (timerInstance != null) {
+            return timerInstance.stop() && timers.remove(timerInstance);
+        }
+        return false;
     }
 
     public boolean pauseTimer(int timerId) {

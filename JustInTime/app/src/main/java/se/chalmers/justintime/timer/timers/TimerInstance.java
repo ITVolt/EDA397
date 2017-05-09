@@ -105,7 +105,7 @@ public class TimerInstance implements Runnable{
 
     public boolean stop(){
         currentTimer.pause();
-        return future.cancel(false);
+        return future != null && future.cancel(false);
     }
     public void start(ScheduledFuture future) {
         this.future = future;

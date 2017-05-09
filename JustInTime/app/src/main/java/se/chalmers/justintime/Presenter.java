@@ -33,13 +33,13 @@ public class Presenter {
         states = new HashMap<>(100);
     }
 
-    public void newTimer(String name, String[] tags, ArrayList<Long> durations){
+    public int newTimer(String label, String[] tags, ArrayList<Long> durations){
         Log.d("Presenter", "newTimer");
-        Message message = Message.obtain(null, TimerService.NEW_TIMER);
-        message.getData().putSerializable(TimerService.TIMER_NAME, name);
-        message.getData().putSerializable(TimerService.TIMER_TAGS, tags);
+        int id = databaseHelper.insertTimer(label, tags);
+        Message message = Message.obtain(null, TimerService.NEW_TIMER, id, 0);
         message.getData().putSerializable(TimerService.TIMER_DURATIONS, durations);
         sendMessage(message);
+        return id;
     }
 
     public void updateTimer(long time){
@@ -48,11 +48,6 @@ public class Presenter {
 
     public void setTimerService(Messenger timerService) {
         this.timerService = timerService;
-        //TODO remove this when you can add timers
-        ArrayList<Long> duration = new ArrayList<>();
-        duration.add(90000L);
-        String[] tags = new String[]{"A tag"};
-        newTimer("A Timer", tags, duration);
     }
 
     private void sendMessage(Message message){
@@ -84,6 +79,10 @@ public class Presenter {
     public void resetTimer(int id){
         sendMessage(Message.obtain(null, TimerService.RESET_TIMER, id, 0));
     }
+    public void removeTimer(int timerId) {
+        sendMessage(Message.obtain(null, TimerService.REMOVE_TIMER, timerId, 0));
+    }
+
     public void alert(){
         timerFragment.onTimerFinish();
     }
@@ -101,12 +100,6 @@ public class Presenter {
 
     public boolean getRunningState(int id) {
         return states.get(id) != null && states.get(id);
-    }
-
-    public void setTimerId(int timerId) {
-        timerAid = timerId;
-        states.put(timerId, false);
-        timerFragment.setTimerId(timerId);
     }
 
     public void setAid() {
