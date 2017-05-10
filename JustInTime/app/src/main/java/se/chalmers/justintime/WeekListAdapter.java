@@ -4,15 +4,12 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.text.format.DateUtils;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import org.threeten.bp.Duration;
 import org.threeten.bp.LocalDateTime;
 
 import java.util.HashMap;
@@ -21,6 +18,7 @@ import java.util.Locale;
 import se.chalmers.justintime.database.TimerInfoBundle;
 
 /**
+ * Populates the list of week entries.
  * Created by Patrik on 2017-04-18.
  */
 
@@ -63,11 +61,11 @@ public class WeekListAdapter extends BaseAdapter {
             if (background instanceof ColorDrawable) {
                 int bgColor = ((ColorDrawable) background).getColor();
                 int red = Color.red(bgColor);
-                red = red<205?red+50:255;
+                red = red<245?red+10:255;
                 int green = Color.green(bgColor);
-                green = green<205?green+50:255;
+                green = green<245?green+10:255;
                 int blue = Color.blue(bgColor);
-                blue = blue<205?blue+50:255;
+                blue = blue<245?blue+10:255;
                 view.setBackgroundColor(Color.rgb(red,green,blue));
             }
         }
