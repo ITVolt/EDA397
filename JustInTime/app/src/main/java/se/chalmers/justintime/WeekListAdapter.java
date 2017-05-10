@@ -1,16 +1,24 @@
 package se.chalmers.justintime;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.text.format.DateUtils;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import org.threeten.bp.Duration;
 import org.threeten.bp.LocalDateTime;
 
+import java.util.HashMap;
 import java.util.Locale;
+
+import se.chalmers.justintime.database.TimerInfoBundle;
 
 /**
  * Created by Patrik on 2017-04-18.
@@ -50,24 +58,84 @@ public class WeekListAdapter extends BaseAdapter {
         if (view == null) {
             view = inflater.inflate(R.layout.list_statistics_week, null);
         }
+        if (position%2 != 0) {    // Zebra striping
+            Drawable background = view.getBackground();
+            if (background instanceof ColorDrawable) {
+                int bgColor = ((ColorDrawable) background).getColor();
+                int red = Color.red(bgColor);
+                red = red<205?red+50:255;
+                int green = Color.green(bgColor);
+                green = green<205?green+50:255;
+                int blue = Color.blue(bgColor);
+                blue = blue<205?blue+50:255;
+                view.setBackgroundColor(Color.rgb(red,green,blue));
+            }
+        }
+
         StatisticsBundle week = weeks[position];
 
         TextView weekNbr = (TextView) view.findViewById(R.id.weekNbrTV);
         weekNbr.setText(week.getLabel());
 
         TextView year = (TextView) view.findViewById(R.id.weekYearTV);
-        LocalDateTime date = week.getTimers()[0].getTimes().get(0).first;
-        year.setText(String.format(Locale.ENGLISH, "%d", date.getYear()));
+        if (week.getTimers().length>0 && !week.getTimers()[0].getTimes().isEmpty()) {
+            LocalDateTime date = week.getTimers()[0].getTimes().get(0).first;
+            year.setText(String.format(Locale.ENGLISH, "%d", date.getYear()));
+        } else {
+            year.setText(R.string.error);
+        }
 
         TextView totTime = (TextView) view.findViewById(R.id.weekTotalTimeTV);
         totTime.setText(DateFormatterUtil.formatTime(week.getTotalDuration()));
 
-        ((TextView) view.findViewById(R.id.weekTag1TV)).setText("");
-        ((TextView) view.findViewById(R.id.weekTag1TimeTV)).setText("");
-        ((TextView) view.findViewById(R.id.weekTag2TV)).setText("");
-        ((TextView) view.findViewById(R.id.weekTag2TimeTV)).setText("");
-        ((TextView) view.findViewById(R.id.weekTagOthersTV)).setText("");
-        ((TextView) view.findViewById(R.id.weekTagOthersTimeTV)).setText("");
+        HashMap<String, Long> tagDurations = new HashMap<>();
+        long duration;
+        for (TimerInfoBundle tib : week.getTimers()) {
+            String[] tags = tib.getTags();
+            duration = tib.getTotalDuration();
+            for (String tag : tags) {
+                if (!tagDurations.containsKey(tag)) {
+                    tagDurations.put(tag, 0L);
+                }
+                long tmp = tagDurations.get(tag);
+                tagDurations.put(tag, tmp+duration);
+            }
+        }
+        String tag1 = null, tag2 = null;
+        long highest = 0;
+        for (String tag : tagDurations.keySet()) {
+            duration = tagDurations.get(tag);
+            if (duration > highest) {
+                highest = duration;
+                if (tag1 != null) {
+                    tag2 = tag1;
+                }
+                tag1 = tag;
+            }
+        }
+
+        if (tag1 != null) {
+            ((TextView) view.findViewById(R.id.weekTag1TV)).setText(tag1);
+            ((TextView) view.findViewById(R.id.weekTag1TimeTV)).setText(DateFormatterUtil.formatTime(tagDurations.get(tag1)));
+        } else {
+            ((TextView) view.findViewById(R.id.weekTag1TV)).setText("");
+            ((TextView) view.findViewById(R.id.weekTag1TimeTV)).setText("");
+        }
+        if (tag2 != null) {
+            ((TextView) view.findViewById(R.id.weekTag2TV)).setText(tag2);
+            ((TextView) view.findViewById(R.id.weekTag2TimeTV)).setText(DateFormatterUtil.formatTime(tagDurations.get(tag2)));
+        } else {
+            ((TextView) view.findViewById(R.id.weekTag2TV)).setText("");
+            ((TextView) view.findViewById(R.id.weekTag2TimeTV)).setText("");
+        }
+        if (tagDurations.size()>2) {
+            ((TextView) view.findViewById(R.id.weekTagOthersTV)).setText(R.string.others);
+            ((TextView) view.findViewById(R.id.weekTagOthersTimeTV)).setText(DateFormatterUtil.formatTime(
+                    week.getTotalDuration() - tagDurations.get(tag1) - tagDurations.get(tag2)));
+        } else {
+            ((TextView) view.findViewById(R.id.weekTagOthersTV)).setText("");
+            ((TextView) view.findViewById(R.id.weekTagOthersTimeTV)).setText("");
+        }
 
         return view;
     }
