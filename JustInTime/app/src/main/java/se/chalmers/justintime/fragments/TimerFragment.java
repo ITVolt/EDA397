@@ -44,7 +44,7 @@ import se.chalmers.justintime.alert.AlarmBuilder;
 public class TimerFragment extends Fragment implements CounterActivity {
 
     private long startValue;
-    public static long currentTimerValue;
+    private long currentTimerValue;
 
     private String label;
     private String[] tags;
@@ -58,7 +58,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
     private Button startPauseTimerButton;
 
-    private ImageButton playPausButton;
+    private ImageButton playPauseButton;
     private ImageButton resetButton;
 
     private Alarm alarm;
@@ -66,10 +66,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
     private View view;
 
-
     private Presenter presenter;
-
-    private long timeCountInMilliSeconds;
 
     private ProgressBar progressBarCircle;
 
@@ -138,15 +135,19 @@ public class TimerFragment extends Fragment implements CounterActivity {
                 } else if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
                     long newTime = convertStringToMilliseconds(timerText.getText().toString());
                     presenter.removeTimer(timerId);
-                    ArrayList<Long> durations = new ArrayList<Long>(1);
+                    ArrayList<Long> durations = new ArrayList<Long>(2);
                     durations.add(newTime);
+                    if(isSequential){
+                        durations.add(newTime * 2);
+                        nextTimerButton.setVisibility(View.VISIBLE);
+                        previewNextTimerText.setVisibility(View.VISIBLE);
+                    }
                     timerId = presenter.newTimer(label,tags,durations);
                     startValue = newTime;
                     currentTimerValue = newTime;
-                    timeCountInMilliSeconds  = newTime;
                     updateTimerText();
                     setProgressBarValues();
-                    previewNextTimerText.setText(parseTime( startValue + (60*1000)));
+                    previewNextTimerText.setText(parseTime( startValue * 2));
                     InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(timerText.getWindowToken(), 0);
                     return true;
@@ -160,7 +161,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         this.label = "Basic timer";
         this.tags = new String[0];
 
-        playPausButton = (ImageButton) view.findViewById(R.id.imageButton);
+        playPauseButton = (ImageButton) view.findViewById(R.id.imageButton);
         resetButton = (ImageButton) view.findViewById(R.id.imageButton2);
         timerText = (EditText) view.findViewById(R.id.basicTimerTV);
         startPauseTimerButton = (Button) view.findViewById(R.id.timerStartPauseButton);
@@ -261,19 +262,10 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
     }
 
-    private void resetCountDownTimer() {
-        resetProgressBarValues();
-    }
-
     private void setProgressBarValues() {
         progressBarCircle.setMax((int) startValue);
-        progressBarCircle.setProgress((int) (timeCountInMilliSeconds) );
+        progressBarCircle.setProgress((int) (currentTimerValue) );
     }
-
-    private void resetProgressBarValues() {
-        progressBarCircle.setProgress((int) startValue);
-    }
-
 
     @Override
     public void start() {
@@ -296,7 +288,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         disableResetButton();
         currentTimerValue = startValue; // FIXME Remove when the real chronometer is implemented.
         updateTimerText();
-        resetCountDownTimer();
+        progressBarCircle.setProgress((int) startValue);
         presenter.resetTimer(timerId);
     }
 
@@ -344,10 +336,16 @@ public class TimerFragment extends Fragment implements CounterActivity {
     public void onTimerFinish() {
         Log.d("TimerFragment", "onTimerFinish: Time's up!");
         alarm.alert();
-        startPauseTimerButton.setText(R.string.timer_button_stop);
-        disableStartPauseTimerButton();
-        presenter.pauseTimer(timerId);
-        setRunningState(false);
+        if (isSequential) {
+            nextTimerButton.setVisibility(View.INVISIBLE);
+            previewNextTimerText.setVisibility(View.INVISIBLE);
+            startValue = startValue * 2;
+            setProgressBarValues();
+        }else{
+            startPauseTimerButton.setText(R.string.timer_button_stop);
+            disableStartPauseTimerButton();
+            setRunningState(false);
+        }
     }
 
     private void setRunningState(boolean run) {
@@ -495,15 +493,15 @@ public class TimerFragment extends Fragment implements CounterActivity {
     }
 
     private void setButtonOnClickListeners() {
-        playPausButton.setOnClickListener(new View.OnClickListener() {
+        playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isTimerRunning) {
-                    playPausButton.setImageResource(R.drawable.ic_play_arrow_black_48dp);
+                    playPauseButton.setImageResource(R.drawable.ic_play_arrow_black_48dp);
                     pause();
                 } else {
                     start();
-                    playPausButton.setImageResource(R.drawable.ic_pause_black_48dp);
+                    playPauseButton.setImageResource(R.drawable.ic_pause_black_48dp);
                 }
             }
         });
@@ -542,7 +540,6 @@ public class TimerFragment extends Fragment implements CounterActivity {
                 timerId = presenter.newTimer(label,tags,durations);
                 startValue = newTime;
                 currentTimerValue = newTime;
-                timeCountInMilliSeconds  = newTime;
                 updateTimerText();
                 setProgressBarValues();
                 previewNextTimerText.setText(parseTime( startValue + (60*1000)));

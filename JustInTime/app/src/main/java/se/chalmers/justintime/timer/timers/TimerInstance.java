@@ -1,5 +1,7 @@
 package se.chalmers.justintime.timer.timers;
 
+import android.util.Log;
+
 import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.temporal.ChronoUnit;
 
@@ -18,7 +20,6 @@ public class TimerInstance implements Runnable{
     private final Ticker ticker;
     private List<AbstractTimer> sequentialTimers;
     private AbstractTimer currentTimer;
-    private List<String> tags;
     private ScheduledFuture future;
     private LocalDateTime startTime;
 
@@ -33,11 +34,10 @@ public class TimerInstance implements Runnable{
         this.id = id;
         this.ticker = ticker;
         this.sequentialTimers = new ArrayList<>();
-        tags = new ArrayList<>();
         sequentialTimers.add(timer);
         currentTimer = timer;
     }
-    public TimerInstance(int id, ArrayList<Long> durations, Ticker ticker){
+    public TimerInstance(int id, List<Long> durations, Ticker ticker){
         this.id = id;
         sequentialTimers = new ArrayList<>();
         for (Long l: durations) {
@@ -45,6 +45,7 @@ public class TimerInstance implements Runnable{
         }
         currentTimer = sequentialTimers.get(0);
         this.ticker = ticker;
+        Log.d("TimerInstance", "new TimerInstance with " + sequentialTimers.size() + " timers");
     }
 
     @Override
@@ -53,19 +54,26 @@ public class TimerInstance implements Runnable{
         long remainingTime = currentTimer.getRemainingTime();
         if (isSendingUpdates) {
             ticker.onTick(remainingTime);
+            //Log.d("TimerInstance", "Tick");
         }
         if(remainingTime < 0){
             ticker.onFinish(this);
-            future.cancel(false);
+            if(setNextTimer()){
+                Log.d("TimerInstance", "Starting next timer");
+            }else{
+                future.cancel(false);
+            }
         }
     }
 
-    public void setNextTimer() {
+    public boolean setNextTimer() {
         try {
             currentTimer = sequentialTimers.get(sequentialTimers.indexOf(currentTimer) + 1);
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     public void setPreviousTimer() {
@@ -82,14 +90,6 @@ public class TimerInstance implements Runnable{
 
     public long getRemainingTime() {
         return currentTimer.getRemainingTime();
-    }
-
-    public boolean addTag(String tag) {
-        return tags.add(tag);
-    }
-
-    public List<String> getTags() {
-        return tags;
     }
 
     public int getId() {
