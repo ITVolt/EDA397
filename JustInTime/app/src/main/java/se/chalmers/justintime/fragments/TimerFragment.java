@@ -134,6 +134,11 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
                 } else if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
                     long newTime = convertStringToMilliseconds(timerText.getText().toString());
+                    if (newTime == 0) {
+                        startPauseTimerButton.setEnabled(false);
+                    }else {
+                        startPauseTimerButton.setEnabled(true);
+                    }
                     presenter.removeTimer(timerId);
                     ArrayList<Long> durations = new ArrayList<Long>(2);
                     durations.add(newTime);
@@ -283,6 +288,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
     public void reset() {
         if (!isTimerRunning) {
             enableStartPauseTimerButton();
+            playPauseButton.setImageResource(R.drawable.ic_play_arrow_black_48dp);
         }
         setRunningState(false);
         disableResetButton();
@@ -496,10 +502,13 @@ public class TimerFragment extends Fragment implements CounterActivity {
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                long time = convertStringToMilliseconds(timerText.getText().toString());
+
                 if (isTimerRunning) {
                     playPauseButton.setImageResource(R.drawable.ic_play_arrow_black_48dp);
                     pause();
-                } else {
+                } else if (time != 0) {
                     start();
                     playPauseButton.setImageResource(R.drawable.ic_pause_black_48dp);
                 }
