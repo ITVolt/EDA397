@@ -1,4 +1,4 @@
-package se.chalmers.justintime.fragments;
+package se.chalmers.justintime.gui.fragments;
 
 
 import android.os.Bundle;
@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import se.chalmers.justintime.R;
-import se.chalmers.justintime.StatisticsBundle;
+import se.chalmers.justintime.util.StatisticsBundle;
 import se.chalmers.justintime.database.TimerInfoBundle;
 
 /**

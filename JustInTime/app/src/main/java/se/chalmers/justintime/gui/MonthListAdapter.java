@@ -1,4 +1,4 @@
-package se.chalmers.justintime;
+package se.chalmers.justintime.gui;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -15,34 +15,37 @@ import org.threeten.bp.LocalDateTime;
 import java.util.HashMap;
 import java.util.Locale;
 
+import se.chalmers.justintime.util.DateFormatterUtil;
+import se.chalmers.justintime.R;
+import se.chalmers.justintime.util.StatisticsBundle;
 import se.chalmers.justintime.database.TimerInfoBundle;
 
 /**
- * Populates the list of week entries.
- * Created by Patrik on 2017-04-18.
+ * Handles the list of months in the statistics.
+ * Created by Patrik on 2017-04-27.
  */
 
-public class WeekListAdapter extends BaseAdapter {
+public class MonthListAdapter extends BaseAdapter {
 
     private final Context context;
     private final LayoutInflater inflater;
-    private StatisticsBundle[] weeks;
+    private StatisticsBundle[] months;
 
 
-    public WeekListAdapter(Context context, StatisticsBundle[] sb) {
+    public MonthListAdapter(Context context, StatisticsBundle[] months) {
         this.context = context;
-        this.weeks = sb;
+        this.months = months;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     public int getCount() {
-        return weeks.length;
+        return months.length;
     }
 
     @Override
     public Object getItem(int position) {
-        return weeks[position];
+        return months[position];
     }
 
     @Override
@@ -54,7 +57,7 @@ public class WeekListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
         if (view == null) {
-            view = inflater.inflate(R.layout.list_statistics_week, null);
+            view = inflater.inflate(R.layout.list_statistics_month, null);
         }
         if (position%2 != 0) {    // Zebra striping
             Drawable background = view.getBackground();
@@ -70,25 +73,21 @@ public class WeekListAdapter extends BaseAdapter {
             }
         }
 
-        StatisticsBundle week = weeks[position];
+        StatisticsBundle month = months[position];
 
-        TextView weekNbr = (TextView) view.findViewById(R.id.weekNbrTV);
-        weekNbr.setText(week.getLabel());
+        TextView monthTV = (TextView) view.findViewById(R.id.monthTV);
+        monthTV.setText(month.getLabel());
 
-        TextView year = (TextView) view.findViewById(R.id.weekYearTV);
-        if (week.getTimers().length>0 && !week.getTimers()[0].getTimes().isEmpty()) {
-            LocalDateTime date = week.getTimers()[0].getTimes().get(0).first;
-            year.setText(String.format(Locale.ENGLISH, "%d", date.getYear()));
-        } else {
-            year.setText(R.string.error);
-        }
+        TextView year = (TextView) view.findViewById(R.id.monthYearTV);
+        LocalDateTime date = month.getTimers()[0].getTimes().get(0).first;
+        year.setText(String.format(Locale.ENGLISH, "%d", date.getYear()));
 
-        TextView totTime = (TextView) view.findViewById(R.id.weekTotalTimeTV);
-        totTime.setText(DateFormatterUtil.formatTime(week.getTotalDuration()));
+        TextView totTime = (TextView) view.findViewById(R.id.monthTotalTimeTV);
+        totTime.setText(DateFormatterUtil.formatMillisecondsToShortTimeString(month.getTotalDuration()));
 
         HashMap<String, Long> tagDurations = new HashMap<>();
         long duration;
-        for (TimerInfoBundle tib : week.getTimers()) {
+        for (TimerInfoBundle tib : month.getTimers()) {
             String[] tags = tib.getTags();
             duration = tib.getTotalDuration();
             for (String tag : tags) {
@@ -113,26 +112,26 @@ public class WeekListAdapter extends BaseAdapter {
         }
 
         if (tag1 != null) {
-            ((TextView) view.findViewById(R.id.weekTag1TV)).setText(shortenString(tag1));
-            ((TextView) view.findViewById(R.id.weekTag1TimeTV)).setText(DateFormatterUtil.formatTime(tagDurations.get(tag1)));
+            ((TextView) view.findViewById(R.id.monthTag1TV)).setText(shortenString(tag1));
+            ((TextView) view.findViewById(R.id.monthTag1TimeTV)).setText(DateFormatterUtil.formatMillisecondsToShortTimeString(tagDurations.get(tag1)));
         } else {
-            ((TextView) view.findViewById(R.id.weekTag1TV)).setText("");
-            ((TextView) view.findViewById(R.id.weekTag1TimeTV)).setText("");
+            ((TextView) view.findViewById(R.id.monthTag1TV)).setText("");
+            ((TextView) view.findViewById(R.id.monthTag1TimeTV)).setText("");
         }
         if (tag2 != null) {
-            ((TextView) view.findViewById(R.id.weekTag2TV)).setText(shortenString(tag2));
-            ((TextView) view.findViewById(R.id.weekTag2TimeTV)).setText(DateFormatterUtil.formatTime(tagDurations.get(tag2)));
+            ((TextView) view.findViewById(R.id.monthTag2TV)).setText(shortenString(tag2));
+            ((TextView) view.findViewById(R.id.monthTag2TimeTV)).setText(DateFormatterUtil.formatMillisecondsToShortTimeString(tagDurations.get(tag2)));
         } else {
-            ((TextView) view.findViewById(R.id.weekTag2TV)).setText("");
-            ((TextView) view.findViewById(R.id.weekTag2TimeTV)).setText("");
+            ((TextView) view.findViewById(R.id.monthTag2TV)).setText("");
+            ((TextView) view.findViewById(R.id.monthTag2TimeTV)).setText("");
         }
         if (tagDurations.size()>2) {
-            ((TextView) view.findViewById(R.id.weekTagOthersTV)).setText(R.string.others);
-            ((TextView) view.findViewById(R.id.weekTagOthersTimeTV)).setText(DateFormatterUtil.formatTime(
-                    week.getTotalDuration() - tagDurations.get(tag1) - tagDurations.get(tag2)));
+            ((TextView) view.findViewById(R.id.monthTagOthersTV)).setText(R.string.others);
+            ((TextView) view.findViewById(R.id.monthTagOthersTimeTV)).setText(DateFormatterUtil.formatMillisecondsToShortTimeString(
+                    month.getTotalDuration() - tagDurations.get(tag1) - tagDurations.get(tag2)));
         } else {
-            ((TextView) view.findViewById(R.id.weekTagOthersTV)).setText("");
-            ((TextView) view.findViewById(R.id.weekTagOthersTimeTV)).setText("");
+            ((TextView) view.findViewById(R.id.monthTagOthersTV)).setText("");
+            ((TextView) view.findViewById(R.id.monthTagOthersTimeTV)).setText("");
         }
 
         return view;
@@ -146,7 +145,7 @@ public class WeekListAdapter extends BaseAdapter {
         return str;
     }
 
-//    private String formatTime(long time) {
+//    private String formatMillisecondsToShortTimeString(long time) {
 //        StringBuilder text = new StringBuilder();
 //        text.setLength(0);
 //

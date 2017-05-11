@@ -1,4 +1,4 @@
-package se.chalmers.justintime.activities;
+package se.chalmers.justintime.gui.activities;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -29,9 +29,8 @@ import se.chalmers.justintime.Presenter;
 import se.chalmers.justintime.R;
 import se.chalmers.justintime.alert.BackgroundAlarm;
 import se.chalmers.justintime.alert.SharedPreference;
-import se.chalmers.justintime.fragments.StatisticsFragment;
-import se.chalmers.justintime.fragments.TimerFragment;
-import se.chalmers.justintime.fragments.TimerSequenceFragment;
+import se.chalmers.justintime.gui.fragments.StatisticsFragment;
+import se.chalmers.justintime.gui.fragments.TimerFragment;
 import se.chalmers.justintime.timer.TimerService;
 
 

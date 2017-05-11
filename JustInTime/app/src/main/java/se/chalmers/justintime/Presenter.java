@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import se.chalmers.justintime.database.DatabaseHelper;
-import se.chalmers.justintime.fragments.TimerFragment;
+import se.chalmers.justintime.gui.fragments.TimerFragment;
 import se.chalmers.justintime.timer.TimerService;
 
 /**

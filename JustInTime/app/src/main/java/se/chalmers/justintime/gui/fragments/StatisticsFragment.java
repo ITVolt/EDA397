@@ -1,4 +1,4 @@
-package se.chalmers.justintime.fragments;
+package se.chalmers.justintime.gui.fragments;
 
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import se.chalmers.justintime.R;
-import se.chalmers.justintime.StatisticsFragmentPagerAdapter;
+import se.chalmers.justintime.gui.StatisticsFragmentPagerAdapter;
 
 /**
  * A simple {@link Fragment} subclass.

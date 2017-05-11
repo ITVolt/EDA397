@@ -1,26 +1,19 @@
-package se.chalmers.justintime;
+package se.chalmers.justintime.gui;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import org.threeten.bp.LocalDateTime;
-
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
+import se.chalmers.justintime.util.DateFormatterUtil;
 import se.chalmers.justintime.R;
-import se.chalmers.justintime.StatisticsBundle;
-import se.chalmers.justintime.fragments.ListStatisticsFragment;
-
-import static se.chalmers.justintime.R.color.colorPrimaryDark;
+import se.chalmers.justintime.gui.fragments.ListStatisticsFragment;
 
 /**
  * Created by Patrik on 2017-04-18.
@@ -68,7 +61,7 @@ public class TagListAdapter extends BaseAdapter {
         tag.setText(entry.getKey());
 
         TextView time = (TextView) view.findViewById(R.id.time);
-        time.setText(DateFormatterUtil.formatTime(entry.getValue()));
+        time.setText(DateFormatterUtil.formatMillisecondsToShortTimeString(entry.getValue()));
 
         if (listStatisticsFragment.isTagSelected(entry.getKey())) {
             time.setTextColor(ContextCompat.getColor(context, R.color.small_text));
@@ -82,7 +75,7 @@ public class TagListAdapter extends BaseAdapter {
         return view;
     }
 
-//    private String formatTime(long time) {
+//    private String formatMillisecondsToShortTimeString(long time) {
 //        StringBuilder text = new StringBuilder();
 //        text.setLength(0);
 //

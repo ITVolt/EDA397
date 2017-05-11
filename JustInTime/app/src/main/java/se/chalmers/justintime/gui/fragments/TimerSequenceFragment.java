@@ -1,4 +1,4 @@
-package se.chalmers.justintime.fragments;
+package se.chalmers.justintime.gui.fragments;
 
 
 import android.os.Bundle;

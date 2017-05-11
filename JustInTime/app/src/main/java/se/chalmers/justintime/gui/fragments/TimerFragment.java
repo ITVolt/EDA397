@@ -1,4 +1,4 @@
-package se.chalmers.justintime.fragments;
+package se.chalmers.justintime.gui.fragments;
 
 
 import android.animation.Animator;
@@ -32,9 +32,10 @@ import java.util.regex.Pattern;
 
 import se.chalmers.justintime.Presenter;
 import se.chalmers.justintime.R;
-import se.chalmers.justintime.activities.CounterActivity;
+import se.chalmers.justintime.gui.activities.CounterActivity;
 import se.chalmers.justintime.alert.Alarm;
 import se.chalmers.justintime.alert.AlarmBuilder;
+import se.chalmers.justintime.gui.dialogs.TextEntryDialog;
 
 /**
  * This fragment shows a basic timer counting down from a time to zero.
@@ -55,8 +56,6 @@ public class TimerFragment extends Fragment implements CounterActivity {
     private TextView timerLabel;
     private TextView timerTagText;
     private TextView timerTagList;
-
-    private Button startPauseTimerButton;
 
     private ImageButton playPauseButton;
     private ImageButton resetButton;
@@ -100,106 +99,54 @@ public class TimerFragment extends Fragment implements CounterActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            isSequential = getArguments().getBoolean("isSequential");
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_timer, container, false);
 
-        isSequential = getArguments().getBoolean("isSequential");
-
+        playPauseButton = (ImageButton) view.findViewById(R.id.playPauseButton);
+        resetButton = (ImageButton) view.findViewById(R.id.resetButton);
         timerText = (EditText) view.findViewById(R.id.basicTimerTV);
-        timerText.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                timerText.setSelection(timerText.getText().length());
-            }
-        });
-
-
-        timerText.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_DEL) {
-                    timerText.setText(removeNumberFromTimerText());
-                    return true;
-
-                } else if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode != KeyEvent.KEYCODE_DEL && keyCode != KeyEvent.KEYCODE_ENTER) {
-                    timerText.setText(addNumberToTimerText(keyCode-7));
-                    timerText.setSelection(timerText.getText().length());
-                    return true;
-
-                } else if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                    long newTime = convertStringToMilliseconds(timerText.getText().toString());
-                    if (newTime == 0) {
-                        startPauseTimerButton.setEnabled(false);
-                    }else {
-                        startPauseTimerButton.setEnabled(true);
-                    }
-                    presenter.removeTimer(timerId);
-                    ArrayList<Long> durations = new ArrayList<Long>(2);
-                    durations.add(newTime);
-                    if(isSequential){
-                        durations.add(newTime * 2);
-                        nextTimerButton.setVisibility(View.VISIBLE);
-                        previewNextTimerText.setVisibility(View.VISIBLE);
-                    }
-                    timerId = presenter.newTimer(label,tags,durations);
-                    startValue = newTime;
-                    currentTimerValue = newTime;
-                    updateTimerText();
-                    setProgressBarValues();
-                    previewNextTimerText.setText(parseTime( startValue * 2));
-                    InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(timerText.getWindowToken(), 0);
-                    return true;
-
-                }
-                return false;
-
-            }
-        });
-
-        if (isSequential) {
-            this.label = "Sequential timer";
-        } else {
-            this.label = "Basic timer";
-        }
-        this.tags = new String[0];
-
-        playPauseButton = (ImageButton) view.findViewById(R.id.imageButton);
-        resetButton = (ImageButton) view.findViewById(R.id.imageButton2);
-        timerText = (EditText) view.findViewById(R.id.basicTimerTV);
-        startPauseTimerButton = (Button) view.findViewById(R.id.timerStartPauseButton);
         timerLabel = (TextView) view.findViewById(R.id.timerLabelTV);
         timerTagText = (TextView) view.findViewById(R.id.timerTagLabelTV);
         timerTagList = (TextView) view.findViewById(R.id.timerTagsTV);
         previewNextTimerText = (TextView) view.findViewById(R.id.previewTV);
         nextTimerButton = (ImageButton) view.findViewById(R.id.nextButton);
 
+        if (isSequential) {
+            this.label = "Sequential timer";
+        } else {
+            this.label = "Basic timer";
+            nextTimerButton.setVisibility(View.INVISIBLE);
+            previewNextTimerText.setVisibility(View.INVISIBLE);
+        }
         timerLabel.setText(label);
+
+        this.tags = new String[0];
         updateTagListText();
 
         setRunningState(isTimerRunning);
 
+        setupAlarm();
+
+        previewNextTimerText.setText("");//Set it invisible since no initial time set
+
+        setViewListeners();
+        progressBarCircle = (ProgressBar) view.findViewById(R.id.progressBarCircle);
+        disableResetButton();
+        return view;
+    }
+
+    private void setupAlarm() {
         AlarmBuilder ab = new AlarmBuilder(view.getContext());
         ab.setUseSound(true);
         ab.setUseVibration(true);
         alarm = ab.getAlarmInstance();
-
-        if (!isSequential) {
-            nextTimerButton.setVisibility(View.INVISIBLE);
-            previewNextTimerText.setVisibility(View.INVISIBLE);
-        }
-        previewNextTimerText.setText("");//Set it invisible since no initial time set
-
-        setButtonOnClickListeners();
-        progressBarCircle = (ProgressBar) view.findViewById(R.id.progressBarCircle);
-        disableResetButton();
-        return view;
     }
 
     public String removeNumberFromTimerText() {
@@ -352,7 +299,6 @@ public class TimerFragment extends Fragment implements CounterActivity {
             startValue = startValue * 2;
             setProgressBarValues();
         }else{
-            startPauseTimerButton.setText(R.string.timer_button_stop);
             disableStartPauseTimerButton();
             setRunningState(false);
         }
@@ -360,11 +306,9 @@ public class TimerFragment extends Fragment implements CounterActivity {
 
     private void setRunningState(boolean run) {
         if (run) {
-            startPauseTimerButton.setText(R.string.timer_button_pause);
             disableResetButton();
             isTimerRunning = true;
         } else {
-            startPauseTimerButton.setText(R.string.timer_button_start);
             enableResetButton();
             isTimerRunning = false;
         }
@@ -502,7 +446,7 @@ public class TimerFragment extends Fragment implements CounterActivity {
         builderInner.show();
     }
 
-    private void setButtonOnClickListeners() {
+    private void setViewListeners() {
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -558,6 +502,55 @@ public class TimerFragment extends Fragment implements CounterActivity {
                 previewNextTimerText.setText(parseTime( startValue + (60*1000)));
             }
         });
+        timerText.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                timerText.setSelection(timerText.getText().length());
+            }
+        });
+        timerText.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_DEL) {
+                    timerText.setText(removeNumberFromTimerText());
+                    return true;
+
+                } else if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode != KeyEvent.KEYCODE_DEL && keyCode != KeyEvent.KEYCODE_ENTER) {
+                    timerText.setText(addNumberToTimerText(keyCode-7));
+                    timerText.setSelection(timerText.getText().length());
+                    return true;
+
+                } else if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                    long newTime = convertStringToMilliseconds(timerText.getText().toString());
+                    if (newTime == 0) {
+                        playPauseButton.setEnabled(false);
+                    }else {
+                        playPauseButton.setEnabled(true);
+                    }
+                    presenter.removeTimer(timerId);
+                    ArrayList<Long> durations = new ArrayList<Long>(2);
+                    durations.add(newTime);
+                    if(isSequential){
+                        durations.add(newTime * 2);
+                        nextTimerButton.setVisibility(View.VISIBLE);
+                        previewNextTimerText.setVisibility(View.VISIBLE);
+                    }
+                    timerId = presenter.newTimer(label,tags,durations);
+                    startValue = newTime;
+                    currentTimerValue = newTime;
+                    updateTimerText();
+                    setProgressBarValues();
+                    previewNextTimerText.setText(parseTime( startValue * 2));
+                    InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(timerText.getWindowToken(), 0);
+                    return true;
+
+                }
+                return false;
+
+            }
+        });
     }
 
     private void enableResetButton() {
@@ -575,16 +568,16 @@ public class TimerFragment extends Fragment implements CounterActivity {
     }
 
     private void disableStartPauseTimerButton() {
-        startPauseTimerButton.setEnabled(false);
+        playPauseButton.setEnabled(false);
         Animator animator = AnimatorInflater.loadAnimator(view.getContext(), R.animator.fade_out);
-        animator.setTarget(startPauseTimerButton);
+        animator.setTarget(playPauseButton);
         animator.start();
     }
 
     private void enableStartPauseTimerButton() {
-        startPauseTimerButton.setEnabled(true);
+        playPauseButton.setEnabled(true);
         Animator animator = AnimatorInflater.loadAnimator(view.getContext(), R.animator.fade_in);
-        animator.setTarget(startPauseTimerButton);
+        animator.setTarget(playPauseButton);
         animator.start();
     }
 

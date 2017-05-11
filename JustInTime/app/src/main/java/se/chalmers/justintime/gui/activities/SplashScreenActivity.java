@@ -1,4 +1,4 @@
-package se.chalmers.justintime.activities;
+package se.chalmers.justintime.gui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;

@@ -1,4 +1,4 @@
-package se.chalmers.justintime.fragments;
+package se.chalmers.justintime.gui.fragments;
 
 import android.database.Cursor;
 import android.graphics.Typeface;
@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -21,14 +20,11 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
-import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.ViewPortHandler;
@@ -46,13 +42,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import se.chalmers.justintime.DateFormatterUtil;
+import se.chalmers.justintime.util.DateFormatterUtil;
 import se.chalmers.justintime.R;
 import se.chalmers.justintime.alert.SharedPreference;
 import se.chalmers.justintime.database.DatabaseHelper;
-import se.chalmers.justintime.TagListAdapter;
+import se.chalmers.justintime.gui.TagListAdapter;
 
-import static android.R.attr.data;
 import static android.content.ContentValues.TAG;
 
 public class ListStatisticsFragment extends Fragment {
@@ -254,7 +249,7 @@ public class ListStatisticsFragment extends Fragment {
 
             @Override
             public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
-                return "";//DateFormatterUtil.formatTime( (long) entry.getY());
+                return "";//DateFormatterUtil.formatMillisecondsToShortTimeString( (long) entry.getY());
             }
         };
 
@@ -386,7 +381,7 @@ public class ListStatisticsFragment extends Fragment {
             textView_1.setGravity(Gravity.START);
             tableRow.addView(textView_1);
 
-            String duration = " " + DateFormatterUtil.formatTime((Long)allTimes.get(i-1).second) + "";
+            String duration = " " + DateFormatterUtil.formatMillisecondsToShortTimeString((Long)allTimes.get(i-1).second) + "";
             textView_2.setText(duration);
             textView_2.setGravity(Gravity.END);
             tableRow.addView(textView_2);

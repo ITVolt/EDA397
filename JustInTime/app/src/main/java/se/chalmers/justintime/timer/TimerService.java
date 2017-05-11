@@ -19,7 +19,7 @@ import com.jakewharton.threetenabp.AndroidThreeTen;
 import java.util.ArrayList;
 
 import se.chalmers.justintime.R;
-import se.chalmers.justintime.activities.MainActivity;
+import se.chalmers.justintime.gui.activities.MainActivity;
 
 /**
  * Created by Nieo on 08/04/17.

@@ -10,7 +10,7 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import se.chalmers.justintime.R;
-import se.chalmers.justintime.activities.MainActivity;
+import se.chalmers.justintime.gui.activities.MainActivity;
 
 /**
  * Created by Abel Asefa on 4/11/2017.

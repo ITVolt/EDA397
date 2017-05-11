@@ -1,14 +1,15 @@
-package se.chalmers.justintime;
+package se.chalmers.justintime.gui;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import se.chalmers.justintime.fragments.ListStatisticsFragment;
-import se.chalmers.justintime.fragments.MonthStatisticsFragment;
-import se.chalmers.justintime.fragments.TempStatisticsFragment;
-import se.chalmers.justintime.fragments.WeekStatisticsFragment;
+import se.chalmers.justintime.R;
+import se.chalmers.justintime.gui.fragments.ListStatisticsFragment;
+import se.chalmers.justintime.gui.fragments.MonthStatisticsFragment;
+import se.chalmers.justintime.gui.fragments.TempStatisticsFragment;
+import se.chalmers.justintime.gui.fragments.WeekStatisticsFragment;
 
 /**
  * Handles the tabs in the statistics view.

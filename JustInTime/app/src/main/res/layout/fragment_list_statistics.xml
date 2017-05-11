@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimaryDark"
-        tools:context="se.chalmers.justintime.fragments.StatisticsFragment">
+        tools:context=".gui.fragments.StatisticsFragment">
 
 
         <Button

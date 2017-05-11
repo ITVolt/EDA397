@@ -1,4 +1,4 @@
-package se.chalmers.justintime.fragments;
+package se.chalmers.justintime.gui.fragments;
 
 
 import android.os.Bundle;
@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -18,17 +17,14 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-
-import org.threeten.bp.DayOfWeek;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import se.chalmers.justintime.R;
-import se.chalmers.justintime.StatisticsBundle;
+import se.chalmers.justintime.util.StatisticsBundle;
 import se.chalmers.justintime.database.TimerInfoBundle;
 
 /**

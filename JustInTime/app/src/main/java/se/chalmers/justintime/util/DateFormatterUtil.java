@@ -1,4 +1,4 @@
-package se.chalmers.justintime;
+package se.chalmers.justintime.util;
 
 import android.text.format.DateUtils;
 
@@ -7,7 +7,7 @@ import android.text.format.DateUtils;
  */
 
 public class DateFormatterUtil {
-    public static String formatTime(long time) {
+    public static String formatMillisecondsToShortTimeString(long time) {
         StringBuilder text = new StringBuilder();
         text.setLength(0);
 

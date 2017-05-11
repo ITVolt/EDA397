@@ -1,4 +1,4 @@
-package se.chalmers.justintime;
+package se.chalmers.justintime.util;
 
 import se.chalmers.justintime.database.TimerInfoBundle;
 import se.chalmers.justintime.database.TimerLogEntry;
