@@ -113,14 +113,14 @@ public class WeekListAdapter extends BaseAdapter {
         }
 
         if (tag1 != null) {
-            ((TextView) view.findViewById(R.id.weekTag1TV)).setText(tag1);
+            ((TextView) view.findViewById(R.id.weekTag1TV)).setText(shortenString(tag1));
             ((TextView) view.findViewById(R.id.weekTag1TimeTV)).setText(DateFormatterUtil.formatTime(tagDurations.get(tag1)));
         } else {
             ((TextView) view.findViewById(R.id.weekTag1TV)).setText("");
             ((TextView) view.findViewById(R.id.weekTag1TimeTV)).setText("");
         }
         if (tag2 != null) {
-            ((TextView) view.findViewById(R.id.weekTag2TV)).setText(tag2);
+            ((TextView) view.findViewById(R.id.weekTag2TV)).setText(shortenString(tag2));
             ((TextView) view.findViewById(R.id.weekTag2TimeTV)).setText(DateFormatterUtil.formatTime(tagDurations.get(tag2)));
         } else {
             ((TextView) view.findViewById(R.id.weekTag2TV)).setText("");
@@ -136,6 +136,14 @@ public class WeekListAdapter extends BaseAdapter {
         }
 
         return view;
+    }
+
+    private String shortenString(String str) {
+        if (str.length()>10) {
+            str = str.substring(0, 10);
+            str = str + "...";
+        }
+        return str;
     }
 
 //    private String formatTime(long time) {
