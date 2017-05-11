@@ -163,7 +163,11 @@ public class TimerFragment extends Fragment implements CounterActivity {
             }
         });
 
-        this.label = "Basic timer";
+        if (isSequential) {
+            this.label = "Sequential timer";
+        } else {
+            this.label = "Basic timer";
+        }
         this.tags = new String[0];
 
         playPauseButton = (ImageButton) view.findViewById(R.id.imageButton);
