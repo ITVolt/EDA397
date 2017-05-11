@@ -35,7 +35,6 @@ import se.chalmers.justintime.R;
 import se.chalmers.justintime.gui.activities.CounterActivity;
 import se.chalmers.justintime.alert.Alarm;
 import se.chalmers.justintime.alert.AlarmBuilder;
-import se.chalmers.justintime.gui.dialogs.TextEntryDialog;
 
 /**
  * This fragment shows a basic timer counting down from a time to zero.
