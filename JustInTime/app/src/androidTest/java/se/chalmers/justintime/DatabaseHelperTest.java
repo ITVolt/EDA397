@@ -254,7 +254,7 @@ public class DatabaseHelperTest {
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Studies"});
-        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(10), 1400000);
+        entry = new TimerLogEntry(id, LocalDateTime.now().minusDays(10), 140000);
         databaseHelper.insertTimerData(entry);
 
         id = databaseHelper.insertTimer("Timer A", new String[]{"Studies"});

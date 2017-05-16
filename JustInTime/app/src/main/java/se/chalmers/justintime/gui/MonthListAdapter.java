@@ -99,15 +99,19 @@ public class MonthListAdapter extends BaseAdapter {
             }
         }
         String tag1 = null, tag2 = null;
-        long highest = 0;
+        long first = 0, second = 0;
         for (String tag : tagDurations.keySet()) {
             duration = tagDurations.get(tag);
-            if (duration > highest) {
-                highest = duration;
+            if (duration > first) {
                 if (tag1 != null) {
                     tag2 = tag1;
+                    second = first;
                 }
                 tag1 = tag;
+                first = duration;
+            } else if (duration > second) {
+                tag2 = tag;
+                second = duration;
             }
         }
 
@@ -126,9 +130,11 @@ public class MonthListAdapter extends BaseAdapter {
             ((TextView) view.findViewById(R.id.monthTag2TimeTV)).setText("");
         }
         if (tagDurations.size()>2) {
+            long otherTotal = month.getTotalDuration();
+            otherTotal -= (tagDurations.get(tag1)!=null) ? tagDurations.get(tag1) : 0;
+            otherTotal -= (tagDurations.get(tag2)!=null) ? tagDurations.get(tag2) : 0;
             ((TextView) view.findViewById(R.id.monthTagOthersTV)).setText(R.string.others);
-            ((TextView) view.findViewById(R.id.monthTagOthersTimeTV)).setText(DateFormatterUtil.formatMillisecondsToShortTimeString(
-                    month.getTotalDuration() - tagDurations.get(tag1) - tagDurations.get(tag2)));
+            ((TextView) view.findViewById(R.id.monthTagOthersTimeTV)).setText(DateFormatterUtil.formatMillisecondsToShortTimeString(otherTotal));
         } else {
             ((TextView) view.findViewById(R.id.monthTagOthersTV)).setText("");
             ((TextView) view.findViewById(R.id.monthTagOthersTimeTV)).setText("");
